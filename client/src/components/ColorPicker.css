@@ -1,0 +1,86 @@
+.color-picker-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .color-buttons {
+      display: flex;
+      flex-wrap: wrap;       
+      align-items: center;
+      margin-bottom: 10px;
+      width: 350px;          
+      justify-content: center;
+      row-gap: 10px; 
+  }
+  
+  .color-buttons > button,
+  .color-buttons .brush-size-button {
+    margin: 0 5px;
+    padding: 10px; 
+    width: 40px;   
+    height: 40px; 
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: opacity 0.3s, transform 0.1s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .color-buttons > button:hover,
+  .color-buttons .brush-size-button:hover {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+  
+  .color-buttons .clear-button {
+    background-color: transparent;
+    padding: 5px;
+  }
+  
+  .brush-size-dropdown {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  
+  .brush-size-button {
+    background: none;
+  }
+  
+  .brush-size-list {
+    position: absolute;
+    bottom: 100%; 
+    left: 0;
+    transform: translateY(-10px);
+    background-color: #fff;
+    box-shadow: 0px -8px 16px 0px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .brush-size-option {
+    display: block;
+    width: 100%;
+    margin: 0;
+    padding: 10px 15px;
+    text-align: center;
+    border: none;
+    background: none;
+    cursor: pointer;
+    background-color: #fff;
+    color: #000;
+    font-size: 15px;
+  }
+  
+  .brush-size-option:hover {
+    background-color: #f1f1f1;
+  }
+  
+  .color-picker-container {
+    overflow: visible;
+  }
+  

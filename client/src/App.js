@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import SockJS from 'sockjs-client';
 import { Client } from '@stomp/stompjs';
-import logo from './logo.svg';
+import DrawingArea from './components/DrawingArea';
 import './App.css';
 
 function App() {
@@ -38,8 +38,12 @@ function App() {
 
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
+      <h1>What's Being Drawn?</h1>
+      <div className="GameArea">
+        <DrawingArea
+        userID={1}
+        isDrawingAllowed={true}
+        />
         <input
           value={input}
           onChange={(e) => setInput(e.target.value)}
@@ -51,7 +55,7 @@ function App() {
             <p key={idx}>{msg}</p>
           ))}
         </div>
-      </header>
+      </div>
     </div>
   );
 }
