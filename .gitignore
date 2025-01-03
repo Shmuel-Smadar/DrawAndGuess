@@ -17,6 +17,7 @@
 
 # dependencies
 /client/node_modules
+/.idea/.gitignore
 /.pnp
 .pnp.js
 
