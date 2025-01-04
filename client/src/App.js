@@ -2,13 +2,14 @@ import React, { useEffect, useState } from 'react'
 import SockJS from 'sockjs-client'
 import { Client } from '@stomp/stompjs'
 import DrawingArea from './components/DrawingArea'
-import NicknamePrompt from './components/NicknamePrompt';
+import NicknamePrompt from './components/NicknamePrompt'
 import './App.css'
 
 function App() {
   const [client, setClient] = useState(null)
   const [connected, setConnected] = useState(false)
-  const [username, setUsername] = useState('');
+  const [username, setUsername] = useState('')
+  const [nicknameError, setNicknameError] = useState('')
 
   useEffect(() => {
     const stompClient = new Client({
@@ -34,9 +35,8 @@ function App() {
   }, [])
 
   if (!username) {
-    return <NicknamePrompt setUsername={setUsername} />;
+    return <NicknamePrompt client={client} connected={connected} setUsername={setUsername} setNicknameError={setNicknameError} error={nicknameError} />
   }
-
 
   return (
     <div className="app">
