@@ -10,7 +10,6 @@ import org.springframework.stereotype.Controller;
 @Controller
 public class DrawingController {
 
-    // Called when the client starts drawing
     @MessageMapping("/startDrawing")
     @SendTo("/topic/drawing")
     public DrawMessage startDrawing(DrawMessage message) {
@@ -18,7 +17,6 @@ public class DrawingController {
         return message;
     }
 
-    // Called repeatedly as the user drags the mouse or finger
     @MessageMapping("/draw")
     @SendTo("/topic/drawing")
     public DrawMessage draw(DrawMessage message) {
@@ -26,7 +24,6 @@ public class DrawingController {
         return message;
     }
 
-    // Called when the client stops drawing
     @MessageMapping("/stopDrawing")
     @SendTo("/topic/drawing")
     public DrawMessage stopDrawing(DrawMessage message) {

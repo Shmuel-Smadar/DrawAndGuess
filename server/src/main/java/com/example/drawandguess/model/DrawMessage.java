@@ -1,6 +1,6 @@
 package com.example.drawandguess.model;
 
-public // A simple POJO for drawing data
+public
 class DrawMessage {
     private double normX;
     private double normY;
@@ -10,8 +10,6 @@ class DrawMessage {
     private String eventType; // e.g. "START", "DRAW", "STOP"
 
     public DrawMessage() {}
-
-    // Getters and setters for all fields
 
     public double getNormX() { return normX; }
     public void setNormX(double normX) { this.normX = normX; }

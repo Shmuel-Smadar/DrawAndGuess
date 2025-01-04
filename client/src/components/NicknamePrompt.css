@@ -1,0 +1,80 @@
+.nickname-prompt {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; 
+  }
+  
+  .nickname-prompt form {
+    background-color: #ffffff;
+    padding: 40px 30px;
+    border-radius: 10px;
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  }
+  
+  .nickname-prompt h2 {
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: #333;
+    margin-top: -10px;
+  }
+  
+  .nickname-prompt input {
+    width: 80%;
+    padding: 10px;
+    margin-bottom: 20px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  .nickname-prompt input:focus {
+    outline: none;
+    border-color: #6200ea;
+    box-shadow: 0 0 5px rgba(98, 0, 234, 0.5);
+  }
+  
+  .nickname-prompt button {
+    padding: 12px 30px;
+    font-size: 16px;
+    background-color: #6200ea;
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .nickname-prompt button:hover {
+    background-color: #3700b3;
+  }
+  
+  .nickname-prompt button:active {
+    background-color: #290e9e;
+  }
+  
+  
+  @media (max-width: 480px) {
+    .nickname-prompt form {
+      padding: 30px 20px;
+    }
+  
+    .nickname-prompt h2 {
+      font-size: 20px;
+      
+    }
+  
+    .nickname-prompt input,
+    .nickname-prompt button {
+      font-size: 14px;
+    }
+  }
+  
