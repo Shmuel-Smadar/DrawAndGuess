@@ -1,63 +1,50 @@
-import { useEffect, useState } from 'react';
-import SockJS from 'sockjs-client';
-import { Client } from '@stomp/stompjs';
-import DrawingArea from './components/DrawingArea';
-import './App.css';
+import React, { useEffect, useState } from 'react'
+import SockJS from 'sockjs-client'
+import { Client } from '@stomp/stompjs'
+import DrawingArea from './components/DrawingArea'
+import './App.css'
 
 function App() {
-  const [client, setClient] = useState(null);
-  const [messages, setMessages] = useState([]);
-  const [input, setInput] = useState('');
+  const [client, setClient] = useState(null)
+  const [connected, setConnected] = useState(false)
 
   useEffect(() => {
     const stompClient = new Client({
-      brokerURL: 'ws://localhost:8080/example', // Use WebSocket endpoint
-      webSocketFactory: () => new SockJS('http://localhost:8080/example'),
+      brokerURL: 'ws://localhost:8080/draw-and-guess',
+      webSocketFactory: () => new SockJS('http://localhost:8080/draw-and-guess'),
       debug: (str) => console.log(str),
       onConnect: () => {
-        console.log('Connected to STOMP');
-        stompClient.subscribe('/topic/messages', (msg) => {
-          setMessages((prev) => [...prev, msg.body]);
-        });
+        console.log('Connected to STOMP')
+        setConnected(true)
       },
-      onDisconnect: () => console.log('Disconnected from STOMP'),
-    });
+      onDisconnect: () => {
+        console.log('Disconnected from STOMP')
+        setConnected(false)
+      },
+    })
 
-    stompClient.activate();
-    setClient(stompClient);
+    stompClient.activate()
+    setClient(stompClient)
 
-    return () => stompClient.deactivate();
-  }, []);
-
-  const sendMessage = () => {
-    if (client && input.trim()) {
-      client.publish({ destination: '/app/sendMessage', body: input });
-      setInput('');
+    return () => {
+      stompClient.deactivate()
     }
-  };
+  }, [])
 
   return (
-    <div className="App">
+    <div className="app">
       <h1>What's Being Drawn?</h1>
-      <div className="GameArea">
-        <DrawingArea
-        userID={1}
-        isDrawingAllowed={true}
-        />
-        <input
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Type message..."
-        />
-        <button onClick={sendMessage}>Send</button>
-        <div>
-          {messages.map((msg, idx) => (
-            <p key={idx}>{msg}</p>
-          ))}
-        </div>
+      <div className="gameArea">
+        {connected && client && (
+          <DrawingArea
+            client={client}
+            userID={Date.now()}
+            isDrawingAllowed={true}
+          />
+        )}
       </div>
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
