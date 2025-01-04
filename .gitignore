@@ -5,6 +5,7 @@
 !*/
 
 # Allow specific extentions
+!*.jsx
 !*.js
 !*.css
 !*.java
