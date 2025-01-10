@@ -3,6 +3,7 @@ import SockJS from 'sockjs-client'
 import { Client } from '@stomp/stompjs'
 import DrawingArea from './components/DrawingArea'
 import NicknamePrompt from './components/NicknamePrompt'
+import RoomPrompt from './components/RoomPrompt'
 import './App.css'
 
 function App() {
@@ -10,6 +11,8 @@ function App() {
   const [connected, setConnected] = useState(false)
   const [username, setUsername] = useState('')
   const [nicknameError, setNicknameError] = useState('')
+  const [room, setRoom] = useState(null)
+  const [rooms, setRooms] = useState([])
 
   useEffect(() => {
     const stompClient = new Client({
@@ -18,6 +21,23 @@ function App() {
       debug: (str) => console.log(str),
       onConnect: () => {
         console.log('Connected to STOMP')
+        stompClient.subscribe('/user/topic/nickname', (message) => {
+          const data = JSON.parse(message.body)
+          if (data.success) {
+            setUsername(data.message)
+            setNicknameError('')
+          } else {
+            setNicknameError(data.message)
+          }
+        })
+        stompClient.subscribe('/topic/rooms', (message) => {
+          const data = JSON.parse(message.body)
+          setRooms(data)
+        })
+        stompClient.publish({
+          destination: '/app/getRooms',
+          body: '',
+        })
         setConnected(true)
       },
       onDisconnect: () => {
@@ -38,6 +58,10 @@ function App() {
     return <NicknamePrompt client={client} connected={connected} setUsername={setUsername} setNicknameError={setNicknameError} error={nicknameError} />
   }
 
+  if (!room) {
+    return <RoomPrompt client={client} connected={connected} rooms={rooms} setRoom={setRoom} />
+  }
+
   return (
     <div className="app">
       <h1>What's Being Drawn?</h1>
@@ -46,6 +70,7 @@ function App() {
           <DrawingArea
             client={client}
             userID={username}
+            roomId={room.roomId}
             isDrawingAllowed={true}
           />
         )}

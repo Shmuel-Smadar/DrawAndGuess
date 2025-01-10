@@ -6,7 +6,7 @@ const VIRTUAL_WIDTH = 10
 const VIRTUAL_HEIGHT = 16
 const ASPECT_RATIO = VIRTUAL_WIDTH / VIRTUAL_HEIGHT
 
-const Canvas = ({ client, color, userID, isDrawingAllowed, brushSize }) => {
+const Canvas = ({ client, color, userID, roomId, isDrawingAllowed, brushSize }) => {
   const canvasRef = useRef(null)
   const lastPositions = useRef({})
   const [isDrawing, setIsDrawing] = useState(false)
@@ -61,7 +61,7 @@ const Canvas = ({ client, color, userID, isDrawingAllowed, brushSize }) => {
 
   useEffect(() => {
     if (!client) return
-    const subscription = client.subscribe('/topic/drawing', (msg) => {
+    const subscription = client.subscribe(`/topic/room/${roomId}/drawing`, (msg) => {
       const data = JSON.parse(msg.body)
       if (data.userID === String(userID)) return
       const canvas = canvasRef.current
@@ -94,12 +94,11 @@ const Canvas = ({ client, color, userID, isDrawingAllowed, brushSize }) => {
       }
     })
     return () => subscription.unsubscribe()
-  }, [client, userID])
+  }, [client, userID, roomId])
 
   useEffect(() => {
     if (!client || !client.connected) return
-    const clearSubscription = client.subscribe('/topic/clearCanvas', (msg) => {
-      const data = JSON.parse(msg.body)
+    const clearSubscription = client.subscribe(`/topic/room/${roomId}/clearCanvas`, (msg) => {
       const canvas = canvasRef.current
       if (canvas) {
         const ctx = canvas.getContext('2d')
@@ -107,8 +106,7 @@ const Canvas = ({ client, color, userID, isDrawingAllowed, brushSize }) => {
       }
     })
     return () => clearSubscription.unsubscribe()
-  }, [client, client?.connected])
-
+  }, [client, roomId])
 
   const startDrawing = (event) => {
     event.preventDefault()
@@ -129,8 +127,9 @@ const Canvas = ({ client, color, userID, isDrawingAllowed, brushSize }) => {
       color,
       brushSize,
       userID: String(userID),
+      eventType: 'START'
     }
-    client.publish({ destination: '/app/startDrawing', body: JSON.stringify(message) })
+    client.publish({ destination: `/app/room/${roomId}/startDrawing`, body: JSON.stringify(message) })
   }
 
   const draw = (event) => {
@@ -149,8 +148,9 @@ const Canvas = ({ client, color, userID, isDrawingAllowed, brushSize }) => {
       normY,
       brushSize,
       userID: String(userID),
+      eventType: 'DRAW'
     }
-    client.publish({ destination: '/app/draw', body: JSON.stringify(message) })
+    client.publish({ destination: `/app/room/${roomId}/draw`, body: JSON.stringify(message) })
   }
 
   const stopDrawing = (event) => {
@@ -158,8 +158,8 @@ const Canvas = ({ client, color, userID, isDrawingAllowed, brushSize }) => {
     if (!isDrawingAllowed || !client) return
     setIsDrawing(false)
     delete lastPositions.current[userID]
-    const message = { userID: String(userID) }
-    client.publish({ destination: '/app/stopDrawing', body: JSON.stringify(message) })
+    const message = { userID: String(userID), eventType: 'STOP' }
+    client.publish({ destination: `/app/room/${roomId}/stopDrawing`, body: JSON.stringify(message) })
   }
 
   return (

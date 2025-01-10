@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import ClearIcon from '../assets/trash-bin.png'
 import BrushIcon from '../assets/paint-brush.png'
 import './ColorPicker.css'
-
 const colors = [
   { name: '', code: '#000000' },
   { name: '', code: '#FF0000' },
@@ -24,31 +23,27 @@ const brushSizes = [
   { name: 'L', size: 10 },
 ]
 
-const ColorPicker = ({ client, setColor, userID, isDrawingAllowed, setBrushSize }) => {
+const ColorPicker = ({ client, setColor, userID, roomId, isDrawingAllowed, setBrushSize }) => {
   const [showSizeList, setShowSizeList] = useState(false)
 
   const handleClearCanvas = () => {
-    if (!client || !client.connected) return
-    const message = { userID: String(userID) }
-    client.publish({ destination: '/app/clearCanvas', body: JSON.stringify(message) })
+    if (!client || !client.connected || !roomId) return
+    const message = { userID }
+    client.publish({
+      destination: `/app/room/${roomId}/clearCanvas`,
+      body: JSON.stringify(message),
+    })
   }
 
   return (
     <div className="color-picker-container">
       {isDrawingAllowed && (
         <div className="color-buttons">
-          <button
-            onClick={handleClearCanvas}
-            className="clear-button"
-            aria-label="Clear Canvas"
-          >
+          <button onClick={handleClearCanvas} className="clear-button" aria-label="Clear Canvas">
             <img src={ClearIcon} alt="Clear Canvas" className="button-icon" />
           </button>
           <div className="brush-size-dropdown">
-            <button
-              onClick={() => setShowSizeList(!showSizeList)}
-              className="brush-size-button"
-            >
+            <button onClick={() => setShowSizeList(!showSizeList)} className="brush-size-button">
               <img src={BrushIcon} alt="Brush Size" className="button-icon" />
             </button>
             {showSizeList && (
