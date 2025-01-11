@@ -13,7 +13,7 @@ public class NicknameRegistration {
         if (isNicknameTaken(nickname)) {
             return new NicknameStatus(false, "Nickname is already taken");
         }
-        // Otherwise store it
+        // otherwise store it
         sessionToNickname.put(sessionId, nickname);
         System.out.println("Registered\n");
         return new NicknameStatus(true, "Nickname registered successfully");

@@ -10,8 +10,12 @@ import org.springframework.stereotype.Controller;
 @Controller
 public class DrawingController {
 
+    private final SimpMessagingTemplate messagingTemplate;
+
     @Autowired
-    private SimpMessagingTemplate messagingTemplate;
+    public DrawingController(SimpMessagingTemplate messagingTemplate) {
+        this.messagingTemplate = messagingTemplate;
+    }
 
     @MessageMapping("/room/{roomId}/startDrawing")
     public void startDrawing(@DestinationVariable String roomId, DrawMessage message) {

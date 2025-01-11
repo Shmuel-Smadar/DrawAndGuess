@@ -14,7 +14,7 @@ const NicknamePrompt = ({ client, connected, setUsername, setNicknameError, erro
           setUsername(currentNickname.current)
           setNicknameError('')
         } else {
-          setNicknameError(data.message) // Display the error
+          setNicknameError(data.message)
         }
       })
       return () => subscription.unsubscribe()

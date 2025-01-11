@@ -16,17 +16,17 @@
   .chat-header {
     background-color: #6200ea;
     color: white;
-    padding: 10px 0; /* Added vertical padding for better aesthetics */
+    padding: 10px 0;
     text-align: center;
     flex-shrink: 0;
   }
   
   .chat-window {
-    flex-grow: 1; /* Grow to fill available space */
+    flex-grow: 1;
     background-color: #f9f9f9;
-    overflow-y: auto; /* Enable vertical scrolling */
-    overflow-x: hidden; /* Hide horizontal scrollbar */
-    padding: 10px; /* Optional: Add padding if needed */
+    overflow-y: auto; 
+    overflow-x: hidden; 
+    padding: 10px; 
     max-height: calc(0.745 * 100vh);
     position: relative;
   }
@@ -36,7 +36,7 @@
     display: flex;
     padding: 10px;
     background-color: #eee;
-    flex-shrink: 0; /* Keep input at natural height */
+    flex-shrink: 0;
   }
   .chat-message {
     margin-bottom: 10px;
@@ -44,16 +44,11 @@
     background-color: #ffffff;
     border-radius: 5px;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-    word-wrap: break-word; /* Break long words */
+    word-wrap: break-word;
   }
   
-  /* Styling for user messages */
   .user-message .chat-sender {
     font-weight: bold;
-  }
-  
-  .user-message .chat-text {
-    /* Regular styling */
   }
   
   /* Styling for system messages */
@@ -94,11 +89,10 @@
     background-color: #3700b3;
   }
   
-  /* Scroll to Bottom Button */
   .scroll-button {
     position: absolute;
-    bottom: 70px; /* Adjust this value as needed */
-    right: 10px;   /* Adjust this value as needed */
+    bottom: 70px; 
+    right: 10px;   
     background-color: #6200ea;
     color: white;
     border: none;
@@ -111,18 +105,17 @@
     gap: 5px;
     transition: opacity 0.3s ease, transform 0.3s ease;
     opacity: 0.9;
-    z-index: 1; /* Ensure the button stays on top */
+    z-index: 1; 
   }
   
   .scroll-button:hover {
-    background-color: #3700b3; /* Darker shade on hover */
+    background-color: #3700b3;
   }
   
   .scroll-button:active {
     transform: scale(0.95);
   }
   
-  /* Responsive design for smaller screens */
   @media screen and (max-width: 768px) {
     .app1 {
       flex-direction: column;
@@ -136,7 +129,7 @@
     }
   
     .scroll-button {
-      bottom: 100px; /* Adjust if necessary */
+      bottom: 100px;
       right: 10px;
       padding: 6px 10px;
       font-size: 14px;
