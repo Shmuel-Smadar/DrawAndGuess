@@ -60,10 +60,10 @@ const Canvas = ({ client, color, userID, roomId, isDrawingAllowed, brushSize }) 
   }, [brushSize])
 
   useEffect(() => {
-     if (!client || !client.connected || !roomId) return;
+    if (!client || !client.connected) return
     const subscription = client.subscribe(`/topic/room/${roomId}/drawing`, (msg) => {
       const data = JSON.parse(msg.body)
-      if (data.userID === String(userID)) return
+      
       const canvas = canvasRef.current
       if (!canvas) return
       const ctx = canvas.getContext('2d')
@@ -94,7 +94,7 @@ const Canvas = ({ client, color, userID, roomId, isDrawingAllowed, brushSize }) 
       }
     })
     return () => subscription.unsubscribe()
-  }, [client, userID, roomId])
+  }, [client, roomId])
 
   useEffect(() => {
     if (!client || !client.connected) return

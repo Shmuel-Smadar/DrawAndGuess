@@ -9,11 +9,12 @@ const NicknamePrompt = ({ client, connected, setUsername, setNicknameError, erro
     if (client && connected) {
       const subscription = client.subscribe('/user/topic/nickname', (message) => {
         const data = JSON.parse(message.body)
+        console.log('Received nickname data:', data)
         if (data.success) {
           setUsername(currentNickname.current)
           setNicknameError('')
         } else {
-          setNicknameError(data.message) //TODO: display the error
+          setNicknameError(data.message) // Display the error
         }
       })
       return () => subscription.unsubscribe()
@@ -22,9 +23,10 @@ const NicknamePrompt = ({ client, connected, setUsername, setNicknameError, erro
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    if (nicknameInput.trim() !== '' && client && connected) {
-      currentNickname.current = nicknameInput.trim()
-      const registrationMessage = { nickname: nicknameInput.trim() }
+    const trimmedNickname = nicknameInput.trim()
+    if (trimmedNickname !== '' && client && connected) {
+      currentNickname.current = trimmedNickname
+      const registrationMessage = { nickname: trimmedNickname }
       client.publish({
         destination: '/app/registerNickname',
         body: JSON.stringify(registrationMessage),
@@ -44,6 +46,7 @@ const NicknamePrompt = ({ client, connected, setUsername, setNicknameError, erro
           maxLength={20}
         />
         <button type="submit">Join</button>
+        {error && <p className="error-message">{error}</p>}
       </form>
     </div>
   )
