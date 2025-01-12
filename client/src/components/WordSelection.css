@@ -1,0 +1,61 @@
+.word-selection-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1001; 
+  }
+  
+  .word-selection-container {
+    background-color: #fff;
+    padding: 40px 30px;
+    border-radius: 10px;
+    text-align: center;
+    max-width: 500px;
+    width: 90%;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  }
+  
+  .word-selection-title {
+    font-size: 28px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 30px;
+  }
+  
+  .word-selection-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .word-button {
+    background-color: #ff6f61;
+    color: #fff;
+    border: none;
+    padding: 15px 25px;
+    font-size: 18px;
+    font-weight: 500;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .word-button:hover {
+    background-color: #ff3b2f;
+  }
+  
+  .word-button:active {
+    background-color: #e63229;
+  }
+  
+  .word-button:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(255, 111, 97, 0.5);
+  }
+  

@@ -1,24 +1,32 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './ParticipantsList.css';
 
-const ParticipantsList = ({client,  height, roomId, username }) => {
+const ParticipantsList = ({ client, height, roomId, username, onDrawerChange }) => {
   const [userList, setUserList] = useState([]);
   const participantsWindowRef = useRef(null);
 
   useEffect(() => {
     if (!client || !roomId) return;
 
+    // Subscribe to the participants list
     const subscription = client.subscribe(`/topic/room/${roomId}/participants`, (message) => {
       const participants = JSON.parse(message.body);
       setUserList(participants);
+
+      // Find the current user in the list of participants
+      const me = participants.find((p) => p.username === username);
+      if (me && me.isDrawer) {
+        // Notify the parent of the change
+        onDrawerChange(true);
+      } else {
+        onDrawerChange(false);
+      }
     });
 
     return () => {
-      if (subscription) {
-        subscription.unsubscribe();
-      }
+      subscription.unsubscribe();
     };
-  }, [client, roomId]);
+  }, [client, roomId, username, onDrawerChange]);
 
   return (
     <div className="participants-container" style={{ height: `${height}px` }}>

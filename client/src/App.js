@@ -4,14 +4,21 @@ import DrawingArea from './components/DrawingArea'
 import NicknamePrompt from './components/NicknamePrompt'
 import RoomPrompt from './components/RoomPrompt'
 import RightSidebar from './components/RightSidebar'
-import './App.css'
+import WordSelection from './components/WordSelection'
+import './App.css';
 
 function App() {
   const [username, setUsername] = useState('')
   const [nicknameError, setNicknameError] = useState('')
   const [room, setRoom] = useState(null)
   const [rooms, setRooms] = useState([])
-  const { client, connected } = useStompClient('http://localhost:8080/draw-and-guess')
+  const { client, connected } = useStompClient('http://localhost:8080/draw-and-guess');
+  // Game logic
+  const [isDrawer, setIsDrawer] = useState(false)
+  const [showWordSelection, setShowWordSelection] = useState(false)
+  const [wordOptions, setWordOptions] = useState([])
+
+  
 
   useEffect(() => {
     if (!client || !connected) return
@@ -25,8 +32,45 @@ function App() {
     })
     return () => {
       subscription.unsubscribe()
-    }
+    };
   }, [client, connected])
+
+  const handleDrawerChange = (drawerState) => {
+    if(isDrawer !== drawerState) { // Check if there was a change in who's the drawer
+    setIsDrawer(drawerState);
+    if (drawerState) {
+      requestWordOptions();
+    }
+  }
+  };
+
+  const requestWordOptions = () => {
+    
+    if (!client || !connected || !room) return;
+    client.publish({
+      destination: `/app/room/${room.roomId}/requestWords`,
+      body: '',
+    });
+  };
+
+  useEffect(() => {
+    if (!client || !connected) return;
+    const sub = client.subscribe('/user/topic/wordOptions', (msg) => {
+      const data = JSON.parse(msg.body);
+      setWordOptions([data.word1, data.word2, data.word3]);
+      setShowWordSelection(true);
+    });
+    return () => sub.unsubscribe();
+  }, [client, connected]);
+
+  const handleWordSelect = (selectedWord) => {
+    if (!client || !connected || !room) return;
+    client.publish({
+      destination: `/app/room/${room.roomId}/chooseWord`,
+      body: selectedWord,
+    });
+    setShowWordSelection(false);
+  };
 
   if (!username) {
     return (
@@ -37,11 +81,18 @@ function App() {
         setNicknameError={setNicknameError}
         error={nicknameError}
       />
-    )
+    );
   }
 
   if (!room) {
-    return <RoomPrompt client={client} connected={connected} rooms={rooms} setRoom={setRoom} />
+    return (
+      <RoomPrompt
+        client={client}
+        connected={connected}
+        rooms={rooms}
+        setRoom={setRoom}
+      />
+    );
   }
 
   return (
@@ -63,10 +114,17 @@ function App() {
           canChat={true}
           width={window.innerWidth * 0.9}
           height={window.innerHeight * 0.83}
+          onDrawerChange={handleDrawerChange}
         />
       </div>
+      {isDrawer && showWordSelection && (
+        <WordSelection
+          words={wordOptions}
+          onWordSelect={handleWordSelect}
+        />
+      )}
     </div>
-  )
+  );
 }
 
-export default App
+export default App;

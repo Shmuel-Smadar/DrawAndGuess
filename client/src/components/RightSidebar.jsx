@@ -1,9 +1,18 @@
+
 import React from 'react';
 import Chat from './Chat';
 import ParticipantsList from './ParticipantsList';
 import './RightSidebar.css';
 
-const RightSidebar = ({ client, roomId, username, canChat, width, height }) => {
+const RightSidebar = ({
+  client,
+  roomId,
+  username,
+  canChat,
+  width,
+  height,
+  onDrawerChange
+}) => {
   const chatHeight = height * 0.75;
   const participantsHeight = height * 0.25;
   return (
@@ -16,11 +25,12 @@ const RightSidebar = ({ client, roomId, username, canChat, width, height }) => {
         width={width}
         height={chatHeight}
       />
-       <ParticipantsList
+      <ParticipantsList
         client={client}
         height={participantsHeight}
         roomId={roomId}
         username={username}
+        onDrawerChange={onDrawerChange}
       />
     </div>
   );
