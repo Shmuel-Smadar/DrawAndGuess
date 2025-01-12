@@ -14,6 +14,8 @@ import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
 import java.util.Set;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.stream.Collectors;
 
 @Component
@@ -56,7 +58,6 @@ public class WebSocketEventListener {
 
                     messagingTemplate.convertAndSend("/topic/room/" + roomId + "/chat", joinMessage);
 
-                    // Update and broadcast participant list
                     broadcastParticipantList(roomId);
                 }
             }
@@ -88,16 +89,20 @@ public class WebSocketEventListener {
     }
 
     private void broadcastParticipantList(String roomId) {
-        Set<String> sessionIds = userRoomService.findSessionsByRoom(roomId);
-        List<Participant> participants = sessionIds.stream()
-                .map(sessionId -> {
-                    String username = nicknameRegistration.findNickname(sessionId);
-                    // Assuming you have a way to determine if a user is a drawer
-                    boolean isDrawer = false; // Implement logic to check if user is a drawer
-                    return new Participant(sessionId, username, isDrawer);
-                })
-                .collect(Collectors.toList());
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                Set<String> sessionIds = userRoomService.findSessionsByRoom(roomId);
+                List<Participant> participants = sessionIds.stream()
+                        .map(sessionId -> {
+                            String username = nicknameRegistration.findNickname(sessionId);
+                            boolean isDrawer = false; // TODO: Implement logic to check if user is a drawer
+                            return new Participant(sessionId, username, isDrawer);
+                        })
+                        .collect(Collectors.toList());
 
-        messagingTemplate.convertAndSend("/topic/room/" + roomId + "/participants", participants);
+                messagingTemplate.convertAndSend("/topic/room/" + roomId + "/participants", participants);
+            }
+        }, 100); // Delay of 100ms
     }
 }
