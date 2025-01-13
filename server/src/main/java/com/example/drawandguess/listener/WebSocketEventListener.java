@@ -1,65 +1,33 @@
+// src/main/java/com/example/drawandguess/listener/WebSocketEventListener.java
 package com.example.drawandguess.listener;
 
-import com.example.drawandguess.model.ChatMessage;
-import com.example.drawandguess.model.Participant;
-import com.example.drawandguess.service.NicknameRegistration;
-import com.example.drawandguess.service.UserRoomService;
+import com.example.drawandguess.service.RoomService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
-import java.util.Set;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.stream.Collectors;
-
 @Component
 public class WebSocketEventListener {
-
-    private final SimpMessagingTemplate messagingTemplate;
-    private final NicknameRegistration nicknameRegistration;
-    private final UserRoomService userRoomService;
+    private final RoomService roomService;
 
     @Autowired
-    public WebSocketEventListener(SimpMessagingTemplate messagingTemplate,
-                                  NicknameRegistration nicknameRegistration,
-                                  UserRoomService userRoomService) {
-        this.messagingTemplate = messagingTemplate;
-        this.nicknameRegistration = nicknameRegistration;
-        this.userRoomService = userRoomService;
+    public WebSocketEventListener(RoomService roomService) {
+        this.roomService = roomService;
     }
 
     @EventListener
     public void handleSessionSubscribe(SessionSubscribeEvent event) {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
         String destination = accessor.getDestination();
-
         if (destination != null && destination.startsWith("/topic/room/") && destination.endsWith("/chat")) {
             String[] parts = destination.split("/");
             if (parts.length >= 5) {
                 String roomId = parts[3];
                 String sessionId = accessor.getSessionId();
-                String nickname = nicknameRegistration.findNickname(sessionId);
-
-                if (nickname != null) {
-                    // Assign the room to the session
-                    userRoomService.assignRoomToSession(sessionId, roomId);
-
-                    // Send join message
-                    ChatMessage joinMessage = new ChatMessage();
-                    joinMessage.setSender("system");
-                    joinMessage.setText(nickname + " has joined the room.");
-                    joinMessage.setType("system");
-
-                    messagingTemplate.convertAndSend("/topic/room/" + roomId + "/chat", joinMessage);
-
-                    broadcastParticipantList(roomId);
-                }
+                roomService.handleSubscription(sessionId, roomId);
             }
         }
     }
@@ -68,41 +36,6 @@ public class WebSocketEventListener {
     public void handleSessionDisconnect(SessionDisconnectEvent event) {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
         String sessionId = accessor.getSessionId();
-        String nickname = nicknameRegistration.findNickname(sessionId);
-        String roomId = userRoomService.findRoomBySession(sessionId);
-
-        if (nickname != null && roomId != null) {
-            ChatMessage leaveMessage = new ChatMessage();
-            leaveMessage.setSender("system");
-            leaveMessage.setText(nickname + " has left the room.");
-            leaveMessage.setType("system");
-
-            messagingTemplate.convertAndSend("/topic/room/" + roomId + "/chat", leaveMessage);
-
-            // Remove user from room
-            userRoomService.removeSessionFromRoom(sessionId);
-            nicknameRegistration.removeNickname(sessionId);
-
-            // Update and broadcast participant list
-            broadcastParticipantList(roomId);
-        }
-    }
-
-    private void broadcastParticipantList(String roomId) {
-        new Timer().schedule(new TimerTask() {
-            @Override
-            public void run() {
-                Set<String> sessionIds = userRoomService.findSessionsByRoom(roomId);
-                List<Participant> participants = sessionIds.stream()
-                        .map(sessionId -> {
-                            String username = nicknameRegistration.findNickname(sessionId);
-                            boolean isDrawer = false; // TODO: Implement logic to check if user is a drawer
-                            return new Participant(sessionId, username, isDrawer);
-                        })
-                        .collect(Collectors.toList());
-
-                messagingTemplate.convertAndSend("/topic/room/" + roomId + "/participants", participants);
-            }
-        }, 100); // Delay of 100ms
+        roomService.handleDisconnect(sessionId);
     }
 }

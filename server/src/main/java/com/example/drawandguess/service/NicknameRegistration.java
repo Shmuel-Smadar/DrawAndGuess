@@ -1,3 +1,4 @@
+// src/main/java/com/example/drawandguess/service/NicknameRegistration.java
 package com.example.drawandguess.service;
 
 import org.springframework.stereotype.Service;
