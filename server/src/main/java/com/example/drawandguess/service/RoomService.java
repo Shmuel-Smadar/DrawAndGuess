@@ -1,4 +1,3 @@
-// src/main/java/com/example/drawandguess/service/RoomService.java
 package com.example.drawandguess.service;
 
 import com.example.drawandguess.model.ChatMessage;
@@ -33,6 +32,13 @@ public class RoomService {
 
     public void joinRoom(String sessionId, String roomId) {
         gameService.joinRoom(sessionId, roomId);
+        String nickname = nicknameRegistration.findNickname(sessionId);
+        ChatMessage m = new ChatMessage();
+        m.setSender("system");
+        m.setText(nickname + " has joined the room.");
+        m.setType("system");
+        chatService.sendChatMessage(roomId, m);
+        broadcastParticipants(roomId);
     }
 
     public void leaveRoom(String sessionId) {
@@ -49,17 +55,6 @@ public class RoomService {
                 }
             }
         }, 100);
-    }
-
-    public void handleSubscription(String sessionId, String roomId) {
-        joinRoom(sessionId, roomId);
-        String nickname = nicknameRegistration.findNickname(sessionId);
-        ChatMessage m = new ChatMessage();
-        m.setSender("system");
-        m.setText(nickname + " has joined the room.");
-        m.setType("system");
-        chatService.sendChatMessage(roomId, m);
-        broadcastParticipants(roomId);
     }
 
     public void handleDisconnect(String sessionId) {

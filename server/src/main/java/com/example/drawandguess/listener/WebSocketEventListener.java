@@ -1,4 +1,3 @@
-// src/main/java/com/example/drawandguess/listener/WebSocketEventListener.java
 package com.example.drawandguess.listener;
 
 import com.example.drawandguess.service.RoomService;
@@ -6,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Component;
-import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
 @Component
@@ -16,20 +14,6 @@ public class WebSocketEventListener {
     @Autowired
     public WebSocketEventListener(RoomService roomService) {
         this.roomService = roomService;
-    }
-
-    @EventListener
-    public void handleSessionSubscribe(SessionSubscribeEvent event) {
-        StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
-        String destination = accessor.getDestination();
-        if (destination != null && destination.startsWith("/topic/room/") && destination.endsWith("/chat")) {
-            String[] parts = destination.split("/");
-            if (parts.length >= 5) {
-                String roomId = parts[3];
-                String sessionId = accessor.getSessionId();
-                roomService.handleSubscription(sessionId, roomId);
-            }
-        }
     }
 
     @EventListener
