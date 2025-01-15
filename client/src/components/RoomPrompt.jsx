@@ -6,6 +6,12 @@ const RoomPrompt = ({ client, connected, rooms, setRoom }) => {
   const [error, setError] = useState('')
 
   const handleJoinRoom = (room) => {
+    if (client && connected) {
+      client.publish({
+        destination: '/app/joinRoom',
+        body: room.roomId,
+      })
+    }
     setRoom(room)
   }
 

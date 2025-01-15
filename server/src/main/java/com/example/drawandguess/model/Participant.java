@@ -1,8 +1,12 @@
 package com.example.drawandguess.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class Participant {
     private String socketID;
     private String username;
+
+    @JsonProperty("isDrawer")
     private boolean isDrawer;
 
     public Participant() {}
@@ -29,11 +33,13 @@ public class Participant {
         this.username = username;
     }
 
+    @JsonProperty("isDrawer")
     public boolean isDrawer() {
         return isDrawer;
     }
 
+    @JsonProperty("isDrawer")
     public void setDrawer(boolean drawer) {
-        isDrawer = drawer;
+        this.isDrawer = drawer;
     }
 }
