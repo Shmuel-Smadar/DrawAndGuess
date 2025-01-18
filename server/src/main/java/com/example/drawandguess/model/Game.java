@@ -5,104 +5,67 @@ import com.example.drawandguess.model.Participant;
 import com.example.drawandguess.model.WordOptions;
 
 public class Game {
-    private final String roomId;
-    private final String roomName;
-    private final List<Participant> participants = new ArrayList<>();
+    private final List<String> participantSessionIds = new ArrayList<>();
+    private int currentDrawerIndex = -1;
     private String chosenWord;
-    private int drawerIndex;
-    private final List<String> wordPool = Arrays.asList("Cat","Computer","Pizza","Bicycle","Tree","Car","House","Sun","Moon","Banana");
+    private final List<String> wordPool = List.of(
+            "Cat","Computer","Pizza","Bicycle","Tree","Car","House","Sun","Moon","Banana"
+    );
 
-    public Game(String roomId, String roomName) {
-        this.roomId = roomId;
-        this.roomName = roomName;
-    }
-
-    public String getRoomId() {
-        return roomId;
-    }
-
-    public String getRoomName() {
-        return roomName;
-    }
-
-    public void join(String sessionId, String nickname) {
-        if (nickname == null) {
-            nickname = "Player";
-        }
-        if (!hasSession(sessionId)) {
-            participants.add(new Participant(sessionId, nickname, false));
-        }
-        if (participants.size() == 1) {
-            participants.get(0).setDrawer(true);
+    public void addParticipant(String sessionId) {
+        if (!participantSessionIds.contains(sessionId)) {
+            participantSessionIds.add(sessionId);
+            if (currentDrawerIndex < 0) currentDrawerIndex = 0;
         }
     }
-
-    public void leave(String sessionId) {
-        Iterator<Participant> it = participants.iterator();
-        while (it.hasNext()) {
-            Participant p = it.next();
-            if (p.getSocketID().equals(sessionId)) {
-                it.remove();
-                break;
+    public void removeParticipant(String sessionId) {
+        int idx = participantSessionIds.indexOf(sessionId);
+        if (idx != -1) {
+            participantSessionIds.remove(idx);
+            if (idx == currentDrawerIndex) {
+                if (participantSessionIds.isEmpty()) {
+                    currentDrawerIndex = -1;
+                } else {
+                    currentDrawerIndex %= participantSessionIds.size();
+                }
+            } else if (idx < currentDrawerIndex) {
+                currentDrawerIndex--;
             }
         }
-        if (drawerIndex >= participants.size()) {
-            drawerIndex = 0;
-        }
-        if (!participants.isEmpty()) {
-            for (Participant p : participants) {
-                p.setDrawer(false);
-            }
-            participants.get(drawerIndex).setDrawer(true);
-        }
     }
-
-    public boolean hasSession(String sessionId) {
-        for (Participant p : participants) {
-            if (p.getSocketID().equals(sessionId)) {
-                return true;
-            }
+    public List<String> getParticipantSessionIds() {
+        return participantSessionIds;
+    }
+    public String getCurrentDrawer() {
+        if (currentDrawerIndex >= 0 && currentDrawerIndex < participantSessionIds.size()) {
+            return participantSessionIds.get(currentDrawerIndex);
         }
-        return false;
+        return null;
     }
-
-    public List<Participant> getParticipants() {
-        return participants;
-    }
-
     public boolean isDrawer(String sessionId) {
-        for (Participant p : participants) {
-            if (p.isDrawer() && p.getSocketID().equals(sessionId)) {
-                return true;
-            }
+        return sessionId.equals(getCurrentDrawer());
+    }
+    public void moveToNextDrawer() {
+        if (!participantSessionIds.isEmpty()) {
+            currentDrawerIndex = (currentDrawerIndex + 1) % participantSessionIds.size();
         }
-        return false;
     }
-
-    public WordOptions getRandomWords() {
-        Random r = new Random();
-        int i1 = r.nextInt(wordPool.size());
-        int i2 = r.nextInt(wordPool.size());
-        int i3 = r.nextInt(wordPool.size());
-        return new WordOptions(wordPool.get(i1), wordPool.get(i2), wordPool.get(i3));
+    public void setChosenWord(String chosenWord) {
+        this.chosenWord = chosenWord;
     }
-
-    public void setChosenWord(String w) {
-        chosenWord = w;
-    }
-
     public boolean isCorrectGuess(String guess) {
         return chosenWord != null && chosenWord.equalsIgnoreCase(guess);
     }
-
     public void nextRound() {
-        if (!participants.isEmpty()) {
-            drawerIndex = (drawerIndex + 1) % participants.size();
-            chosenWord = null;
-            for (Participant p : participants) {
-                p.setDrawer(false);
-            }
-            participants.get(drawerIndex).setDrawer(true);
-        }
+        chosenWord = null;
+        moveToNextDrawer();
+    }
+    public WordOptions getRandomWords() {
+        Random r = new Random();
+        return new WordOptions(
+                wordPool.get(r.nextInt(wordPool.size())),
+                wordPool.get(r.nextInt(wordPool.size())),
+                wordPool.get(r.nextInt(wordPool.size()))
+        );
     }
 }

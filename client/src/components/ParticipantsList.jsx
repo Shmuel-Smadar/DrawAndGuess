@@ -15,8 +15,11 @@ const ParticipantsList = ({ client, height, roomId, username, onDrawerChange }) 
 
       // Find the current user in the list of participants
       const me = participants.find((p) => p.username === username);
+      console.log('in participantsList')
+      console.log(me.isDrawer)
       if (me && me.isDrawer) {
         // Notify the parent of the change
+
         onDrawerChange(true);
       } else {
         onDrawerChange(false);
@@ -35,7 +38,7 @@ const ParticipantsList = ({ client, height, roomId, username, onDrawerChange }) 
       </div>
       <div className="participants-window" ref={participantsWindowRef}>
         {userList.map((user) => (
-          <div key={user.socketID} className="participant-item">
+          <div key={user.sessionId} className="participant-item">
             <span className="participant-name">{user.username}</span>
             {user.isDrawer && (
               <span className="drawer-indicator"> (Drawing)</span>

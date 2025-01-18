@@ -1,4 +1,3 @@
-// src/main/java/com/example/drawandguess/controller/WordGameController.java
 package com.example.drawandguess.controller;
 
 import com.example.drawandguess.model.WordOptions;
@@ -11,8 +10,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 
 @Controller
-public class WordGameController {
+public class
+WordGameController {
     private final GameService gameService;
+
 
     public WordGameController(GameService gameService) {
         this.gameService = gameService;
@@ -22,6 +23,7 @@ public class WordGameController {
     @SendToUser("/topic/wordOptions")
     public WordOptions handleWordRequest(@DestinationVariable String roomId, SimpMessageHeaderAccessor headerAccessor) {
         String sessionId = headerAccessor.getSessionId();
+        System.out.println("hereee");
         return gameService.requestWords(roomId, sessionId);
     }
 

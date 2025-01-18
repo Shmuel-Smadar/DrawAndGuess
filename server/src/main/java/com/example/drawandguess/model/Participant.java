@@ -3,7 +3,7 @@ package com.example.drawandguess.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Participant {
-    private String socketID;
+    private String sessionId;
     private String username;
 
     @JsonProperty("isDrawer")
@@ -11,18 +11,18 @@ public class Participant {
 
     public Participant() {}
 
-    public Participant(String socketID, String username, boolean isDrawer) {
-        this.socketID = socketID;
+    public Participant(String sessionId, String username, boolean isDrawer) {
+        this.sessionId = sessionId;
         this.username = username;
         this.isDrawer = isDrawer;
     }
 
-    public String getSocketID() {
-        return socketID;
+    public String getSessionId() {
+        return sessionId;
     }
 
-    public void setSocketID(String socketID) {
-        this.socketID = socketID;
+    public void setSessionId(String sessionId) {
+        this.sessionId = sessionId;
     }
 
     public String getUsername() {

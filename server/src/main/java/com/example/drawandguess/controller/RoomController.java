@@ -1,7 +1,9 @@
 // src/main/java/com/example/drawandguess/controller/RoomController.java
 package com.example.drawandguess.controller;
 
+import com.example.drawandguess.model.Participant;
 import com.example.drawandguess.model.Room;
+import com.example.drawandguess.service.ParticipantService;
 import com.example.drawandguess.service.RoomService;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -12,17 +14,19 @@ import java.util.Collection;
 
 @Controller
 public class RoomController {
-    private final RoomService roomService;
+    private RoomService roomService;
+    private ParticipantService participantService;
 
-    public RoomController(RoomService roomService) {
+    public RoomController(RoomService roomService, ParticipantService participantService) {
         this.roomService = roomService;
+        this.participantService = participantService;
     }
 
     @MessageMapping("/createRoom")
     @SendTo("/topic/rooms")
     public Collection<?> createRoom(@Payload String roomName) {
         roomService.createRoom(roomName);
-        return roomService.getRooms();
+        return roomService.getAllRooms();
     }
 
     @MessageMapping("/joinRoom")
@@ -34,12 +38,13 @@ public class RoomController {
     @MessageMapping("/leaveRoom")
     public void leaveRoom(@Payload String roomId, SimpMessageHeaderAccessor headerAccessor) {
         String sessionId = headerAccessor.getSessionId();
-        roomService.leaveRoom(sessionId);
+
+        roomService.removeParticipantFromRoom(roomId, participantService.findParticipantBySessionId(sessionId));
     }
 
     @MessageMapping("/getRooms")
     @SendTo("/topic/rooms")
     public Collection<?> getRooms() {
-        return roomService.getRooms();
+        return roomService.getAllRooms();
     }
 }

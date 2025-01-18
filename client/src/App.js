@@ -36,7 +36,7 @@ function App() {
   }, [client, connected])
 
   const handleDrawerChange = (drawerState) => {
-    if(isDrawer !== drawerState) { // Check if there was a change in who's the drawer
+    if(isDrawer !== drawerState) { 
     setIsDrawer(drawerState);
     if (drawerState) {
       requestWordOptions();
@@ -45,7 +45,6 @@ function App() {
   };
 
   const requestWordOptions = () => {
-    
     if (!client || !connected || !room) return;
     client.publish({
       destination: `/app/room/${room.roomId}/requestWords`,

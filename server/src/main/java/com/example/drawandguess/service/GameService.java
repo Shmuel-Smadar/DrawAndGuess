@@ -1,88 +1,70 @@
-// src/main/java/com/example/drawandguess/service/GameService.java
 package com.example.drawandguess.service;
 
+import com.example.drawandguess.model.ChatMessage;
 import com.example.drawandguess.model.Game;
 import com.example.drawandguess.model.Room;
 import com.example.drawandguess.model.WordOptions;
-import com.example.drawandguess.model.ChatMessage;
 import org.springframework.stereotype.Service;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class GameService {
-    private final Map<String, Game> games = new ConcurrentHashMap<>();
     private final ChatService chatService;
-    private final NicknameRegistration nicknameRegistration;
+    private final ParticipantService participantService;
+    private final RoomService roomService;
 
-    public GameService(ChatService chatService, NicknameRegistration nicknameRegistration) {
+    public GameService(
+            ChatService chatService,
+            ParticipantService participantService,
+            RoomService roomService
+    ) {
         this.chatService = chatService;
-        this.nicknameRegistration = nicknameRegistration;
-    }
-
-    public void createRoom(String roomName) {
-        String roomId = UUID.randomUUID().toString();
-        games.put(roomId, new Game(roomId, roomName));
-    }
-
-    public Collection<Room> getRooms() {
-        List<Room> result = new ArrayList<>();
-        for (Game g : games.values()) {
-            result.add(new Room(g.getRoomId(), g.getRoomName()));
-        }
-        return result;
-    }
-
-    public void joinRoom(String sessionId, String roomId) {
-        Game game = games.get(roomId);
-        if (game != null) {
-            String nickname = nicknameRegistration.findNickname(sessionId);
-            game.join(sessionId, nickname);
-        }
-    }
-
-    public void leaveRoom(String sessionId) {
-        for (Game g : games.values()) {
-            if (g.hasSession(sessionId)) {
-                g.leave(sessionId);
-                break;
-            }
-        }
+        this.participantService = participantService;
+        this.roomService = roomService;
     }
 
     public WordOptions requestWords(String roomId, String sessionId) {
-        Game game = games.get(roomId);
-        if (game != null && game.isDrawer(sessionId)) {
-            return game.getRandomWords();
-        }
-        return new WordOptions();
+        Room room = roomService.getRoom(roomId);
+        if (room == null) return new WordOptions();
+        Game game = room.getGame();
+        return game.isDrawer(sessionId) ? game.getRandomWords() : new WordOptions();
     }
 
     public void chooseWord(String roomId, String sessionId, String chosenWord) {
-        Game game = games.get(roomId);
-        if (game != null && game.isDrawer(sessionId)) {
+        Room room = roomService.getRoom(roomId);
+        if (room == null) return;
+        Game game = room.getGame();
+        if (game.isDrawer(sessionId)) {
             game.setChosenWord(chosenWord);
-            ChatMessage m = new ChatMessage();
-            m.setSender("system");
-            m.setText("A new round has started. The drawer is " + nicknameRegistration.findNickname(sessionId) + ".");
-            m.setType("system");
-            chatService.sendChatMessage(roomId, m);
+            ChatMessage msg = new ChatMessage();
+            msg.setSender("system");
+            msg.setText(
+                    "A new round has started. The drawer is " +
+                            participantService.findParticipantBySessionId(sessionId).getUsername() + "."
+            );
+            msg.setType("system");
+            chatService.sendChatMessage(roomId, msg);
         }
     }
 
     public void correctGuess(String roomId, String guess, String sessionId) {
-        Game g = games.get(roomId);
-        if (g != null && g.isCorrectGuess(guess)) {
-            ChatMessage m = new ChatMessage();
-            m.setSender("system");
-            m.setText("A player guessed the word correctly! Starting next round.");
-            m.setType("system");
-            chatService.sendChatMessage(roomId, m);
-            g.nextRound();
+        Room room = roomService.getRoom(roomId);
+        if (room == null) return;
+        Game game = room.getGame();
+        if (game.isCorrectGuess(guess)) {
+            ChatMessage msg = new ChatMessage();
+            msg.setSender("system");
+            msg.setText("A player guessed the word correctly! Starting next round.");
+            msg.setType("system");
+            chatService.sendChatMessage(roomId, msg);
+            game.nextRound();
+            String newDrawerId = game.getCurrentDrawer();
+            participantService.getAllParticipants().values().forEach(p ->
+                    participantService.setDrawer(
+                            p.getSessionId(),
+                            p.getSessionId().equals(newDrawerId)
+                    )
+            );
+            roomService.broadcastParticipants(roomId);
         }
-    }
-
-    public Map<String, Game> getGames() {
-        return games;
     }
 }
