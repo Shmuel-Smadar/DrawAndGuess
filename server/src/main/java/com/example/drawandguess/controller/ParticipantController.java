@@ -1,4 +1,3 @@
-// src/main/java/com/example/drawandguess/controller/NicknameController.java
 package com.example.drawandguess.controller;
 
 import com.example.drawandguess.model.NicknameStatus;

@@ -13,12 +13,9 @@ function App() {
   const [room, setRoom] = useState(null)
   const [rooms, setRooms] = useState([])
   const { client, connected } = useStompClient('http://localhost:8080/draw-and-guess');
-  // Game logic
   const [isDrawer, setIsDrawer] = useState(false)
   const [showWordSelection, setShowWordSelection] = useState(false)
   const [wordOptions, setWordOptions] = useState([])
-
-  
 
   useEffect(() => {
     if (!client || !connected) return
@@ -28,7 +25,7 @@ function App() {
     })
     client.publish({
       destination: '/app/getRooms',
-      body: '',
+      body: ''
     })
     return () => {
       subscription.unsubscribe()
@@ -37,18 +34,18 @@ function App() {
 
   const handleDrawerChange = (drawerState) => {
     if(isDrawer !== drawerState) { 
-    setIsDrawer(drawerState);
-    if (drawerState) {
-      requestWordOptions();
+      setIsDrawer(drawerState);
+      if (drawerState) {
+        requestWordOptions();
+      }
     }
-  }
   };
 
   const requestWordOptions = () => {
     if (!client || !connected || !room) return;
     client.publish({
       destination: `/app/room/${room.roomId}/requestWords`,
-      body: '',
+      body: ''
     });
   };
 
@@ -66,7 +63,7 @@ function App() {
     if (!client || !connected || !room) return;
     client.publish({
       destination: `/app/room/${room.roomId}/chooseWord`,
-      body: selectedWord,
+      body: selectedWord
     });
     setShowWordSelection(false);
   };

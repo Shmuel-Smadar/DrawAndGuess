@@ -1,16 +1,17 @@
-// src/main/java/com/example/drawandguess/controller/RoomController.java
 package com.example.drawandguess.controller;
 
 import com.example.drawandguess.model.Participant;
-import com.example.drawandguess.model.Room;
 import com.example.drawandguess.service.ParticipantService;
 import com.example.drawandguess.service.RoomService;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
+import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.stereotype.Controller;
 import java.util.Collection;
+import java.util.List;
 
 @Controller
 public class RoomController {
@@ -46,5 +47,11 @@ public class RoomController {
     @SendTo("/topic/rooms")
     public Collection<?> getRooms() {
         return roomService.getAllRooms();
+    }
+
+    @MessageMapping("/room/{roomId}/getParticipants")
+    @SendToUser("/topic/participants")
+    public List<Participant> handleParticipantsRequest(@DestinationVariable String roomId) {
+        return roomService.getParticipants(roomId);
     }
 }

@@ -1,14 +1,12 @@
 package com.example.drawandguess.service;
-import java.util.*;
 import com.example.drawandguess.model.ChatMessage;
-import com.example.drawandguess.model.Game;
 import com.example.drawandguess.model.Participant;
 import com.example.drawandguess.model.Room;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 @Service
 public class RoomService {
@@ -69,7 +67,6 @@ public class RoomService {
         leaveMsg.setText(participant.getUsername() + " has left the room.");
         leaveMsg.setType("system");
         chatService.sendChatMessage(roomId, leaveMsg);
-
         String newDrawerId = room.getGame().getCurrentDrawer();
         participantService.getAllParticipants().values().forEach(p ->
                 participantService.setDrawer(
@@ -88,23 +85,17 @@ public class RoomService {
             }
         }
     }
-    public List<String> getParticipants(String roomId) {
-        Room room = rooms.get(roomId);
-        if (room == null) return new ArrayList<>();
-        return room.getGame().getParticipantSessionIds();
-    }
     public void broadcastParticipants(String roomId) {
         Room room = rooms.get(roomId);
         if (room == null) return;
-        new Timer().schedule(new TimerTask() {
-            @Override
-            public void run() {
-                List<String> participantIds = room.getGame().getParticipantSessionIds();
-                messagingTemplate.convertAndSend(
-                        "/topic/room/" + roomId + "/participants",
-                        participantService.getParticipantsBySessionIds(participantIds)
-                );
+
+        List<String> participantIds = room.getGame().getParticipantSessionIds();
+        messagingTemplate.convertAndSend(
+                "/topic/room/" + roomId + "/participants",
+                        participantService.getParticipantsBySessionIds(participantIds));
             }
-        }, 100);
+
+    public List<Participant> getParticipants(String roomId) {
+        return participantService.getParticipantsBySessionIds(rooms.get(roomId).getGame().getParticipantSessionIds());
     }
 }
