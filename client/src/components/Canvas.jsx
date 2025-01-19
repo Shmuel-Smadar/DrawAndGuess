@@ -37,11 +37,7 @@ const Canvas = ({ client, color, userID, roomId, isDrawingAllowed, brushSize }) 
 
   useEffect(() => {
     resizeCanvas()
-    window.addEventListener('resize', resizeCanvas)
-    return () => {
-      window.removeEventListener('resize', resizeCanvas)
-    }
-  }, [resizeCanvas])
+  }, [])
 
   useEffect(() => {
     const canvas = canvasRef.current
