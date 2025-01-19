@@ -7,16 +7,18 @@ const ParticipantsList = ({ client, height, roomId, username, onDrawerChange }) 
 
   useEffect(() => {
     if (!client || !roomId) return;
-    const subscription = client.subscribe('/user/topic/participants', (message) => {
-      const participants = JSON.parse(message.body)
-      setUserList(participants)
-      const me = participants.find((p) => p.username === username)
-      onDrawerChange(me && me.isDrawer)
-    })
+    const destination = `/topic/room/${roomId}/participants`;
+    const subscription = client.subscribe(destination, (message) => {
+      const participants = JSON.parse(message.body);
+      setUserList(participants);
+      const me = participants.find((p) => p.username === username);
+      onDrawerChange(me && me.isDrawer);
+    });
     client.publish({
       destination: `/app/room/${roomId}/getParticipants`,
       body: ''
-    })
+    });
+
     return () => {
       subscription.unsubscribe();
     };
@@ -33,7 +35,7 @@ const ParticipantsList = ({ client, height, roomId, username, onDrawerChange }) 
             <span className="participant-name">{user.username}</span>
             {user.isDrawer && (
               <span className="drawer-indicator"> (Drawing)</span>
-              )}
+            )}
           </div>
         ))}
       </div>

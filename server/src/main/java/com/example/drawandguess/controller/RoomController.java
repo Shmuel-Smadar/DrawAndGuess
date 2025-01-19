@@ -7,6 +7,7 @@ import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.stereotype.Controller;
@@ -15,12 +16,14 @@ import java.util.List;
 
 @Controller
 public class RoomController {
-    private RoomService roomService;
-    private ParticipantService participantService;
+    private final RoomService roomService;
+    private final ParticipantService participantService;
+    private final SimpMessagingTemplate messagingTemplate;
 
-    public RoomController(RoomService roomService, ParticipantService participantService) {
+    public RoomController(RoomService roomService, ParticipantService participantService, SimpMessagingTemplate messagingTemplate) {
         this.roomService = roomService;
         this.participantService = participantService;
+        this.messagingTemplate = messagingTemplate;
     }
 
     @MessageMapping("/createRoom")
@@ -39,7 +42,6 @@ public class RoomController {
     @MessageMapping("/leaveRoom")
     public void leaveRoom(@Payload String roomId, SimpMessageHeaderAccessor headerAccessor) {
         String sessionId = headerAccessor.getSessionId();
-
         roomService.removeParticipantFromRoom(roomId, participantService.findParticipantBySessionId(sessionId));
     }
 
@@ -50,8 +52,8 @@ public class RoomController {
     }
 
     @MessageMapping("/room/{roomId}/getParticipants")
-    @SendToUser("/topic/participants")
-    public List<Participant> handleParticipantsRequest(@DestinationVariable String roomId) {
-        return roomService.getParticipants(roomId);
+    public void handleParticipantsRequest(@DestinationVariable String roomId) {
+        List<Participant> participants = roomService.getParticipants(roomId);
+        messagingTemplate.convertAndSend("/topic/room/" + roomId + "/participants", participants);
     }
 }
