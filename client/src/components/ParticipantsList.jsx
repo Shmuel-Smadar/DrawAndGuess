@@ -14,10 +14,11 @@ const ParticipantsList = ({ client, height, roomId, username, onDrawerChange }) 
       const me = participants.find((p) => p.username === username);
       onDrawerChange(me && me.isDrawer);
     });
-    client.publish({
+    //TODO: fix the server side so this call works
+    /*client.publish({
       destination: `/app/room/${roomId}/getParticipants`,
       body: ''
-    });
+    });*/
 
     return () => {
       subscription.unsubscribe();

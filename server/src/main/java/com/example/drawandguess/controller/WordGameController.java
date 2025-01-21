@@ -23,7 +23,6 @@ WordGameController {
     @SendToUser("/topic/wordOptions")
     public WordOptions handleWordRequest(@DestinationVariable String roomId, SimpMessageHeaderAccessor headerAccessor) {
         String sessionId = headerAccessor.getSessionId();
-        System.out.println("hereee");
         return gameService.requestWords(roomId, sessionId);
     }
 

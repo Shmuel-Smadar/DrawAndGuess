@@ -15,4 +15,7 @@ public class ChatService {
     public void sendChatMessage(String roomId, ChatMessage msg) {
         messagingTemplate.convertAndSend("/topic/room/" + roomId + "/chat", msg);
     }
+    public void sendWordHint(String sessionId, String roomId, String hint) {
+        messagingTemplate.convertAndSend("/topic/room/" + roomId + "/wordHint", hint);
+    }
 }

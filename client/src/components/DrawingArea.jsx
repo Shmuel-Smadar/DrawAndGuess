@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import Canvas from './Canvas'
 import ColorPicker from './ColorPicker'
+import WordHint from './WordHint'
 
 const DrawingArea = ({ client, userID, roomId, isDrawingAllowed }) => {
   const [color, setColor] = useState('#000000')
@@ -16,16 +17,20 @@ const DrawingArea = ({ client, userID, roomId, isDrawingAllowed }) => {
         isDrawingAllowed={isDrawingAllowed}
         brushSize={brushSize}
       />
-      <ColorPicker
-  client={client}
-  setColor={setColor}
-  userID={userID}
-  roomId={roomId}
-  isDrawingAllowed={isDrawingAllowed}
-  setBrushSize={setBrushSize}
-/>
+      {isDrawingAllowed ? (
+        <ColorPicker
+          client={client}
+          setColor={setColor}
+          userID={userID}
+          roomId={roomId}
+          isDrawingAllowed={isDrawingAllowed}
+          setBrushSize={setBrushSize}
+        />
+      ) : (
+        <WordHint client={client} roomId={roomId} isDrawer={isDrawingAllowed} />
+      )}
     </div>
-  )
-}
+  );
+};
 
-export default DrawingArea
+export default DrawingArea;

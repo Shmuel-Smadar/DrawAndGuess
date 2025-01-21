@@ -1,16 +1,42 @@
 package com.example.drawandguess.model;
 
 import java.util.*;
-import com.example.drawandguess.model.Participant;
-import com.example.drawandguess.model.WordOptions;
 
 public class Game {
     private final List<String> participantSessionIds = new ArrayList<>();
     private int currentDrawerIndex = -1;
     private String chosenWord;
     private final List<String> wordPool = List.of(
-            "Cat","Computer","Pizza","Bicycle","Tree","Car","House","Sun","Moon","Banana"
+            "Cat", "Computer", "Pizza", "Bicycle", "Tree", "Car", "House", "Sun", "Moon", "Banana"
     );
+
+    private List<Integer> revealOrder = new ArrayList<>();
+    private Set<Integer> revealedClues = new HashSet<>();
+    private String currentHint = "";
+
+    public List<Integer> getRevealOrder() {
+        return revealOrder;
+    }
+
+    public void setRevealOrder(List<Integer> revealOrder) {
+        this.revealOrder = revealOrder;
+    }
+
+    public Set<Integer> getRevealedClues() {
+        return revealedClues;
+    }
+
+    public void setRevealedClues(Set<Integer> revealedClues) {
+        this.revealedClues = revealedClues;
+    }
+
+    public String getCurrentHint() {
+        return currentHint;
+    }
+
+    public void setCurrentHint(String currentHint) {
+        this.currentHint = currentHint;
+    }
 
     public void addParticipant(String sessionId) {
         if (!participantSessionIds.contains(sessionId)) {
@@ -52,6 +78,7 @@ public class Game {
     }
     public void setChosenWord(String chosenWord) {
         this.chosenWord = chosenWord;
+        initializeHint();
     }
     public boolean isCorrectGuess(String guess) {
         return chosenWord != null && chosenWord.equalsIgnoreCase(guess);
@@ -59,6 +86,9 @@ public class Game {
     public void nextRound() {
         chosenWord = null;
         moveToNextDrawer();
+        revealOrder = new ArrayList<>();
+        revealedClues = new HashSet<>();
+        currentHint = "";
     }
     public WordOptions getRandomWords() {
         Random r = new Random();
@@ -67,5 +97,19 @@ public class Game {
                 wordPool.get(r.nextInt(wordPool.size())),
                 wordPool.get(r.nextInt(wordPool.size()))
         );
+    }
+    private void initializeHint() {
+        int length = chosenWord.length();
+        currentHint = "_".repeat(length);
+        List<Integer> clues = new ArrayList<>();
+        for (int i = 0; i < length; i++) {
+            clues.add(i);
+        }
+        Collections.shuffle(clues);
+        revealOrder = clues;
+        revealedClues.clear();
+    }
+    public String getChosenWord() {
+        return this.chosenWord;
     }
 }

@@ -100,7 +100,7 @@ function App() {
             client={client}
             userID={username}
             roomId={room.roomId}
-            isDrawingAllowed={true}
+            isDrawingAllowed={isDrawer}
           />
         )}
         <RightSidebar

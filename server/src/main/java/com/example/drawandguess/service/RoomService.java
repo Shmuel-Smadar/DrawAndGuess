@@ -58,42 +58,52 @@ public class RoomService {
         chatService.sendChatMessage(roomId, msg);
         broadcastParticipants(roomId);
     }
-    public void removeParticipantFromRoom(String roomId, Participant participant) {
-        Room room = rooms.get(roomId);
-        if (room == null) return;
-        room.getGame().removeParticipant(participant.getSessionId());
-        ChatMessage leaveMsg = new ChatMessage();
-        leaveMsg.setSender("system");
-        leaveMsg.setText(participant.getUsername() + " has left the room.");
-        leaveMsg.setType("system");
-        chatService.sendChatMessage(roomId, leaveMsg);
-        String newDrawerId = room.getGame().getCurrentDrawer();
-        participantService.getAllParticipants().values().forEach(p ->
-                participantService.setDrawer(
-                        p.getSessionId(),
-                        p.getSessionId().equals(newDrawerId)
-                )
-        );
-        broadcastParticipants(roomId);
-    }
+    public void removeParticipantFromRoom(String roomId, Participant participant)
+     {
+     Room room = rooms.get(roomId);
+     if (room == null) return;
+     room.getGame().removeParticipant(participant.getSessionId());
+     ChatMessage leaveMsg = new ChatMessage();
+     leaveMsg.setSender("system");
+     leaveMsg.setText(participant.getUsername() + " has left the room.");
+     leaveMsg.setType("system");
+     chatService.sendChatMessage(roomId, leaveMsg);
+     String newDrawerId = room.getGame().getCurrentDrawer();
+     participantService.getAllParticipants().values().forEach(p ->
+             participantService.setDrawer(
+                     p.getSessionId(),
+                     p.getSessionId().equals(newDrawerId)
+             )       );
+     broadcastParticipants(roomId);
+     }
+
+
     public void removeParticipantFromAllRooms(Participant participant) {
         String sessionId = participant.getSessionId();
         for (Room room : rooms.values()) {
+            System.out.println("room:");
+            System.out.println(room.getGame().getParticipantSessionIds());
             if (room.getGame().getParticipantSessionIds().contains(sessionId)) {
                 removeParticipantFromRoom(room.getRoomId(), participantService.findParticipantBySessionId(sessionId));
                 broadcastParticipants(room.getRoomId());
             }
         }
     }
-    public void broadcastParticipants(String roomId) {
-        Room room = rooms.get(roomId);
-        if (room == null) return;
 
-        List<String> participantIds = room.getGame().getParticipantSessionIds();
-        messagingTemplate.convertAndSend(
-                "/topic/room/" + roomId + "/participants",
+    public void broadcastParticipants(String roomId) {
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                Room room = rooms.get(roomId);
+                if (room == null) return;
+
+                List<String> participantIds = room.getGame().getParticipantSessionIds();
+                messagingTemplate.convertAndSend(
+                        "/topic/room/" + roomId + "/participants",
                         participantService.getParticipantsBySessionIds(participantIds));
             }
+        }, 100);
+    }
 
     public List<Participant> getParticipants(String roomId) {
         return participantService.getParticipantsBySessionIds(rooms.get(roomId).getGame().getParticipantSessionIds());

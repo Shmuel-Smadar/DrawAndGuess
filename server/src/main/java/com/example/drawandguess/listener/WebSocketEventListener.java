@@ -25,7 +25,9 @@ public class WebSocketEventListener {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
         String sessionId = accessor.getSessionId();
         Participant participant = participantService.findParticipantBySessionId(sessionId);
-        roomService.removeParticipantFromAllRooms(participant);
-        participantService.removeParticipant(sessionId);
+        if (participant != null) {
+            roomService.removeParticipantFromAllRooms(participant);
+            participantService.removeParticipant(sessionId);
+        }
     }
 }

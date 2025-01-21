@@ -4,22 +4,33 @@ import com.example.drawandguess.model.ChatMessage;
 import com.example.drawandguess.model.Game;
 import com.example.drawandguess.model.Room;
 import com.example.drawandguess.model.WordOptions;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
+
+import java.time.Duration;
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledFuture;
 
 @Service
 public class GameService {
     private final ChatService chatService;
     private final ParticipantService participantService;
     private final RoomService roomService;
+    private final TaskScheduler taskScheduler;
+
+    private final ConcurrentHashMap<String, ScheduledFuture<?>> hintTasks = new ConcurrentHashMap<>();
 
     public GameService(
             ChatService chatService,
             ParticipantService participantService,
-            RoomService roomService
+            RoomService roomService,
+            TaskScheduler taskScheduler
     ) {
         this.chatService = chatService;
         this.participantService = participantService;
         this.roomService = roomService;
+        this.taskScheduler = taskScheduler;
     }
 
     public WordOptions requestWords(String roomId, String sessionId) {
@@ -43,6 +54,7 @@ public class GameService {
             );
             msg.setType("system");
             chatService.sendChatMessage(roomId, msg);
+            startHintProgression(roomId);
         }
     }
 
@@ -56,6 +68,7 @@ public class GameService {
             msg.setText("A player guessed the word correctly! Starting next round.");
             msg.setType("system");
             chatService.sendChatMessage(roomId, msg);
+            stopHintProgression(roomId);
             game.nextRound();
             String newDrawerId = game.getCurrentDrawer();
             participantService.getAllParticipants().values().forEach(p ->
@@ -66,5 +79,61 @@ public class GameService {
             );
             roomService.broadcastParticipants(roomId);
         }
+    }
+
+    private void startHintProgression(String roomId) {
+        Room room = roomService.getRoom(roomId);
+        if (room == null) return;
+        Game game = room.getGame();
+
+        Runnable hintTask = new Runnable() {
+            @Override
+            public void run() {
+                synchronized (game) {
+                    if (game.getRevealOrder().isEmpty()) {
+                        stopHintProgression(roomId);
+                        return;
+                    }
+                    int nextIndex = game.getRevealOrder().remove(0);
+                    game.getRevealedClues().add(nextIndex);
+                    StringBuilder hintBuilder = new StringBuilder();
+                    String word = game.getChosenWord();
+                    for (int i = 0; i < word.length(); i++) {
+                        if (game.getRevealedClues().contains(i)) {
+                            hintBuilder.append(word.charAt(i));
+                        } else {
+                            hintBuilder.append("_");
+                        }
+                    }
+                    game.setCurrentHint(hintBuilder.toString());
+                    sendHintToParticipants(roomId, game.getCurrentHint());
+                    if (game.getRevealOrder().isEmpty()) {
+                        stopHintProgression(roomId);
+                    }
+                }
+            }
+        };
+
+        ScheduledFuture<?> future = taskScheduler.scheduleAtFixedRate(hintTask, Duration.ofSeconds(10));
+        hintTasks.put(roomId, future);
+    }
+
+    private void stopHintProgression(String roomId) {
+        ScheduledFuture<?> future = hintTasks.remove(roomId);
+        if (future != null) {
+            future.cancel(false);
+        }
+    }
+
+    private void sendHintToParticipants(String roomId, String currentHint) {
+        Room room = roomService.getRoom(roomId);
+        if (room == null) return;
+        List<String> participantIds = room.getGame().getParticipantSessionIds();
+        String drawerId = room.getGame().getCurrentDrawer();
+        participantIds.stream()
+                .filter(sessionId -> !sessionId.equals(drawerId))
+                .forEach(sessionId -> {
+                    chatService.sendWordHint(sessionId, roomId, currentHint);
+                });
     }
 }
