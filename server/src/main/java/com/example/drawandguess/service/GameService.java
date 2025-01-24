@@ -81,7 +81,11 @@ public class GameService {
         }
     }
 
-    private void startHintProgression(String roomId) {
+    public void startHintProgression(String roomId) {
+        if (hintTasks.containsKey(roomId)) {
+            return;
+        }
+
         Room room = roomService.getRoom(roomId);
         if (room == null) return;
         Game game = room.getGame();
@@ -90,24 +94,13 @@ public class GameService {
             @Override
             public void run() {
                 synchronized (game) {
-                    if (game.getRevealOrder().isEmpty()) {
+                    if (!game.hasMoreHints()) {
                         stopHintProgression(roomId);
                         return;
                     }
-                    int nextIndex = game.getRevealOrder().remove(0);
-                    game.getRevealedClues().add(nextIndex);
-                    StringBuilder hintBuilder = new StringBuilder();
-                    String word = game.getChosenWord();
-                    for (int i = 0; i < word.length(); i++) {
-                        if (game.getRevealedClues().contains(i)) {
-                            hintBuilder.append(word.charAt(i));
-                        } else {
-                            hintBuilder.append("_");
-                        }
-                    }
-                    game.setCurrentHint(hintBuilder.toString());
-                    sendHintToParticipants(roomId, game.getCurrentHint());
-                    if (game.getRevealOrder().isEmpty()) {
+                    String hint = game.getNextHint();
+                    sendHintToParticipants(roomId, hint);
+                    if (!game.hasMoreHints()) {
                         stopHintProgression(roomId);
                     }
                 }

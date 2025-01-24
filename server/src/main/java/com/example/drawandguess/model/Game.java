@@ -6,6 +6,8 @@ public class Game {
     private final List<String> participantSessionIds = new ArrayList<>();
     private int currentDrawerIndex = -1;
     private String chosenWord;
+    private StringBuilder currentHintBuilder = new StringBuilder();
+    private boolean isFirstHint;
     private final List<String> wordPool = List.of(
             "Cat", "Computer", "Pizza", "Bicycle", "Tree", "Car", "House", "Sun", "Moon", "Banana"
     );
@@ -98,9 +100,17 @@ public class Game {
                 wordPool.get(r.nextInt(wordPool.size()))
         );
     }
+
+
+    public boolean hasMoreHints() {
+        return !revealOrder.isEmpty();
+    }
     private void initializeHint() {
         int length = chosenWord.length();
-        currentHint = "_".repeat(length);
+        currentHintBuilder.setLength(0); // Clear any existing content
+        currentHintBuilder.append("_".repeat(length));
+        currentHint = currentHintBuilder.toString();
+
         List<Integer> clues = new ArrayList<>();
         for (int i = 0; i < length; i++) {
             clues.add(i);
@@ -108,7 +118,23 @@ public class Game {
         Collections.shuffle(clues);
         revealOrder = clues;
         revealedClues.clear();
+        isFirstHint = true;
     }
+
+    public String getNextHint() {
+        if (isFirstHint || revealOrder.isEmpty()) {
+            isFirstHint = false;
+            return currentHint;
+        }
+        int nextIndex = revealOrder.remove(0);
+        revealedClues.add(nextIndex);
+
+        currentHintBuilder.setCharAt(nextIndex, chosenWord.charAt(nextIndex));
+        currentHint = currentHintBuilder.toString();
+
+        return currentHint;
+    }
+
     public String getChosenWord() {
         return this.chosenWord;
     }
