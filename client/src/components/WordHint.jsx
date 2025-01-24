@@ -26,7 +26,7 @@ const WordHint = ({ client, roomId, isDrawer }) => {
       <div className="word-hint">
         {currentHint.split('').map((char, index) => (
           <span key={index} className="word-letter">
-            {char === ' ' ? '\u00A0' : char}
+            {(char === ' ' ||char === '_') ? '\u00A0' : char}
           </span>
         ))}
       </div>
