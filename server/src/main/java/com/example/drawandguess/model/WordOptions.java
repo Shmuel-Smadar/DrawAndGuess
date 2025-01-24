@@ -14,7 +14,6 @@ public class WordOptions {
         this.word3 = word3;
     }
 
-    // getters / setters
     public String getWord1() { return word1; }
     public void setWord1(String word1) { this.word1 = word1; }
     public String getWord2() { return word2; }

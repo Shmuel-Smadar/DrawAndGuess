@@ -18,7 +18,6 @@ public class ParticipantService {
         }
         Participant participant = new Participant(sessionId, nickname, false);
         sessionIdToParticipant.put(sessionId, participant);
-        System.out.println("Registered participant: " + nickname);
         return new NicknameStatus(true, "Nickname registered successfully");
     }
 
