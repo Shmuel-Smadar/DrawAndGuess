@@ -23,4 +23,7 @@ public class DrawingService {
     public void clearCanvas(String roomId, ClearCanvasMessage message) {
         messagingTemplate.convertAndSend("/topic/room/" + roomId + "/clearCanvas", message);
     }
+    public void fill(String roomId, DrawMessage message) {
+        messagingTemplate.convertAndSend("/topic/room/" + roomId + "/drawing", message);
+    }
 }

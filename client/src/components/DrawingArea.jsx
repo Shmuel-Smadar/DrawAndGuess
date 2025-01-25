@@ -6,6 +6,7 @@ import WordHint from './WordHint'
 const DrawingArea = ({ client, userID, roomId, isDrawingAllowed }) => {
   const [color, setColor] = useState('#000000')
   const [brushSize, setBrushSize] = useState(2)
+  const [isFillMode, setIsFillMode] = useState(false)
 
   return (
     <div className="drawing-area">
@@ -16,6 +17,8 @@ const DrawingArea = ({ client, userID, roomId, isDrawingAllowed }) => {
         roomId={roomId}
         isDrawingAllowed={isDrawingAllowed}
         brushSize={brushSize}
+        isFillMode={isFillMode}
+        onFillToggle={() => setIsFillMode(!isFillMode)}
       />
       {isDrawingAllowed ? (
         <ColorPicker
@@ -25,6 +28,8 @@ const DrawingArea = ({ client, userID, roomId, isDrawingAllowed }) => {
           roomId={roomId}
           isDrawingAllowed={isDrawingAllowed}
           setBrushSize={setBrushSize}
+          onFillToggle={() => setIsFillMode(!isFillMode)}
+          isFillMode={isFillMode}
         />
       ) : (
         <WordHint client={client} roomId={roomId} isDrawer={isDrawingAllowed} />

@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 import ClearIcon from '../assets/trash-bin.png'
 import BrushIcon from '../assets/paint-brush.png'
+import BucketIcon from '../assets/paint-bucket.png'
+
 import './ColorPicker.css'
 const colors = [
   { name: '', code: '#000000' },
@@ -15,17 +17,25 @@ const colors = [
   { name: '', code: '#808080' },
   { name: '', code: '#00FFFF' },
   { name: '', code: '#FF00FF' },
+  { name: '', code: '#8950F7' },
+  
 ]
-
 const brushSizes = [
   { name: 'S', size: 2 },
   { name: 'M', size: 5 },
   { name: 'L', size: 10 },
 ]
-
-const ColorPicker = ({ client, setColor, userID, roomId, isDrawingAllowed, setBrushSize }) => {
+const ColorPicker = ({
+  client,
+  setColor,
+  userID,
+  roomId,
+  isDrawingAllowed,
+  setBrushSize,
+  onFillToggle,
+  isFillMode
+}) => {
   const [showSizeList, setShowSizeList] = useState(false)
-
   const handleClearCanvas = () => {
     if (!client || !client.connected || !roomId) return
     const message = { userID }
@@ -34,13 +44,18 @@ const ColorPicker = ({ client, setColor, userID, roomId, isDrawingAllowed, setBr
       body: JSON.stringify(message),
     })
   }
-
   return (
     <div className="color-picker-container">
       {isDrawingAllowed && (
         <div className="color-buttons">
           <button onClick={handleClearCanvas} className="clear-button" aria-label="Clear Canvas">
             <img src={ClearIcon} alt="Clear Canvas" className="button-icon" />
+          </button>
+          <button
+            onClick={onFillToggle}
+            className={isFillMode ? "fill-button active" : "fill-button"}
+          >
+            <img src={BucketIcon} alt="Fill shape" className="button-icon" />
           </button>
           <div className="brush-size-dropdown">
             <button onClick={() => setShowSizeList(!showSizeList)} className="brush-size-button">
@@ -75,5 +90,4 @@ const ColorPicker = ({ client, setColor, userID, roomId, isDrawingAllowed, setBr
     </div>
   )
 }
-
 export default ColorPicker
