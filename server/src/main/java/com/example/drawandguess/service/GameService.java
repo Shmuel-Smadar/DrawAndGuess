@@ -88,9 +88,15 @@ public class GameService {
 
         Room room = roomService.getRoom(roomId);
         if (room == null) return;
+        Runnable hintTask = getRunnable(roomId, room);
+        ScheduledFuture<?> future = taskScheduler.scheduleAtFixedRate(hintTask, Duration.ofSeconds(10));
+        hintTasks.put(roomId, future);
+    }
+
+    private Runnable getRunnable(String roomId, Room room) {
         Game game = room.getGame();
 
-        Runnable hintTask = new Runnable() {
+        return new Runnable() {
             @Override
             public void run() {
                 synchronized (game) {
@@ -98,7 +104,7 @@ public class GameService {
                         stopHintProgression(roomId);
                         return;
                     }
-                    String hint = game.getNextHint();
+                    String hint = game.nextHint();
                     sendHintToParticipants(roomId, hint);
                     if (!game.hasMoreHints()) {
                         stopHintProgression(roomId);
@@ -106,9 +112,6 @@ public class GameService {
                 }
             }
         };
-
-        ScheduledFuture<?> future = taskScheduler.scheduleAtFixedRate(hintTask, Duration.ofSeconds(10));
-        hintTasks.put(roomId, future);
     }
 
     private void stopHintProgression(String roomId) {

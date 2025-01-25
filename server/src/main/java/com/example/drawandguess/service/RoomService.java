@@ -44,12 +44,9 @@ public class RoomService {
         if (room == null) return;
         room.getGame().addParticipant(sessionId);
         String newDrawerId = room.getGame().getCurrentDrawer();
-        participantService.getAllParticipants().values().forEach(p ->
-                participantService.setDrawer(
-                        p.getSessionId(),
-                        p.getSessionId().equals(newDrawerId)
-                )
-        );
+        if(newDrawerId != null) {
+            participantService.setDrawer(newDrawerId, true);
+        }
         String nickname = participantService.findParticipantBySessionId(sessionId).getUsername();
         ChatMessage msg = new ChatMessage();
         msg.setSender("system");

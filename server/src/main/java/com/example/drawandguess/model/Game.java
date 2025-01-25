@@ -121,11 +121,12 @@ public class Game {
         isFirstHint = true;
     }
 
-    public String getNextHint() {
+    public String nextHint() {
         if (isFirstHint || revealOrder.isEmpty()) {
             isFirstHint = false;
             return currentHint;
         }
+        System.out.println("nextHint() in: " + Arrays.toString(Thread.currentThread().getStackTrace()));
         int nextIndex = revealOrder.remove(0);
         revealedClues.add(nextIndex);
 
