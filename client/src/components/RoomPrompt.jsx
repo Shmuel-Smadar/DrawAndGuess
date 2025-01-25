@@ -58,7 +58,7 @@ const RoomPrompt = ({ client, connected, setRoom}) => {
           <div className="room-item" key={room.roomId}>
             <div className="room-info">
               <span className="room-name">{room.roomName}</span>
-              <span className="participants">0/10</span> {/* Placeholder */}
+              <span className="participants">{room.numberOfParticipants}/10</span>
             </div>
             <button className="join-button" onClick={() => handleJoinRoom(room)}>
               Join

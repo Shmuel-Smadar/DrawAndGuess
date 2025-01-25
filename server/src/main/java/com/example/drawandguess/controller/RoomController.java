@@ -12,7 +12,10 @@ import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.stereotype.Controller;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 public class RoomController {
@@ -48,7 +51,13 @@ public class RoomController {
     @MessageMapping("/getRooms")
     @SendTo("/topic/rooms")
     public Collection<?> getRooms() {
-        return roomService.getAllRooms();
+        return roomService.getAllRooms().stream().map(room -> {
+            Map<String, Object> roomInfo = new HashMap<>();
+            roomInfo.put("roomName", room.getRoomName());
+            roomInfo.put("roomId", room.getRoomId());
+            roomInfo.put("numberOfParticipants", room.getGame().getParticipantSessionIds().size());
+            return roomInfo;
+        }).collect(Collectors.toList());
     }
 
     @MessageMapping("/room/{roomId}/getParticipants")
