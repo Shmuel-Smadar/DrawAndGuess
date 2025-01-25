@@ -18,6 +18,17 @@ const WordHint = ({ client, roomId, isDrawer }) => {
     };
   }, [client, roomId, isDrawer]);
 
+  useEffect(() => {
+      if (!client || !roomId) return;
+  
+      client.publish({
+        destination: `/app/room/${roomId}/getCurrentHint`,
+        body: ''
+      });
+    }, [client, roomId]);
+  
+
+
   if (isDrawer) return null;
 
   return (
