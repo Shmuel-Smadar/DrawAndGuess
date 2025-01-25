@@ -11,26 +11,11 @@ function App() {
   const [username, setUsername] = useState('')
   const [nicknameError, setNicknameError] = useState('')
   const [room, setRoom] = useState(null)
-  const [rooms, setRooms] = useState([])
   const { client, connected } = useStompClient('http://localhost:8080/draw-and-guess');
   const [isDrawer, setIsDrawer] = useState(false)
   const [showWordSelection, setShowWordSelection] = useState(false)
   const [wordOptions, setWordOptions] = useState([])
 
-  useEffect(() => {
-    if (!client || !connected) return
-    const subscription = client.subscribe('/topic/rooms', (message) => {
-      const data = JSON.parse(message.body)
-      setRooms(data)
-    })
-    client.publish({
-      destination: '/app/getRooms',
-      body: ''
-    })
-    return () => {
-      subscription.unsubscribe()
-    };
-  }, [client, connected])
 
   const handleDrawerChange = (drawerState) => {
     if(isDrawer !== drawerState) { 
@@ -85,7 +70,6 @@ function App() {
       <RoomPrompt
         client={client}
         connected={connected}
-        rooms={rooms}
         setRoom={setRoom}
       />
     );

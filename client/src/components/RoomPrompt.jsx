@@ -1,9 +1,26 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import './RoomPrompt.css'
 
-const RoomPrompt = ({ client, connected, rooms, setRoom }) => {
+const RoomPrompt = ({ client, connected, setRoom}) => {
   const [newRoomName, setNewRoomName] = useState('')
   const [error, setError] = useState('')
+  const [rooms, setRooms] = useState([])
+
+  useEffect(() => {
+    if (!client || !connected) return
+    const subscription = client.subscribe('/topic/rooms', (message) => {
+      const data = JSON.parse(message.body)
+      setRooms(data)
+    })
+    client.publish({
+      destination: '/app/getRooms',
+      body: ''
+    })
+    return () => {
+      subscription.unsubscribe()
+    };
+  }, [client, connected])
+
 
   const handleJoinRoom = (room) => {
     if (client && connected) {
