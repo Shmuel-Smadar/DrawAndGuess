@@ -1,0 +1,3 @@
+export const VIRTUAL_WIDTH = 10;
+export const VIRTUAL_HEIGHT = 16;
+export const ASPECT_RATIO = VIRTUAL_WIDTH / VIRTUAL_HEIGHT;
