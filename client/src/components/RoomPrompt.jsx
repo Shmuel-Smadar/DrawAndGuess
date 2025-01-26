@@ -40,6 +40,10 @@ const RoomPrompt = ({ client, connected, setRoom }) => {
         destination: '/app/createRoom',
         body: newRoomName.trim(),
       })
+      client.publish({
+        destination: '/app/getRooms',
+        body: ''
+      })
       setNewRoomName('')
       setError('')
     } else {
