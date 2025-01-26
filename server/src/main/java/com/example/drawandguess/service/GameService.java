@@ -47,7 +47,7 @@ public class GameService {
         if (game.isDrawer(sessionId)) {
             game.setChosenWord(chosenWord);
             ChatMessage msg = new ChatMessage();
-            msg.setSender("system");
+            msg.setSenderSessionId("system");
             msg.setText(
                     "A new round has started. The drawer is " +
                             participantService.findParticipantBySessionId(sessionId).getUsername() + "."
@@ -63,9 +63,10 @@ public class GameService {
         if (room == null) return;
         Game game = room.getGame();
         if (game.isCorrectGuess(guess)) {
+            String username = participantService.findParticipantBySessionId(sessionId).getUsername();
             ChatMessage msg = new ChatMessage();
-            msg.setSender("system");
-            msg.setText("A player guessed the word correctly! Starting next round.");
+            msg.setSenderSessionId("system");
+            msg.setText(username + " guessed the word correctly! Starting next round.");
             msg.setType("system");
             chatService.sendChatMessage(roomId, msg);
             stopHintProgression(roomId);

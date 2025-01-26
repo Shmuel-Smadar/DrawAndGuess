@@ -21,6 +21,8 @@ public class ParticipantController {
     @SendToUser("/topic/nickname")
     public NicknameStatus registerNickname(@Payload RegistrationMessage message, SimpMessageHeaderAccessor headerAccessor) {
         String sessionId = headerAccessor.getSessionId();
-        return participantService.registerParticipant(sessionId, message.getNickname());
+        NicknameStatus status = participantService.registerParticipant(sessionId, message.getNickname());
+        status.setSessionId(sessionId);
+        return status;
     }
 }

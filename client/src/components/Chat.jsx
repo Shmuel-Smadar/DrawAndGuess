@@ -1,15 +1,16 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import DOMPurify from 'dompurify';
+import { useSelector } from 'react-redux';
 import './Chat.css';
 
 const Chat = ({ client, roomId, username, canChat, width, height }) => {
+  const sessionId = useSelector((state) => state.user.sessionId)
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [isAtBottom, setIsAtBottom] = useState(true);
   const [showScrollButton, setShowScrollButton] = useState(false);
   const [error, setError] = useState(null);
   const [unreadCount, setUnreadCount] = useState(0);
-
   const chatWindowRef = useRef(null);
 
   useEffect(() => {
@@ -22,7 +23,6 @@ const Chat = ({ client, roomId, username, canChat, width, height }) => {
         setUnreadCount((prevCount) => prevCount + 1);
       }
     });
-    
     return () => {
       subscription.unsubscribe();
     };
@@ -56,7 +56,7 @@ const Chat = ({ client, roomId, username, canChat, width, height }) => {
     if (!chatWindowRef.current) return;
     chatWindowRef.current.scrollTo({
       top: chatWindowRef.current.scrollHeight,
-      behavior: 'smooth',
+      behavior: 'smooth'
     });
     setShowScrollButton(false);
     setIsAtBottom(true);
@@ -64,18 +64,20 @@ const Chat = ({ client, roomId, username, canChat, width, height }) => {
   }, []);
 
   const handleSendMessage = () => {
-    if (!client || !roomId || newMessage.trim() === '') return;
+    if (!client || !roomId || newMessage.trim() === '' || !sessionId) return
     const messageData = {
       text: newMessage,
-      sender: username,
-      type: 'user',
-    };
+      senderSessionId: sessionId,
+      senderUsername: username,
+      type: 'user'
+    }
+    console.log(username)
     client.publish({
       destination: `/app/room/${roomId}/chat`,
-      body: JSON.stringify(messageData),
-    });
+      body: JSON.stringify(messageData)
+    })
     setNewMessage('');
-  };
+  }
 
   return (
     <div className="chat-container" style={{ height: `${height}px` }}>
@@ -94,7 +96,7 @@ const Chat = ({ client, roomId, username, canChat, width, height }) => {
                 <span className="chat-text system-text" dangerouslySetInnerHTML={{ __html: sanitizedText }} />
               ) : (
                 <>
-                  <span className="chat-sender">{message.sender}: </span>
+                  <span className="chat-sender">{username}: </span>
                   <span className="chat-text" dangerouslySetInnerHTML={{ __html: sanitizedText }} />
                 </>
               )}

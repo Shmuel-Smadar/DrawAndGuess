@@ -4,7 +4,8 @@ const userSlice = createSlice({
   name: 'user',
   initialState: {
     username: '',
-    nicknameError: ''
+    nicknameError: '',
+    sessionId: ''
   },
   reducers: {
     setUsername: (state, action) => {
@@ -12,9 +13,12 @@ const userSlice = createSlice({
     },
     setNicknameError: (state, action) => {
       state.nicknameError = action.payload
+    },
+    setSessionId: (state, action) => {
+      state.sessionId = action.payload
     }
   }
 })
 
-export const { setUsername, setNicknameError } = userSlice.actions
+export const { setUsername, setNicknameError, setSessionId } = userSlice.actions
 export default userSlice.reducer

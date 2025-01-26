@@ -49,7 +49,7 @@ public class RoomService {
         }
         String nickname = participantService.findParticipantBySessionId(sessionId).getUsername();
         ChatMessage msg = new ChatMessage();
-        msg.setSender("system");
+        msg.setSenderSessionId("system");
         msg.setText(nickname + " has joined the room.");
         msg.setType("system");
         chatService.sendChatMessage(roomId, msg);
@@ -61,7 +61,7 @@ public class RoomService {
      if (room == null) return;
      room.getGame().removeParticipant(participant.getSessionId());
      ChatMessage leaveMsg = new ChatMessage();
-     leaveMsg.setSender("system");
+     leaveMsg.setSenderSessionId("system");
      leaveMsg.setText(participant.getUsername() + " has left the room.");
      leaveMsg.setType("system");
      chatService.sendChatMessage(roomId, leaveMsg);

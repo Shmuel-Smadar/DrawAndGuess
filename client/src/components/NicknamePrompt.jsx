@@ -1,8 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react'
+import { useDispatch } from 'react-redux'
+import { setUsername, setNicknameError, setSessionId } from '../store/userSlice'
 import './NicknamePrompt.css'
 
-const NicknamePrompt = ({ client, connected, setUsername, setNicknameError, error }) => {
+const NicknamePrompt = ({ client, connected, error }) => {
   const [nicknameInput, setNicknameInput] = useState('')
+  const dispatch = useDispatch()
   const currentNickname = useRef('')
 
   useEffect(() => {
@@ -10,15 +13,16 @@ const NicknamePrompt = ({ client, connected, setUsername, setNicknameError, erro
       const subscription = client.subscribe('/user/topic/nickname', (message) => {
         const data = JSON.parse(message.body)
         if (data.success) {
-          setUsername(currentNickname.current)
-          setNicknameError('')
+          dispatch(setUsername(currentNickname.current))
+          dispatch(setNicknameError(''))
+          dispatch(setSessionId(data.sessionId))
         } else {
-          setNicknameError(data.message)
+          dispatch(setNicknameError(data.message))
         }
       })
       return () => subscription.unsubscribe()
     }
-  }, [client, connected, setUsername, setNicknameError])
+  }, [client, connected, dispatch])
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -28,7 +32,7 @@ const NicknamePrompt = ({ client, connected, setUsername, setNicknameError, erro
       const registrationMessage = { nickname: trimmedNickname }
       client.publish({
         destination: '/app/registerNickname',
-        body: JSON.stringify(registrationMessage),
+        body: JSON.stringify(registrationMessage)
       })
     }
   }

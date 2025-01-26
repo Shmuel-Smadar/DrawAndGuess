@@ -1,5 +1,4 @@
 import { useCallback } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
 import { setIsFillMode } from '../store/drawSlice';
 import { getEventCoordinates } from '../utils/helpers';
 import { VIRTUAL_WIDTH, VIRTUAL_HEIGHT } from '../utils/constants';

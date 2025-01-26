@@ -2,15 +2,17 @@ package com.example.drawandguess.model;
 
 public class ChatMessage {
     private String text;
-    private String sender;
+    private String senderSessionId;
+    private String senderUsername;
     private String type;
 
     public ChatMessage() {
     }
 
-    public ChatMessage(String text, String sender, String type) {
+    public ChatMessage(String text, String senderSessionId, String senderUsername, String type) {
         this.text = text;
-        this.sender = sender;
+        this.senderSessionId = senderSessionId;
+        this.senderUsername = senderUsername;
         this.type = type;
     }
 
@@ -22,12 +24,12 @@ public class ChatMessage {
         this.text = text;
     }
 
-    public String getSender() {
-        return sender;
+    public String getSenderSessionId() {
+        return senderSessionId;
     }
 
-    public void setSender(String sender) {
-        this.sender = sender;
+    public void setSenderSessionId(String senderSessionId) {
+        this.senderSessionId = senderSessionId;
     }
 
     public String getType() {
