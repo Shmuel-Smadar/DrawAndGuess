@@ -9,7 +9,6 @@ const NicknamePrompt = ({ client, connected, setUsername, setNicknameError, erro
     if (client && connected) {
       const subscription = client.subscribe('/user/topic/nickname', (message) => {
         const data = JSON.parse(message.body)
-        console.log('Received nickname data:', data)
         if (data.success) {
           setUsername(currentNickname.current)
           setNicknameError('')

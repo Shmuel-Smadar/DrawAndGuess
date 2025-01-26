@@ -6,29 +6,23 @@ const WordHint = ({ client, roomId, isDrawer }) => {
 
   useEffect(() => {
     if (!client || !client.connected || isDrawer) return;
-
     const subscription = client.subscribe(`/topic/room/${roomId}/wordHint`, (message) => {
       const hint = message.body;
-      console.log(hint)
       setCurrentHint(hint);
     });
-
     return () => {
       subscription.unsubscribe();
     };
   }, [client, roomId, isDrawer]);
 
   useEffect(() => {
-      if (!client || !roomId) return;
-  
-      client.publish({
-        destination: `/app/room/${roomId}/getCurrentHint`,
-        body: ''
-      });
-    }, [client, roomId]);
-  
-
-
+    if (!client || !roomId) return;
+    
+    client.publish({
+      destination: `/app/room/${roomId}/getCurrentHint`,
+      body: ''
+    });
+  }, [client, roomId]);
   if (isDrawer) return null;
 
   return (

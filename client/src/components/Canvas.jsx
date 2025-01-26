@@ -1,4 +1,7 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
+import { setIsFillMode } from '../store/drawSlice'
+import { floodFill } from '../utils/floodFill'
 import { getEventCoordinates } from '../utils/helpers'
 import './Canvas.css'
 
@@ -6,7 +9,12 @@ const VIRTUAL_WIDTH = 10
 const VIRTUAL_HEIGHT = 16
 const ASPECT_RATIO = VIRTUAL_WIDTH / VIRTUAL_HEIGHT
 
-const Canvas = ({ client, color, userID, roomId, isDrawingAllowed, brushSize, isFillMode, onFillToggle}) => {
+function Canvas({ client, userID, roomId }) {
+  const color = useSelector(state => state.draw.color)
+  const brushSize = useSelector(state => state.draw.brushSize)
+  const isFillMode = useSelector(state => state.draw.isFillMode)
+  const isDrawingAllowed = useSelector(state => state.game.isDrawingAllowed)
+  const dispatch = useDispatch()
   const canvasRef = useRef(null)
   const lastPositions = useRef({})
   const [isDrawing, setIsDrawing] = useState(false)
@@ -57,7 +65,7 @@ const Canvas = ({ client, color, userID, roomId, isDrawingAllowed, brushSize, is
 
   useEffect(() => {
     if (!client || !client.connected) return
-    const subscription = client.subscribe(`/topic/room/${roomId}/drawing`, (msg) => {
+    const sub = client.subscribe(`/topic/room/${roomId}/drawing`, msg => {
       const data = JSON.parse(msg.body)
       const canvas = canvasRef.current
       if (!canvas) return
@@ -74,11 +82,10 @@ const Canvas = ({ client, color, userID, roomId, isDrawingAllowed, brushSize, is
       } else if (data.eventType === 'DRAW') {
         ctx.lineWidth = data.brushSize
         const lastPos = lastPositions.current[data.userID]
+        ctx.beginPath()
         if (lastPos) {
-          ctx.beginPath()
           ctx.moveTo(lastPos.x, lastPos.y)
         } else {
-          ctx.beginPath()
           ctx.moveTo(offsetX, offsetY)
         }
         ctx.lineTo(offsetX, offsetY)
@@ -90,66 +97,22 @@ const Canvas = ({ client, color, userID, roomId, isDrawingAllowed, brushSize, is
         floodFill(ctx, Math.floor(offsetX), Math.floor(offsetY), data.color)
       }
     })
-    return () => subscription.unsubscribe()
+    return () => sub.unsubscribe()
   }, [client, roomId])
 
   useEffect(() => {
     if (!client || !client.connected) return
-    const clearSubscription = client.subscribe(`/topic/room/${roomId}/clearCanvas`, () => {
+    const clearSub = client.subscribe(`/topic/room/${roomId}/clearCanvas`, () => {
       const canvas = canvasRef.current
       if (canvas) {
         const ctx = canvas.getContext('2d')
         ctx.clearRect(0, 0, canvas.width, canvas.height)
       }
     })
-    return () => clearSubscription.unsubscribe()
+    return () => clearSub.unsubscribe()
   }, [client, roomId])
 
-  const floodFill = (ctx, x, y, fillHex) => {
-    const { width, height } = ctx.canvas
-    const imgData = ctx.getImageData(0, 0, width, height)
-    const data = imgData.data
-    const getPixel = (xx, yy) => {
-      const i = (yy * width + xx) * 4
-      return [data[i], data[i+1], data[i+2], data[i+3]]
-    }
-    const targetColor = getPixel(x, y)
-    const fillR = parseInt(fillHex.slice(1, 3), 16)
-    const fillG = parseInt(fillHex.slice(3, 5), 16)
-    const fillB = parseInt(fillHex.slice(5, 7), 16)
-    if (
-      targetColor[0] === fillR &&
-      targetColor[1] === fillG &&
-      targetColor[2] === fillB &&
-      targetColor[3] === 255
-    ) {
-      return
-    }
-    const stack = [[x, y]]
-    while (stack.length) {
-      const [cx, cy] = stack.pop()
-      const c = getPixel(cx, cy)
-      if (
-        c[0] === targetColor[0] &&
-        c[1] === targetColor[1] &&
-        c[2] === targetColor[2] &&
-        c[3] === targetColor[3]
-      ) {
-        const i = (cy * width + cx) * 4
-        data[i] = fillR
-        data[i+1] = fillG
-        data[i+2] = fillB
-        data[i+3] = 255
-        if (cx > 0) stack.push([cx - 1, cy])
-        if (cx < width - 1) stack.push([cx + 1, cy])
-        if (cy > 0) stack.push([cx, cy - 1])
-        if (cy < height - 1) stack.push([cx, cy + 1])
-      }
-    }
-    ctx.putImageData(imgData, 0, 0)
-  }
-
-  const startDrawing = (event) => {
+  function startDrawing(event) {
     event.preventDefault()
     if (!isDrawingAllowed || !client) return
     if (isFillMode) {
@@ -157,15 +120,15 @@ const Canvas = ({ client, color, userID, roomId, isDrawingAllowed, brushSize, is
       const { width, height } = canvasRef.current
       const normX = (offsetX / width) * VIRTUAL_WIDTH
       const normY = (offsetY / height) * VIRTUAL_HEIGHT
-      const message = {
+      const msg = {
         normX,
         normY,
         color,
         userID: String(userID),
         eventType: 'FILL'
       }
-      client.publish({ destination: `/app/room/${roomId}/fill`, body: JSON.stringify(message) })
-      onFillToggle()
+      client.publish({ destination: `/app/room/${roomId}/fill`, body: JSON.stringify(msg) })
+      dispatch(setIsFillMode(false))
       return
     }
     const { offsetX, offsetY } = getEventCoordinates(event, canvasRef)
@@ -189,7 +152,7 @@ const Canvas = ({ client, color, userID, roomId, isDrawingAllowed, brushSize, is
     client.publish({ destination: `/app/room/${roomId}/startDrawing`, body: JSON.stringify(message) })
   }
 
-  const draw = (event) => {
+  function draw(event) {
     if (!isDrawing || !isDrawingAllowed || !client || isFillMode) return
     event.preventDefault()
     const { offsetX, offsetY } = getEventCoordinates(event, canvasRef)
@@ -200,23 +163,23 @@ const Canvas = ({ client, color, userID, roomId, isDrawingAllowed, brushSize, is
     ctx.lineTo(offsetX, offsetY)
     ctx.stroke()
     lastPositions.current[userID] = { x: offsetX, y: offsetY }
-    const message = {
+    const msg = {
       normX,
       normY,
       brushSize,
       userID: String(userID),
       eventType: 'DRAW'
     }
-    client.publish({ destination: `/app/room/${roomId}/draw`, body: JSON.stringify(message) })
+    client.publish({ destination: `/app/room/${roomId}/draw`, body: JSON.stringify(msg) })
   }
 
-  const stopDrawing = (event) => {
+  function stopDrawing(event) {
     event.preventDefault()
     if (!isDrawingAllowed || !client) return
     setIsDrawing(false)
     delete lastPositions.current[userID]
-    const message = { userID: String(userID), eventType: 'STOP' }
-    client.publish({ destination: `/app/room/${roomId}/stopDrawing`, body: JSON.stringify(message) })
+    const msg = { userID: String(userID), eventType: 'STOP' }
+    client.publish({ destination: `/app/room/${roomId}/stopDrawing`, body: JSON.stringify(msg) })
   }
 
   return (
@@ -233,4 +196,5 @@ const Canvas = ({ client, color, userID, roomId, isDrawingAllowed, brushSize, is
     />
   )
 }
+
 export default Canvas

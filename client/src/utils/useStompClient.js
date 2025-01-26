@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react'
 import { Client } from '@stomp/stompjs'
 import SockJS from 'sockjs-client'
 
-
 export default function useStompClient(baseUrl) {
   const [client, setClient] = useState(null)
   const [connected, setConnected] = useState(false)
@@ -13,15 +12,12 @@ export default function useStompClient(baseUrl) {
       webSocketFactory: () => new SockJS(baseUrl),
       debug: (str) => console.log(str),
       onConnect: () => {
-        console.log('Connected to STOMP')
         setConnected(true)
       },
       onDisconnect: () => {
-        console.log('Disconnected from STOMP')
         setConnected(false)
       },
     })
-
     stompClient.activate()
     setClient(stompClient)
     return () => {

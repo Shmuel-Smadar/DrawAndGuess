@@ -1,88 +1,89 @@
 import React, { useState } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
+import { setColor, setBrushSize, setIsFillMode } from '../store/drawSlice'
 import ClearIcon from '../assets/trash-bin.png'
 import BrushIcon from '../assets/paint-brush.png'
 import BucketIcon from '../assets/paint-bucket.png'
-
 import './ColorPicker.css'
+
 const colors = [
-  { name: '', code: '#000000' },
-  { name: '', code: '#FF0000' },
-  { name: '', code: '#00FF00' },
-  { name: '', code: '#0000FF' },
-  { name: '', code: '#FFFF00' },
-  { name: '', code: '#A52A2A' },
-  { name: '', code: '#800080' },
-  { name: '', code: '#FFA500' },
-  { name: '', code: '#FFC0CB' },
-  { name: '', code: '#808080' },
-  { name: '', code: '#00FFFF' },
-  { name: '', code: '#FF00FF' },
-  { name: '', code: '#8950F7' },
-  
+  { code: '#000000' },
+  { code: '#FF0000' },
+  { code: '#00FF00' },
+  { code: '#0000FF' },
+  { code: '#FFFF00' },
+  { code: '#A52A2A' },
+  { code: '#800080' },
+  { code: '#FFA500' },
+  { code: '#FFC0CB' },
+  { code: '#808080' },
+  { code: '#00FFFF' },
+  { code: '#FF00FF' },
+  { code: '#8950F7' }
 ]
 const brushSizes = [
   { name: 'S', size: 2 },
   { name: 'M', size: 5 },
-  { name: 'L', size: 10 },
+  { name: 'L', size: 10 }
 ]
-const ColorPicker = ({
-  client,
-  setColor,
-  userID,
-  roomId,
-  isDrawingAllowed,
-  setBrushSize,
-  onFillToggle,
-  isFillMode
-}) => {
+
+function ColorPicker({ client, userID, roomId, isDrawer }) {
+  const dispatch = useDispatch()
   const [showSizeList, setShowSizeList] = useState(false)
-  const handleClearCanvas = () => {
+  const color = useSelector(state => state.draw.color)
+  const isFillMode = useSelector(state => state.draw.isFillMode)
+
+  function handleClearCanvas() {
     if (!client || !client.connected || !roomId) return
     const message = { userID }
     client.publish({
       destination: `/app/room/${roomId}/clearCanvas`,
-      body: JSON.stringify(message),
+      body: JSON.stringify(message)
     })
   }
+
   return (
     <div className="color-picker-container">
-      {isDrawingAllowed && (
+      {isDrawer && (
         <div className="color-buttons">
-          <button onClick={handleClearCanvas} className="clear-button" aria-label="Clear Canvas">
-            <img src={ClearIcon} alt="Clear Canvas" className="button-icon" />
+          <button onClick={handleClearCanvas} className="clear-button">
+            <img src={ClearIcon} alt="" className="button-icon" />
           </button>
           <button
-            onClick={onFillToggle}
-            className={isFillMode ? "fill-button active" : "fill-button"}
+            onClick={() => dispatch(setIsFillMode(!isFillMode))}
+            className={isFillMode ? 'fill-button active' : 'fill-button'}
           >
-            <img src={BucketIcon} alt="Fill shape" className="button-icon" />
+            <img src={BucketIcon} alt="" className="button-icon" />
           </button>
           <div className="brush-size-dropdown">
-            <button onClick={() => setShowSizeList(!showSizeList)} className="brush-size-button">
-              <img src={BrushIcon} alt="Brush Size" className="button-icon" />
+            <button
+              onClick={() => setShowSizeList(!showSizeList)}
+              className="brush-size-button"
+            >
+              <img src={BrushIcon} alt="" className="button-icon" />
             </button>
             {showSizeList && (
               <div className="brush-size-list">
-                {brushSizes.map((brush) => (
+                {brushSizes.map(b => (
                   <button
-                    key={brush.size}
+                    key={b.size}
                     onClick={() => {
-                      setBrushSize(brush.size)
+                      dispatch(setBrushSize(b.size))
                       setShowSizeList(false)
                     }}
-                    className="brush-size-option"
                   >
-                    {brush.name}
+                    {b.name}
                   </button>
                 ))}
               </div>
             )}
           </div>
-          {colors.map((colorObj) => (
+          {colors.map(c => (
             <button
-              key={colorObj.code}
-              onClick={() => setColor(colorObj.code)}
-              style={{ backgroundColor: colorObj.code }}
+              key={c.code}
+              style={{ backgroundColor: c.code }}
+              onClick={() => dispatch(setColor(c.code))}
+              className={color === c.code ? 'selected-color' : ''}
             />
           ))}
         </div>

@@ -22,7 +22,7 @@ const Chat = ({ client, roomId, username, canChat, width, height }) => {
         setUnreadCount((prevCount) => prevCount + 1);
       }
     });
-
+    
     return () => {
       subscription.unsubscribe();
     };
@@ -37,7 +37,6 @@ const Chat = ({ client, roomId, username, canChat, width, height }) => {
   useEffect(() => {
     const chatWindow = chatWindowRef.current;
     if (!chatWindow) return;
-
     const handleScroll = () => {
       const { scrollTop, scrollHeight, clientHeight } = chatWindow;
       const atBottom = scrollHeight - scrollTop - clientHeight < 100;
@@ -47,7 +46,6 @@ const Chat = ({ client, roomId, username, canChat, width, height }) => {
         setUnreadCount(0);
       }
     };
-
     chatWindow.addEventListener('scroll', handleScroll);
     return () => {
       chatWindow.removeEventListener('scroll', handleScroll);
@@ -67,7 +65,6 @@ const Chat = ({ client, roomId, username, canChat, width, height }) => {
 
   const handleSendMessage = () => {
     if (!client || !roomId || newMessage.trim() === '') return;
-    console.log(username)
     const messageData = {
       text: newMessage,
       sender: username,

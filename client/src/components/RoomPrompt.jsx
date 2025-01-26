@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import './RoomPrompt.css'
 
-const RoomPrompt = ({ client, connected, setRoom}) => {
+const RoomPrompt = ({ client, connected, setRoom }) => {
   const [newRoomName, setNewRoomName] = useState('')
   const [error, setError] = useState('')
   const [rooms, setRooms] = useState([])
@@ -16,11 +16,8 @@ const RoomPrompt = ({ client, connected, setRoom}) => {
       destination: '/app/getRooms',
       body: ''
     })
-    return () => {
-      subscription.unsubscribe()
-    };
+    return () => subscription.unsubscribe()
   }, [client, connected])
-
 
   const handleJoinRoom = (room) => {
     if (client && connected) {
