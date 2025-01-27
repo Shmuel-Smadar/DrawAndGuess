@@ -14,7 +14,6 @@ const ParticipantsList = ({ client, height, roomId, username, onDrawerChange }) 
       const me = participants.find((p) => p.username === username);
       onDrawerChange(me && me.isDrawer);
     });
-
     return () => {
       subscription.unsubscribe();
     };
@@ -22,7 +21,6 @@ const ParticipantsList = ({ client, height, roomId, username, onDrawerChange }) 
 
   useEffect(() => {
     if (!client || !roomId) return;
-
     client.publish({
       destination: `/app/room/${roomId}/getParticipants`,
       body: ''
@@ -37,7 +35,9 @@ const ParticipantsList = ({ client, height, roomId, username, onDrawerChange }) 
       <div className="participants-window" ref={participantsWindowRef}>
         {userList.map((user) => (
           <div key={user.sessionId} className="participant-item">
-            <span className="participant-name">{user.username}</span>
+            <span className="participant-name">
+              {user.username} ({user.score})
+            </span>
             {user.isDrawer && (
               <span className="drawer-indicator"> (Drawing)</span>
             )}
@@ -46,6 +46,6 @@ const ParticipantsList = ({ client, height, roomId, username, onDrawerChange }) 
       </div>
     </div>
   );
-}
+};
 
 export default ParticipantsList;

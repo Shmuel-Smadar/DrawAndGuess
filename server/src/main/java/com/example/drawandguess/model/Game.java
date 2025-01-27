@@ -1,6 +1,15 @@
 package com.example.drawandguess.model;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.Random;
+import java.util.Arrays;
+import java.util.HashSet;
 
 public class Game {
     private final List<String> participantSessionIds = new ArrayList<>();
@@ -11,10 +20,10 @@ public class Game {
     private final List<String> wordPool = List.of(
             "Cat", "Computer", "Pizza", "Bicycle", "Tree", "Car", "House", "Sun", "Moon", "Banana"
     );
-
     private List<Integer> revealOrder = new ArrayList<>();
     private Set<Integer> revealedClues = new HashSet<>();
     private String currentHint = "";
+    private Map<String, Integer> scores = new HashMap<>();
 
     public List<Integer> getRevealOrder() {
         return revealOrder;
@@ -44,12 +53,15 @@ public class Game {
         if (!participantSessionIds.contains(sessionId)) {
             participantSessionIds.add(sessionId);
             if (currentDrawerIndex < 0) currentDrawerIndex = 0;
+            scores.put(sessionId, 0);
         }
     }
+
     public void removeParticipant(String sessionId) {
         int idx = participantSessionIds.indexOf(sessionId);
         if (idx != -1) {
             participantSessionIds.remove(idx);
+            scores.remove(sessionId);
             if (idx == currentDrawerIndex) {
                 if (participantSessionIds.isEmpty()) {
                     currentDrawerIndex = -1;
@@ -101,16 +113,14 @@ public class Game {
         );
     }
 
-
     public boolean hasMoreHints() {
         return !revealOrder.isEmpty();
     }
     private void initializeHint() {
         int length = chosenWord.length();
-        currentHintBuilder.setLength(0); // Clear any existing content
+        currentHintBuilder.setLength(0);
         currentHintBuilder.append("_".repeat(length));
         currentHint = currentHintBuilder.toString();
-
         List<Integer> clues = new ArrayList<>();
         for (int i = 0; i < length; i++) {
             clues.add(i);
@@ -126,17 +136,22 @@ public class Game {
             isFirstHint = false;
             return currentHint;
         }
-        System.out.println("nextHint() in: " + Arrays.toString(Thread.currentThread().getStackTrace()));
         int nextIndex = revealOrder.remove(0);
         revealedClues.add(nextIndex);
-
         currentHintBuilder.setCharAt(nextIndex, chosenWord.charAt(nextIndex));
         currentHint = currentHintBuilder.toString();
-
         return currentHint;
     }
 
     public String getChosenWord() {
         return this.chosenWord;
+    }
+
+    public void addScore(String sessionId, int amount) {
+        scores.put(sessionId, scores.getOrDefault(sessionId, 0) + amount);
+    }
+
+    public int getScore(String sessionId) {
+        return scores.getOrDefault(sessionId, 0);
     }
 }

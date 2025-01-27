@@ -6,7 +6,6 @@ import com.example.drawandguess.model.Room;
 import com.example.drawandguess.model.WordOptions;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
-
 import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -18,7 +17,6 @@ public class GameService {
     private final ParticipantService participantService;
     private final RoomService roomService;
     private final TaskScheduler taskScheduler;
-
     private final ConcurrentHashMap<String, ScheduledFuture<?>> hintTasks = new ConcurrentHashMap<>();
 
     public GameService(
@@ -69,14 +67,13 @@ public class GameService {
             msg.setText(username + " guessed the word correctly! Starting next round.");
             msg.setType("system");
             chatService.sendChatMessage(roomId, msg);
+            game.addScore(sessionId, 10);
+            game.addScore(game.getCurrentDrawer(), 5);
             stopHintProgression(roomId);
             game.nextRound();
             String newDrawerId = game.getCurrentDrawer();
             participantService.getAllParticipants().values().forEach(p ->
-                    participantService.setDrawer(
-                            p.getSessionId(),
-                            p.getSessionId().equals(newDrawerId)
-                    )
+                    participantService.setDrawer(p.getSessionId(), p.getSessionId().equals(newDrawerId))
             );
             roomService.broadcastParticipants(roomId);
         }
@@ -86,7 +83,6 @@ public class GameService {
         if (hintTasks.containsKey(roomId)) {
             return;
         }
-
         Room room = roomService.getRoom(roomId);
         if (room == null) return;
         Runnable hintTask = getRunnable(roomId, room);
@@ -96,7 +92,6 @@ public class GameService {
 
     private Runnable getRunnable(String roomId, Room room) {
         Game game = room.getGame();
-
         return new Runnable() {
             @Override
             public void run() {

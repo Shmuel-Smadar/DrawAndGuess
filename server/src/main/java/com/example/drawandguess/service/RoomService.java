@@ -4,9 +4,12 @@ import com.example.drawandguess.model.Participant;
 import com.example.drawandguess.model.Room;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
-
-import java.util.*;
+import java.util.Map;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.Timer;
+import java.util.TimerTask;
 
 @Service
 public class RoomService {
@@ -15,11 +18,7 @@ public class RoomService {
     private final ChatService chatService;
     private final SimpMessagingTemplate messagingTemplate;
 
-    public RoomService(
-            ParticipantService participantService,
-            ChatService chatService,
-            SimpMessagingTemplate messagingTemplate
-    ) {
+    public RoomService(ParticipantService participantService, ChatService chatService, SimpMessagingTemplate messagingTemplate) {
         this.participantService = participantService;
         this.chatService = chatService;
         this.messagingTemplate = messagingTemplate;
@@ -55,31 +54,28 @@ public class RoomService {
         chatService.sendChatMessage(roomId, msg);
         broadcastParticipants(roomId);
     }
-    public void removeParticipantFromRoom(String roomId, Participant participant)
-     {
-     Room room = rooms.get(roomId);
-     if (room == null) return;
-     room.getGame().removeParticipant(participant.getSessionId());
-     ChatMessage leaveMsg = new ChatMessage();
-     leaveMsg.setSenderSessionId("system");
-     leaveMsg.setText(participant.getUsername() + " has left the room.");
-     leaveMsg.setType("system");
-     chatService.sendChatMessage(roomId, leaveMsg);
-     String newDrawerId = room.getGame().getCurrentDrawer();
-     participantService.getAllParticipants().values().forEach(p ->
-             participantService.setDrawer(
-                     p.getSessionId(),
-                     p.getSessionId().equals(newDrawerId)
-             )       );
-     broadcastParticipants(roomId);
-     }
-
+    public void removeParticipantFromRoom(String roomId, Participant participant) {
+        Room room = rooms.get(roomId);
+        if (room == null) return;
+        room.getGame().removeParticipant(participant.getSessionId());
+        ChatMessage leaveMsg = new ChatMessage();
+        leaveMsg.setSenderSessionId("system");
+        leaveMsg.setText(participant.getUsername() + " has left the room.");
+        leaveMsg.setType("system");
+        chatService.sendChatMessage(roomId, leaveMsg);
+        String newDrawerId = room.getGame().getCurrentDrawer();
+        participantService.getAllParticipants().values().forEach(p ->
+            participantService.setDrawer(
+                    p.getSessionId(),
+                    p.getSessionId().equals(newDrawerId)
+                )      
+             );
+        broadcastParticipants(roomId);
+    }
 
     public void removeParticipantFromAllRooms(Participant participant) {
         String sessionId = participant.getSessionId();
         for (Room room : rooms.values()) {
-            System.out.println("room:");
-            System.out.println(room.getGame().getParticipantSessionIds());
             if (room.getGame().getParticipantSessionIds().contains(sessionId)) {
                 removeParticipantFromRoom(room.getRoomId(), participantService.findParticipantBySessionId(sessionId));
                 broadcastParticipants(room.getRoomId());
@@ -93,11 +89,12 @@ public class RoomService {
             public void run() {
                 Room room = rooms.get(roomId);
                 if (room == null) return;
-
                 List<String> participantIds = room.getGame().getParticipantSessionIds();
-                messagingTemplate.convertAndSend(
-                        "/topic/room/" + roomId + "/participants",
-                        participantService.getParticipantsBySessionIds(participantIds));
+                List<Participant> participantList = participantService.getParticipantsBySessionIds(participantIds);
+                for (Participant p : participantList) {
+                    p.setScore(room.getGame().getScore(p.getSessionId()));
+                }
+                messagingTemplate.convertAndSend("/topic/room/" + roomId + "/participants", participantList);
             }
         }, 100);
     }

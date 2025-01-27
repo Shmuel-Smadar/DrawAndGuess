@@ -5,9 +5,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class Participant {
     private String sessionId;
     private String username;
-
     @JsonProperty("isDrawer")
     private boolean isDrawer;
+    private int score;
 
     public Participant() {}
 
@@ -41,5 +41,13 @@ public class Participant {
     @JsonProperty("isDrawer")
     public void setDrawer(boolean drawer) {
         this.isDrawer = drawer;
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public void setScore(int score) {
+        this.score = score;
     }
 }
