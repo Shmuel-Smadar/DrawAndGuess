@@ -11,7 +11,7 @@
 !*.java
 
 !pom.xml
-
+!package.json
 # Keep .gitignore itself
 !.gitignore
 
