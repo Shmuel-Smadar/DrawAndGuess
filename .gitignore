@@ -9,12 +9,15 @@
 !*.js
 !*.css
 !*.java
-
+!*.html
+!*.png
+!*.ico
+!*.svg
 !pom.xml
 !package.json
 # Keep .gitignore itself
 !.gitignore
-
+!manifest.json
 
 # dependencies
 /client/node_modules
