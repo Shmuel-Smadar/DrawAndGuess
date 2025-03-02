@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from 'react'
 import './RoomPrompt.css'
+import LeaderboardOverlay from './LeaderboardOverlay'
 
 const RoomPrompt = ({ client, connected, setRoom }) => {
   const [newRoomName, setNewRoomName] = useState('')
   const [error, setError] = useState('')
   const [rooms, setRooms] = useState([])
+  
+  // Track whether the leaderboard is open
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
 
   useEffect(() => {
     if (!client || !connected) return
@@ -54,6 +58,17 @@ const RoomPrompt = ({ client, connected, setRoom }) => {
   return (
     <div className="room-prompt">
       <h2>Select a Room</h2>
+
+      <button className="leaderboard-button" onClick={() => setShowLeaderboard(true)}>
+        Show Leaderboard
+      </button>
+
+      {/* The overlay for the leaderboard, only if showLeaderboard is true */}
+      {showLeaderboard && (
+        <LeaderboardOverlay onClose={() => setShowLeaderboard(false)} />
+      )}
+
+      {/* A scrollable grid for the rooms */}
       <div className="room-list">
         {rooms.map((room) => (
           <div className="room-item" key={room.roomId}>
@@ -67,7 +82,8 @@ const RoomPrompt = ({ client, connected, setRoom }) => {
           </div>
         ))}
       </div>
-      <form onSubmit={handleCreateRoom}>
+
+      <form onSubmit={handleCreateRoom} className="new-room-form">
         <input
           type="text"
           value={newRoomName}
