@@ -1,6 +1,5 @@
 import { useRef, useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { setIsFillMode } from '../store/drawSlice';
 import { useCanvasResize } from './useCanvasResize';
 import { useCanvasSubscriptions } from './useCanvasSubscriptions';
 import { useDrawingHandlers } from './useDrawingHandlers';

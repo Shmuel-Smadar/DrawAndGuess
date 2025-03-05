@@ -1,5 +1,4 @@
-import { useEffect, useRef } from 'react';
-import { useSelector } from 'react-redux';
+import { useEffect } from 'react';
 import { floodFill } from '../utils/floodFill';
 import { VIRTUAL_WIDTH, VIRTUAL_HEIGHT } from '../utils/constants';
 

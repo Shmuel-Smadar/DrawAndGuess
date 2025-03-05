@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { VIRTUAL_WIDTH, VIRTUAL_HEIGHT, ASPECT_RATIO } from '../utils/constants';
+import { ASPECT_RATIO } from '../utils/constants';
 
 export const useCanvasResize = (canvasRef) => {
   const resizeCanvas = useCallback(() => {
