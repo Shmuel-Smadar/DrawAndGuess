@@ -29,7 +29,7 @@ export const useCanvasResize = (canvasRef) => {
     ctx.putImageData(imageData, 0, 0);
     ctx.lineWidth = 2;
     ctx.lineCap = 'round';
-  }, []);
+  }, [canvasRef]);
 
   return resizeCanvas;
 };
