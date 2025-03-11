@@ -96,7 +96,7 @@ function App() {
           username={username}
           canChat={true}
           width={window.innerWidth * 0.9}
-          height={window.innerHeight * 0.83}
+          height={window.innerHeight * 0.80}
           onDrawerChange={handleDrawerChange}
         />
       </div>
