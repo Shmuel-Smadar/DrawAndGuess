@@ -5,14 +5,12 @@
   }
   
   .color-buttons {
-      display: flex;
-      flex-wrap: wrap;       
-      align-items: center;
-      margin-bottom: 10px;
-      width: 400px;          
-      justify-content: center;
-      row-gap: 10px; 
-  }
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    row-gap: 10px;
+    max-width: 400px;
+}
   
   .color-buttons > button,
   .color-buttons .brush-size-button {
