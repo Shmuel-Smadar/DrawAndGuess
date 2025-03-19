@@ -1,41 +1,51 @@
 .leaderboard-overlay {
-    position: fixed; 
-    top: 0; 
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 999; 
-  }
-  
+  position: fixed; 
+  top: 0; 
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999; 
+}
+
+.leaderboard-modal {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 6px;
+  width: 90%;            /* Use most of the screen on small devices */
+  max-width: 600px;      /* But don't let it grow too wide */
+  min-height: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+/* Optional: Adjust padding or font-sizes for larger screens */
+@media screen and (min-width: 768px) {
   .leaderboard-modal {
-    background: #fff;
-    padding: 1.5rem;
-    border-radius: 6px;
-    min-width: 300px;
-    min-height: 200px;
-    max-height: 80vh; 
-    overflow-y: auto;
-    position: relative;
+    width: 500px;  /* fixed width for larger screens */
   }
-  
-  .close-button {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    background: #e74c3c;
-    color: #fff;
-    border: none;
-    border-radius: 3px;
-    width: 30px;
-    height: 30px;
-    cursor: pointer;
-  }
-  
-  .close-button:hover {
-    background: #c0392b;
-  }
-  
+}
+
+.close-button {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: #e74c3c;
+  color: #fff;
+  border: none;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.close-button:hover {
+  background: #c0392b;
+}

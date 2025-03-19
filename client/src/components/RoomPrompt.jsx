@@ -6,8 +6,6 @@ const RoomPrompt = ({ client, connected, setRoom }) => {
   const [newRoomName, setNewRoomName] = useState('')
   const [error, setError] = useState('')
   const [rooms, setRooms] = useState([])
-  
-  // Track whether the leaderboard is open
   const [showLeaderboard, setShowLeaderboard] = useState(false);
 
   useEffect(() => {
@@ -59,28 +57,23 @@ const RoomPrompt = ({ client, connected, setRoom }) => {
     <div className="room-prompt">
       <h2>Select a Room</h2>
 
-      <button className="leaderboard-button" onClick={() => setShowLeaderboard(true)}>
-        Show Leaderboard
-      </button>
-
-      {/* The overlay for the leaderboard, only if showLeaderboard is true */}
-      {showLeaderboard && (
-        <LeaderboardOverlay onClose={() => setShowLeaderboard(false)} />
-      )}
-
-      {/* A scrollable grid for the rooms */}
-      <div className="room-list">
-        {rooms.map((room) => (
-          <div className="room-item" key={room.roomId}>
-            <div className="room-info">
-              <span className="room-name">{room.roomName}</span>
-              <span className="participants">{room.numberOfParticipants}/10</span>
+      <div className="scrollable-rooms">
+        <div className="room-list">
+          {rooms.map((room) => (
+            <div className="room-item" key={room.roomId}>
+              <div className="room-info">
+                <span className="room-name">{room.roomName}</span>
+                <span className="participants">{room.numberOfParticipants}/10</span>
+              </div>
+              <button
+                className="join-button"
+                onClick={() => handleJoinRoom(room)}
+              >
+                Join
+              </button>
             </div>
-            <button className="join-button" onClick={() => handleJoinRoom(room)}>
-              Join
-            </button>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
 
       <form onSubmit={handleCreateRoom} className="new-room-form">
@@ -95,6 +88,17 @@ const RoomPrompt = ({ client, connected, setRoom }) => {
         <button type="submit">Create Room</button>
         {error && <div className="error">{error}</div>}
       </form>
+
+      <button
+        className="leaderboard-button"
+        onClick={() => setShowLeaderboard(true)}
+      >
+        Show Leaderboard
+      </button>
+
+      {showLeaderboard && (
+        <LeaderboardOverlay onClose={() => setShowLeaderboard(false)} />
+      )}
     </div>
   )
 }

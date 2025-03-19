@@ -1,34 +1,70 @@
 .leaderboard-container {
-    max-height: 70vh;
-    overflow-y: auto;
-  }
-  
-  .leaderboard-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px;
-    margin: 8px 0;
-    background: #f8f9fa;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  }
-  
-  .leaderboard-rank {
-    font-weight: bold;
-    min-width: 30px;
-  }
-  
-  .leaderboard-username {
-    flex-grow: 1;
-    margin: 0 15px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  
-  .leaderboard-score {
-    font-weight: bold;
-    color: #2ecc71;
-    min-width: 80px;
-    text-align: right;
-  }
+  max-height: 70vh;
+  overflow-y: auto;
+  padding: 20px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.leaderboard-title {
+  margin: 0 0 15px;
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.leaderboard-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.leaderboard-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+  /* Add a smooth hover effect to highlight an item */
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.leaderboard-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.leaderboard-rank-container {
+  display: flex;
+  align-items: center;
+  min-width: 50px;
+}
+
+.leaderboard-rank {
+  font-weight: bold;
+  font-size: 1.1rem;
+  margin-right: 4px;
+}
+
+.leaderboard-medal {
+  font-size: 1.3rem;
+}
+
+.leaderboard-username {
+  flex-grow: 1;
+  margin: 0 15px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.leaderboard-score {
+  font-weight: bold;
+  color: #27ae60;
+  min-width: 80px;
+  text-align: right;
+}
