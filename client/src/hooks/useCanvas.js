@@ -19,8 +19,6 @@ const useCanvas = ({ client, userID, roomId }) => {
 
   useEffect(() => {
     resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
-    return () => window.removeEventListener('resize', resizeCanvas);
   }, [resizeCanvas]);
 
   useEffect(() => {

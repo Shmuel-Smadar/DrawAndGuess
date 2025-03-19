@@ -21,12 +21,9 @@ export const useCanvasResize = (canvasRef) => {
     width = Math.min(width, maxWidth);
     height = Math.min(height, maxHeight);
 
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-
     canvas.width = width;
     canvas.height = height;
 
-    ctx.putImageData(imageData, 0, 0);
     ctx.lineWidth = 2;
     ctx.lineCap = 'round';
   }, [canvasRef]);
