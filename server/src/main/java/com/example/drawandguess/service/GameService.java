@@ -7,7 +7,6 @@ import com.example.drawandguess.model.WordOptions;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
-
 import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -22,11 +21,7 @@ public class GameService {
     private final ConcurrentHashMap<String, ScheduledFuture<?>> hintTasks = new ConcurrentHashMap<>();
     private final JmsTemplate jmsTemplate;
 
-    public GameService(ChatService chatService,
-                       ParticipantService participantService,
-                       RoomService roomService,
-                       TaskScheduler taskScheduler,
-                       JmsTemplate jmsTemplate) {
+    public GameService(ChatService chatService, ParticipantService participantService, RoomService roomService, TaskScheduler taskScheduler, JmsTemplate jmsTemplate) {
         this.chatService = chatService;
         this.participantService = participantService;
         this.roomService = roomService;
@@ -49,8 +44,7 @@ public class GameService {
             game.setChosenWord(chosenWord);
             ChatMessage msg = new ChatMessage();
             msg.setSenderSessionId("system");
-            msg.setText("A new round has started. The drawer is "
-                    + participantService.findParticipantBySessionId(sessionId).getUsername() + ".");
+            msg.setText("A new round has started. The drawer is " + participantService.findParticipantBySessionId(sessionId).getUsername() + ". (Round " + (game.getRoundCount() + 1) + "/" + game.getTotalRounds() + ")");
             msg.setType("system");
             chatService.sendChatMessage(roomId, msg);
             startHintProgression(roomId);
@@ -61,87 +55,107 @@ public class GameService {
         Room room = roomService.getRoom(roomId);
         if (room == null) return;
         Game game = room.getGame();
-
         if (game.isCorrectGuess(guess)) {
-            String username = participantService
-                    .findParticipantBySessionId(sessionId)
-                    .getUsername();
-
-            ChatMessage msg = new ChatMessage();
-            msg.setSenderSessionId("system");
-            msg.setText(username + " guessed the word correctly! Starting next round.");
-            msg.setType("system");
-            chatService.sendChatMessage(roomId, msg);
-
-            // Update game scores
+            String username = participantService.findParticipantBySessionId(sessionId).getUsername();
             game.addScore(sessionId, 10);
-            game.addScore(game.getCurrentDrawer(), 5);
-
-            // Instead of ephemeral sessionId, send the final username to JMS
+            if (game.getCurrentDrawer() != null) game.addScore(game.getCurrentDrawer(), 5);
             String drawerId = game.getCurrentDrawer();
-            String drawerUsername = participantService
-                    .findParticipantBySessionId(drawerId)
-                    .getUsername();
-
+            String drawerUsername = drawerId == null ? "" : participantService.findParticipantBySessionId(drawerId).getUsername();
             jmsTemplate.convertAndSend("leaderboardQueue", username + ":" + game.getScore(sessionId));
-            jmsTemplate.convertAndSend("leaderboardQueue", drawerUsername + ":" + game.getScore(drawerId));
-
+            if (!drawerUsername.isEmpty()) jmsTemplate.convertAndSend("leaderboardQueue", drawerUsername + ":" + game.getScore(drawerId));
             stopHintProgression(roomId);
             game.nextRound();
-
-            String newDrawerId = game.getCurrentDrawer();
-            participantService.getAllParticipants().values().forEach(p ->
-                    participantService.setDrawer(p.getSessionId(), p.getSessionId().equals(newDrawerId))
-            );
-            roomService.broadcastParticipants(roomId);
+            if (game.isGameOver()) {
+                announceScoresAndReset(roomId, "The game has ended after " + game.getTotalRounds() + " rounds. Final scores:");
+            } else {
+                ChatMessage msg = new ChatMessage();
+                msg.setSenderSessionId("system");
+                msg.setText(username + " guessed the word!");
+                msg.setType("system");
+                chatService.sendChatMessage(roomId, msg);
+                updateDrawerAndBroadcast(roomId, game);
+            }
         }
     }
 
     public void startHintProgression(String roomId) {
-        if (hintTasks.containsKey(roomId)) {
-            return;
-        }
+        if (hintTasks.containsKey(roomId)) return;
         Room room = roomService.getRoom(roomId);
         if (room == null) return;
-        Runnable hintTask = getRunnable(roomId, room);
-        ScheduledFuture<?> future = taskScheduler.scheduleAtFixedRate(hintTask, Duration.ofSeconds(10));
+        Runnable r = () -> {
+            Game g = room.getGame();
+            synchronized (g) {
+                if (!g.hasMoreHints()) {
+                    handleNoGuess(roomId, g);
+                    return;
+                }
+                String hint = g.nextHint();
+                sendHintToParticipants(roomId, hint);
+                if (!g.hasMoreHints()) handleNoGuess(roomId, g);
+            }
+        };
+        ScheduledFuture<?> future = taskScheduler.scheduleAtFixedRate(r, Duration.ofSeconds(10));
         hintTasks.put(roomId, future);
     }
 
-    private Runnable getRunnable(String roomId, Room room) {
-        Game game = room.getGame();
-        return new Runnable() {
-            @Override
-            public void run() {
-                synchronized (game) {
-                    if (!game.hasMoreHints()) {
-                        stopHintProgression(roomId);
-                        return;
-                    }
-                    String hint = game.nextHint();
-                    sendHintToParticipants(roomId, hint);
-                    if (!game.hasMoreHints()) {
-                        stopHintProgression(roomId);
-                    }
-                }
-            }
-        };
+    private void handleNoGuess(String roomId, Game game) {
+        stopHintProgression(roomId);
+        game.nextRound();
+        if (game.isGameOver()) {
+            announceScoresAndReset(roomId, "No one guessed the word. The game has ended after " + game.getTotalRounds() + " rounds. Final scores:");
+        } else {
+            ChatMessage msg = new ChatMessage();
+            msg.setSenderSessionId("system");
+            msg.setText("No one guessed the word.");
+            msg.setType("system");
+            chatService.sendChatMessage(roomId, msg);
+            updateDrawerAndBroadcast(roomId, game);
+        }
     }
 
     private void stopHintProgression(String roomId) {
-        ScheduledFuture<?> future = hintTasks.remove(roomId);
-        if (future != null) {
-            future.cancel(false);
+        ScheduledFuture<?> f = hintTasks.remove(roomId);
+        if (f != null) f.cancel(false);
+    }
+
+    private void announceScoresAndReset(String roomId, String endMessage) {
+        Room room = roomService.getRoom(roomId);
+        if (room == null) return;
+        Game game = room.getGame();
+        StringBuilder sb = new StringBuilder(endMessage).append(" ");
+        for (String pid : game.getParticipantSessionIds()) {
+            String uname = participantService.findParticipantBySessionId(pid).getUsername();
+            sb.append(uname).append("=").append(game.getScore(pid)).append("  ");
+        }
+        ChatMessage m = new ChatMessage();
+        m.setSenderSessionId("system");
+        m.setText(sb.toString());
+        m.setType("system");
+        chatService.sendChatMessage(roomId, m);
+        game.resetGame();
+        if (!game.getParticipantSessionIds().isEmpty()) {
+            String firstDrawerId = game.getCurrentDrawer();
+            participantService.getAllParticipants().values().forEach(p -> participantService.setDrawer(p.getSessionId(), p.getSessionId().equals(firstDrawerId)));
+            ChatMessage newGameMsg = new ChatMessage();
+            newGameMsg.setSenderSessionId("system");
+            newGameMsg.setText("A new game has started. (Round " + (game.getRoundCount() + 1) + "/" + game.getTotalRounds() + ") The drawer is " + participantService.findParticipantBySessionId(firstDrawerId).getUsername() + ".");
+            newGameMsg.setType("system");
+            chatService.sendChatMessage(roomId, newGameMsg);
+            roomService.broadcastParticipants(roomId);
         }
     }
 
     private void sendHintToParticipants(String roomId, String currentHint) {
-        Room room = roomService.getRoom(roomId);
-        if (room == null) return;
-        List<String> participantIds = room.getGame().getParticipantSessionIds();
-        String drawerId = room.getGame().getCurrentDrawer();
-        participantIds.stream()
-                .filter(s -> !s.equals(drawerId))
-                .forEach(s -> chatService.sendWordHint(s, roomId, currentHint));
+        Room r = roomService.getRoom(roomId);
+        if (r == null) return;
+        List<String> ids = r.getGame().getParticipantSessionIds();
+        String d = r.getGame().getCurrentDrawer();
+        ids.stream().filter(s -> !s.equals(d)).forEach(s -> chatService.sendWordHint(s, roomId, currentHint));
+    }
+
+    private void updateDrawerAndBroadcast(String roomId, Game g) {
+        String d = g.getCurrentDrawer();
+        participantService.getAllParticipants().values().forEach(p -> participantService.setDrawer(p.getSessionId(), p.getSessionId().equals(d)));
+        roomService.broadcastParticipants(roomId);
     }
 }

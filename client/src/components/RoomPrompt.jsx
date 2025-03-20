@@ -12,7 +12,17 @@ const RoomPrompt = ({ client, connected, setRoom }) => {
     if (!client || !connected) return
     const subscription = client.subscribe('/topic/rooms', (message) => {
       const data = JSON.parse(message.body)
-      setRooms(data)
+
+      /* sort the rooms according to player count (bigger first)
+       and rooms with the same player count will be sorted by A-Z  */
+      const sorted = data.sort((a, b) => {
+        if (b.numberOfParticipants !== a.numberOfParticipants) {
+          return b.numberOfParticipants - a.numberOfParticipants
+        }
+        return a.roomName.localeCompare(b.roomName)
+      })
+  
+      setRooms(sorted)
     })
     client.publish({
       destination: '/app/getRooms',
@@ -93,7 +103,7 @@ const RoomPrompt = ({ client, connected, setRoom }) => {
         className="leaderboard-button"
         onClick={() => setShowLeaderboard(true)}
       >
-        Show Leaderboard
+        Leaderboard
       </button>
 
       {showLeaderboard && (

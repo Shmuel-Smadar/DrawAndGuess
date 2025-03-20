@@ -15,18 +15,17 @@
   background: #fff;
   padding: 2rem;
   border-radius: 6px;
-  width: 90%;            /* Use most of the screen on small devices */
-  max-width: 600px;      /* But don't let it grow too wide */
+  width: 90%;
+  max-width: 600px;
   min-height: 500px;
   max-height: 90vh;
   overflow-y: auto;
   position: relative;
 }
 
-/* Optional: Adjust padding or font-sizes for larger screens */
 @media screen and (min-width: 768px) {
   .leaderboard-modal {
-    width: 500px;  /* fixed width for larger screens */
+    width: 500px;
   }
 }
 
