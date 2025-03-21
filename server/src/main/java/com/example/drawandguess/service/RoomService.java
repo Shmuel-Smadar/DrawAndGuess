@@ -1,9 +1,8 @@
 package com.example.drawandguess.service;
 
-import com.example.drawandguess.model.ChatMessage;
 import com.example.drawandguess.model.Game;
-import com.example.drawandguess.model.Participant;
 import com.example.drawandguess.model.Room;
+import com.example.drawandguess.model.Participant;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
@@ -60,55 +59,11 @@ public class RoomService {
         if (room == null) return;
         room.getGame().addParticipant(sessionId);
         String newDrawerId = room.getGame().getCurrentDrawer();
-        if(newDrawerId != null) {
+        if (newDrawerId != null) {
             participantService.setDrawer(newDrawerId, true);
         }
         String nickname = participantService.findParticipantBySessionId(sessionId).getUsername();
-        ChatMessage msg = new ChatMessage();
-        msg.setSenderSessionId("system");
-        msg.setText(nickname + " has joined the room.");
-        msg.setType("system");
-        chatService.sendChatMessage(roomId, msg);
-        broadcastParticipants(roomId);
-        broadcastRooms();
-    }
-
-    public void removeParticipantFromRoom(String roomId, Participant participant) {
-        Room room = rooms.get(roomId);
-        if (room == null) return;
-        Game game = room.getGame();
-        boolean wasDrawer = game.isDrawer(participant.getSessionId());
-        game.removeParticipant(participant.getSessionId());
-        ChatMessage leaveMsg = new ChatMessage();
-        leaveMsg.setSenderSessionId("system");
-        leaveMsg.setText(participant.getUsername() + " has left the room.");
-        leaveMsg.setType("system");
-        chatService.sendChatMessage(roomId, leaveMsg);
-        if (wasDrawer) {
-            game.resetRound();
-            if (!game.getParticipantSessionIds().isEmpty()) {
-                String newDrawerId = game.getCurrentDrawer();
-                if (newDrawerId != null) {
-                    participantService.setDrawer(newDrawerId, true);
-                    ChatMessage resetMsg = new ChatMessage();
-                    resetMsg.setSenderSessionId("system");
-                    resetMsg.setText(
-                            "The previous drawer quit abruptly. The round has been reset. New drawer is: "
-                                    + participantService.findParticipantBySessionId(newDrawerId).getUsername()
-                    );
-                    resetMsg.setType("system");
-                    chatService.sendChatMessage(roomId, resetMsg);
-                }
-            }
-        } else {
-            String currentDrawerId = game.getCurrentDrawer();
-            participantService.getAllParticipants().values().forEach(p ->
-                    participantService.setDrawer(
-                            p.getSessionId(),
-                            p.getSessionId().equals(currentDrawerId)
-                    )
-            );
-        }
+        chatService.sendChatMessage(roomId, newParticipantMessage(nickname));
         broadcastParticipants(roomId);
         broadcastRooms();
     }
@@ -119,12 +74,12 @@ public class RoomService {
             public void run() {
                 Room room = rooms.get(roomId);
                 if (room == null) return;
-                List<String> participantIds = room.getGame().getParticipantSessionIds();
-                List<Participant> participantList = participantService.getParticipantsBySessionIds(participantIds);
-                for (Participant p : participantList) {
+                List<String> ids = room.getGame().getParticipantSessionIds();
+                List<Participant> list = participantService.getParticipantsBySessionIds(ids);
+                for (Participant p : list) {
                     p.setScore(room.getGame().getScore(p.getSessionId()));
                 }
-                messagingTemplate.convertAndSend("/topic/room/" + roomId + "/participants", participantList);
+                messagingTemplate.convertAndSend("/topic/room/" + roomId + "/participants", list);
             }
         }, 100);
     }
@@ -141,8 +96,17 @@ public class RoomService {
     }
 
     public List<Participant> getParticipants(String roomId) {
-        return participantService.getParticipantsBySessionIds(
-                rooms.get(roomId).getGame().getParticipantSessionIds()
-        );
+        Room room = rooms.get(roomId);
+        if (room == null) return new ArrayList<>();
+        List<String> ids = room.getGame().getParticipantSessionIds();
+        return participantService.getParticipantsBySessionIds(ids);
+    }
+
+    private com.example.drawandguess.model.ChatMessage newParticipantMessage(String nickname) {
+        com.example.drawandguess.model.ChatMessage msg = new com.example.drawandguess.model.ChatMessage();
+        msg.setSenderSessionId("system");
+        msg.setText(nickname + " has joined the room.");
+        msg.setType("system");
+        return msg;
     }
 }

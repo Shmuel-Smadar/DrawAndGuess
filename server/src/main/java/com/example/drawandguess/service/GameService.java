@@ -175,16 +175,52 @@ public class GameService {
         roomService.broadcastParticipants(roomId);
     }
 
+    public void userLeftRoom(String roomId, String sessionId) {
+        Room room = roomService.getRoom(roomId);
+        if (room == null) return;
+        Game game = room.getGame();
+        Participant p = participantService.findParticipantBySessionId(sessionId);
+        if (p == null) return;
+        boolean wasDrawer = game.isDrawer(sessionId);
+        game.removeParticipant(sessionId);
+        ChatMessage leaveMsg = new ChatMessage();
+        leaveMsg.setSenderSessionId("system");
+        leaveMsg.setText(p.getUsername() + " has left the room.");
+        leaveMsg.setType("system");
+        chatService.sendChatMessage(roomId, leaveMsg);
+        if (wasDrawer) {
+            game.resetRound();
+            stopHintProgression(roomId);
+            if (!game.getParticipantSessionIds().isEmpty()) {
+                String newDrawerId = game.getCurrentDrawer();
+                if (newDrawerId != null) {
+                    participantService.setDrawer(newDrawerId, true);
+                    ChatMessage resetMsg = new ChatMessage();
+                    resetMsg.setSenderSessionId("system");
+                    resetMsg.setText(
+                            "The previous drawer quit abruptly. The round has been reset. New drawer is: "
+                                    + participantService.findParticipantBySessionId(newDrawerId).getUsername()
+                    );
+                    resetMsg.setType("system");
+                    chatService.sendChatMessage(roomId, resetMsg);
+                }
+            }
+        } else {
+            String currentDrawerId = game.getCurrentDrawer();
+            participantService.getAllParticipants().values().forEach(pp ->
+                    participantService.setDrawer(pp.getSessionId(), pp.getSessionId().equals(currentDrawerId))
+            );
+        }
+        roomService.broadcastParticipants(roomId);
+        roomService.broadcastRooms();
+    }
+
     public void handleDisconnect(String sessionId) {
         Participant participant = participantService.findParticipantBySessionId(sessionId);
         if (participant == null) return;
         for (Room room : roomService.getAllRooms()) {
             if (room.getGame().getParticipantSessionIds().contains(sessionId)) {
-                if (room.getGame().isDrawer(sessionId)) {
-                    stopHintProgression(room.getRoomId());
-                    room.getGame().resetRound();
-                }
-                roomService.removeParticipantFromRoom(room.getRoomId(), participant);
+                userLeftRoom(room.getRoomId(), sessionId);
             }
         }
         participantService.removeParticipant(sessionId);

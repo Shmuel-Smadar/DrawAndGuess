@@ -52,14 +52,7 @@ public class RoomController {
     @MessageMapping("/leaveRoom")
     public void leaveRoom(@Payload String roomId, SimpMessageHeaderAccessor headerAccessor) {
         String sessionId = headerAccessor.getSessionId();
-        Participant p = participantService.findParticipantBySessionId(sessionId);
-        if (p == null) return;
-        Room room = roomService.getRoom(roomId);
-        if (room == null) return;
-        if (room.getGame().isDrawer(sessionId)) {
-            gameService.stopHintProgression(roomId);
-        }
-        roomService.removeParticipantFromRoom(roomId, p);
+        gameService.userLeftRoom(roomId, sessionId);
     }
 
     @MessageMapping("/getRooms")
