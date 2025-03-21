@@ -15,6 +15,10 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.stream.Collectors;
 
+import static com.example.drawandguess.config.Constants.TOPIC_ROOMS;
+import static com.example.drawandguess.config.Constants.TOPIC_ROOM_PREFIX;
+import static com.example.drawandguess.config.Constants.TIMER_DELAY_MS;
+
 @Service
 public class RoomService {
     private final Map<String, Room> rooms = new ConcurrentHashMap<>();
@@ -79,9 +83,9 @@ public class RoomService {
                 for (Participant p : list) {
                     p.setScore(room.getGame().getScore(p.getSessionId()));
                 }
-                messagingTemplate.convertAndSend("/topic/room/" + roomId + "/participants", list);
+                messagingTemplate.convertAndSend(TOPIC_ROOM_PREFIX + roomId + "/participants", list);
             }
-        }, 100);
+        }, TIMER_DELAY_MS);
     }
 
     public void broadcastRooms() {
@@ -92,7 +96,7 @@ public class RoomService {
             map.put("numberOfParticipants", room.getGame().getParticipantSessionIds().size());
             return map;
         }).collect(Collectors.toList());
-        messagingTemplate.convertAndSend("/topic/rooms", data);
+        messagingTemplate.convertAndSend(TOPIC_ROOMS, data);
     }
 
     public List<Participant> getParticipants(String roomId) {

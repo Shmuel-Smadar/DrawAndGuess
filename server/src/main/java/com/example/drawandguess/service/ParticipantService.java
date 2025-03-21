@@ -8,23 +8,27 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static com.example.drawandguess.config.Constants.NICKNAME_TAKEN_MSG;
+import static com.example.drawandguess.config.Constants.NICKNAME_REGISTERED_MSG;
+import static com.example.drawandguess.config.Constants.REMOVED_PARTICIPANT_MSG_PREFIX;
+
 @Service
 public class ParticipantService {
     private final Map<String, Participant> sessionIdToParticipant = new ConcurrentHashMap<>();
 
     public NicknameStatus registerParticipant(String sessionId, String nickname) {
         if (isNicknameTaken(nickname)) {
-            return new NicknameStatus(false, "Nickname is already taken");
+            return new NicknameStatus(false, NICKNAME_TAKEN_MSG);
         }
         Participant participant = new Participant(sessionId, nickname, false);
         sessionIdToParticipant.put(sessionId, participant);
-        return new NicknameStatus(true, "Nickname registered successfully");
+        return new NicknameStatus(true, NICKNAME_REGISTERED_MSG);
     }
 
     public void removeParticipant(String sessionId) {
         Participant removed = sessionIdToParticipant.remove(sessionId);
         if (removed != null) {
-            System.out.println("Removed participant: " + removed.getUsername());
+            System.out.println(REMOVED_PARTICIPANT_MSG_PREFIX + removed.getUsername());
         }
     }
 
@@ -49,12 +53,13 @@ public class ParticipantService {
             participant.setDrawer(isDrawer);
         }
     }
-        public List<Participant> getParticipantsBySessionIds(List<String> sessionIds) {
-            return sessionIds.stream()
-                    .map(sessionIdToParticipant::get)
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.toList());
-        }
+
+    public List<Participant> getParticipantsBySessionIds(List<String> sessionIds) {
+        return sessionIds.stream()
+                .map(sessionIdToParticipant::get)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+    }
 
     public Map<String, Participant> getAllParticipants() {
         return new ConcurrentHashMap<>(sessionIdToParticipant);

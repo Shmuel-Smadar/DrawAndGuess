@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
+import static com.example.drawandguess.config.Constants.TOTAL_ROUNDS;
+
 public class Game {
     private final List<String> participantSessionIds = new ArrayList<>();
     private int currentDrawerIndex = -1;
@@ -20,7 +22,7 @@ public class Game {
     private Map<String, Integer> scores = new HashMap<>();
     private int roundCount = 0;
     private boolean gameOver = false;
-    private final int totalRounds = 6;
+    private final int totalRounds = TOTAL_ROUNDS;
 
     public void addParticipant(String sessionId) {
         if (!participantSessionIds.contains(sessionId)) {
@@ -41,25 +43,33 @@ public class Game {
             } else if (sessionIdIndex < currentDrawerIndex) currentDrawerIndex--;
         }
     }
+
     public List<String> getParticipantSessionIds() {
         return participantSessionIds;
     }
+
     public String getCurrentDrawer() {
-        if (currentDrawerIndex >= 0 && currentDrawerIndex < participantSessionIds.size()) return participantSessionIds.get(currentDrawerIndex);
+        if (currentDrawerIndex >= 0 && currentDrawerIndex < participantSessionIds.size()) {
+            return participantSessionIds.get(currentDrawerIndex);
+        }
         return null;
     }
+
     public boolean isDrawer(String sessionId) {
         return sessionId.equals(getCurrentDrawer());
     }
+
     public void moveToNextDrawer() {
         if (!participantSessionIds.isEmpty()) {
             currentDrawerIndex = (currentDrawerIndex + 1) % participantSessionIds.size();
         }
     }
+
     public void setChosenWord(String chosenWord) {
         this.chosenWord = chosenWord;
         initializeHint();
     }
+
     public String getChosenWord() {
         return chosenWord;
     }
@@ -67,18 +77,21 @@ public class Game {
     public boolean isCorrectGuess(String guess) {
         return chosenWord != null && chosenWord.equalsIgnoreCase(guess);
     }
+
     public void nextRound() {
         roundCount++;
         if (roundCount >= totalRounds) gameOver = true;
         resetRound();
         moveToNextDrawer();
     }
+
     public void resetRound() {
         this.chosenWord = null;
         this.isFirstHint = true;
         this.currentHintBuilder.setLength(0);
         this.revealOrder.clear();
     }
+
     public void resetGame() {
         roundCount = 0;
         gameOver = false;
@@ -109,6 +122,7 @@ public class Game {
     public boolean hasMoreHints() {
         return !revealOrder.isEmpty();
     }
+
     private void initializeHint() {
         int length = chosenWord.length();
         currentHintBuilder.setLength(0);
