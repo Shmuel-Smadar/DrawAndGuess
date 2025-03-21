@@ -2,6 +2,7 @@ package com.example.drawandguess.service;
 
 import com.example.drawandguess.model.ChatMessage;
 import com.example.drawandguess.model.Game;
+import com.example.drawandguess.model.Participant;
 import com.example.drawandguess.model.Room;
 import com.example.drawandguess.model.WordOptions;
 import org.springframework.jms.core.JmsTemplate;
@@ -21,7 +22,13 @@ public class GameService {
     private final ConcurrentHashMap<String, ScheduledFuture<?>> hintTasks = new ConcurrentHashMap<>();
     private final JmsTemplate jmsTemplate;
 
-    public GameService(ChatService chatService, ParticipantService participantService, RoomService roomService, TaskScheduler taskScheduler, JmsTemplate jmsTemplate) {
+    public GameService(
+            ChatService chatService,
+            ParticipantService participantService,
+            RoomService roomService,
+            TaskScheduler taskScheduler,
+            JmsTemplate jmsTemplate
+    ) {
         this.chatService = chatService;
         this.participantService = participantService;
         this.roomService = roomService;
@@ -44,7 +51,9 @@ public class GameService {
             game.setChosenWord(chosenWord);
             ChatMessage msg = new ChatMessage();
             msg.setSenderSessionId("system");
-            msg.setText("A new round has started. The drawer is " + participantService.findParticipantBySessionId(sessionId).getUsername() + ". (Round " + (game.getRoundCount() + 1) + "/" + game.getTotalRounds() + ")");
+            msg.setText("A new round has started. The drawer is "
+                    + participantService.findParticipantBySessionId(sessionId).getUsername()
+                    + ". (Round " + (game.getRoundCount() + 1) + "/" + game.getTotalRounds() + ")");
             msg.setType("system");
             chatService.sendChatMessage(roomId, msg);
             startHintProgression(roomId);
@@ -98,6 +107,11 @@ public class GameService {
         hintTasks.put(roomId, future);
     }
 
+    public void stopHintProgression(String roomId) {
+        ScheduledFuture<?> f = hintTasks.remove(roomId);
+        if (f != null) f.cancel(false);
+    }
+
     private void handleNoGuess(String roomId, Game game) {
         stopHintProgression(roomId);
         game.nextRound();
@@ -111,11 +125,6 @@ public class GameService {
             chatService.sendChatMessage(roomId, msg);
             updateDrawerAndBroadcast(roomId, game);
         }
-    }
-
-    private void stopHintProgression(String roomId) {
-        ScheduledFuture<?> f = hintTasks.remove(roomId);
-        if (f != null) f.cancel(false);
     }
 
     private void announceScoresAndReset(String roomId, String endMessage) {
@@ -135,10 +144,15 @@ public class GameService {
         game.resetGame();
         if (!game.getParticipantSessionIds().isEmpty()) {
             String firstDrawerId = game.getCurrentDrawer();
-            participantService.getAllParticipants().values().forEach(p -> participantService.setDrawer(p.getSessionId(), p.getSessionId().equals(firstDrawerId)));
+            participantService.getAllParticipants().values().forEach(p ->
+                    participantService.setDrawer(p.getSessionId(), p.getSessionId().equals(firstDrawerId))
+            );
             ChatMessage newGameMsg = new ChatMessage();
             newGameMsg.setSenderSessionId("system");
-            newGameMsg.setText("A new game has started. (Round " + (game.getRoundCount() + 1) + "/" + game.getTotalRounds() + ") The drawer is " + participantService.findParticipantBySessionId(firstDrawerId).getUsername() + ".");
+            newGameMsg.setText(
+                    "A new game has started. (Round " + (game.getRoundCount() + 1) + "/" + game.getTotalRounds()
+                            + ") The drawer is " + participantService.findParticipantBySessionId(firstDrawerId).getUsername() + "."
+            );
             newGameMsg.setType("system");
             chatService.sendChatMessage(roomId, newGameMsg);
             roomService.broadcastParticipants(roomId);
@@ -155,7 +169,24 @@ public class GameService {
 
     private void updateDrawerAndBroadcast(String roomId, Game g) {
         String d = g.getCurrentDrawer();
-        participantService.getAllParticipants().values().forEach(p -> participantService.setDrawer(p.getSessionId(), p.getSessionId().equals(d)));
+        participantService.getAllParticipants().values().forEach(p ->
+                participantService.setDrawer(p.getSessionId(), p.getSessionId().equals(d))
+        );
         roomService.broadcastParticipants(roomId);
+    }
+
+    public void handleDisconnect(String sessionId) {
+        Participant participant = participantService.findParticipantBySessionId(sessionId);
+        if (participant == null) return;
+        for (Room room : roomService.getAllRooms()) {
+            if (room.getGame().getParticipantSessionIds().contains(sessionId)) {
+                if (room.getGame().isDrawer(sessionId)) {
+                    stopHintProgression(room.getRoomId());
+                    room.getGame().resetRound();
+                }
+                roomService.removeParticipantFromRoom(room.getRoomId(), participant);
+            }
+        }
+        participantService.removeParticipant(sessionId);
     }
 }

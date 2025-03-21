@@ -1,15 +1,19 @@
 package com.example.drawandguess.service;
+
 import com.example.drawandguess.model.ChatMessage;
+import com.example.drawandguess.model.Game;
 import com.example.drawandguess.model.Participant;
 import com.example.drawandguess.model.Room;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+
 import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.stream.Collectors;
 
 @Service
 public class RoomService {
@@ -18,7 +22,11 @@ public class RoomService {
     private final ChatService chatService;
     private final SimpMessagingTemplate messagingTemplate;
 
-    public RoomService(ParticipantService participantService, ChatService chatService, SimpMessagingTemplate messagingTemplate) {
+    public RoomService(
+            ParticipantService participantService,
+            ChatService chatService,
+            SimpMessagingTemplate messagingTemplate
+    ) {
         this.participantService = participantService;
         this.chatService = chatService;
         this.messagingTemplate = messagingTemplate;
@@ -27,17 +35,26 @@ public class RoomService {
     public Room createRoom(String roomName) {
         Room room = new Room(roomName);
         rooms.put(room.getRoomId(), room);
+        broadcastRooms();
         return room;
     }
+
     public boolean deleteRoom(String roomId) {
-        return rooms.remove(roomId) != null;
+        boolean removed = rooms.remove(roomId) != null;
+        if (removed) {
+            broadcastRooms();
+        }
+        return removed;
     }
+
     public Room getRoom(String roomId) {
         return rooms.get(roomId);
     }
+
     public List<Room> getAllRooms() {
         return new ArrayList<>(rooms.values());
     }
+
     public void joinRoom(String sessionId, String roomId) {
         Room room = rooms.get(roomId);
         if (room == null) return;
@@ -53,34 +70,47 @@ public class RoomService {
         msg.setType("system");
         chatService.sendChatMessage(roomId, msg);
         broadcastParticipants(roomId);
+        broadcastRooms();
     }
+
     public void removeParticipantFromRoom(String roomId, Participant participant) {
         Room room = rooms.get(roomId);
         if (room == null) return;
-        room.getGame().removeParticipant(participant.getSessionId());
+        Game game = room.getGame();
+        boolean wasDrawer = game.isDrawer(participant.getSessionId());
+        game.removeParticipant(participant.getSessionId());
         ChatMessage leaveMsg = new ChatMessage();
         leaveMsg.setSenderSessionId("system");
         leaveMsg.setText(participant.getUsername() + " has left the room.");
         leaveMsg.setType("system");
         chatService.sendChatMessage(roomId, leaveMsg);
-        String newDrawerId = room.getGame().getCurrentDrawer();
-        participantService.getAllParticipants().values().forEach(p ->
-            participantService.setDrawer(
-                    p.getSessionId(),
-                    p.getSessionId().equals(newDrawerId)
-                )      
-             );
-        broadcastParticipants(roomId);
-    }
-
-    public void removeParticipantFromAllRooms(Participant participant) {
-        String sessionId = participant.getSessionId();
-        for (Room room : rooms.values()) {
-            if (room.getGame().getParticipantSessionIds().contains(sessionId)) {
-                removeParticipantFromRoom(room.getRoomId(), participantService.findParticipantBySessionId(sessionId));
-                broadcastParticipants(room.getRoomId());
+        if (wasDrawer) {
+            game.resetRound();
+            if (!game.getParticipantSessionIds().isEmpty()) {
+                String newDrawerId = game.getCurrentDrawer();
+                if (newDrawerId != null) {
+                    participantService.setDrawer(newDrawerId, true);
+                    ChatMessage resetMsg = new ChatMessage();
+                    resetMsg.setSenderSessionId("system");
+                    resetMsg.setText(
+                            "The previous drawer quit abruptly. The round has been reset. New drawer is: "
+                                    + participantService.findParticipantBySessionId(newDrawerId).getUsername()
+                    );
+                    resetMsg.setType("system");
+                    chatService.sendChatMessage(roomId, resetMsg);
+                }
             }
+        } else {
+            String currentDrawerId = game.getCurrentDrawer();
+            participantService.getAllParticipants().values().forEach(p ->
+                    participantService.setDrawer(
+                            p.getSessionId(),
+                            p.getSessionId().equals(currentDrawerId)
+                    )
+            );
         }
+        broadcastParticipants(roomId);
+        broadcastRooms();
     }
 
     public void broadcastParticipants(String roomId) {
@@ -99,7 +129,20 @@ public class RoomService {
         }, 100);
     }
 
+    public void broadcastRooms() {
+        List<Map<String, Object>> data = getAllRooms().stream().map(room -> {
+            Map<String, Object> map = new ConcurrentHashMap<>();
+            map.put("roomName", room.getRoomName());
+            map.put("roomId", room.getRoomId());
+            map.put("numberOfParticipants", room.getGame().getParticipantSessionIds().size());
+            return map;
+        }).collect(Collectors.toList());
+        messagingTemplate.convertAndSend("/topic/rooms", data);
+    }
+
     public List<Participant> getParticipants(String roomId) {
-        return participantService.getParticipantsBySessionIds(rooms.get(roomId).getGame().getParticipantSessionIds());
+        return participantService.getParticipantsBySessionIds(
+                rooms.get(roomId).getGame().getParticipantSessionIds()
+        );
     }
 }

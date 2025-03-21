@@ -70,11 +70,15 @@ public class Game {
     public void nextRound() {
         roundCount++;
         if (roundCount >= totalRounds) gameOver = true;
-        chosenWord = null;
+        resetRound();
         moveToNextDrawer();
-        revealOrder.clear();
     }
-
+    public void resetRound() {
+        this.chosenWord = null;
+        this.isFirstHint = true;
+        this.currentHintBuilder.setLength(0);
+        this.revealOrder.clear();
+    }
     public void resetGame() {
         roundCount = 0;
         gameOver = false;

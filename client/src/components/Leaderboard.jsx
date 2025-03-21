@@ -39,7 +39,6 @@ function Leaderboard() {
           <div className="leaderboard-item" key={index}>
             <div className="leaderboard-rank-container">
               <span className="leaderboard-rank">{index + 1}.</span>
-              {/* optional medal for top 3 */}
               {getRankIcon(index) && (
                 <span className="leaderboard-medal">
                   {getRankIcon(index)}

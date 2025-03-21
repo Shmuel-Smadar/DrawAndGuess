@@ -3,6 +3,8 @@ package com.example.drawandguess.controller;
 import com.example.drawandguess.model.Participant;
 import com.example.drawandguess.service.ParticipantService;
 import com.example.drawandguess.service.RoomService;
+import com.example.drawandguess.service.GameService;
+import com.example.drawandguess.model.Room;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -22,11 +24,18 @@ public class RoomController {
     private final RoomService roomService;
     private final ParticipantService participantService;
     private final SimpMessagingTemplate messagingTemplate;
+    private final GameService gameService;
 
-    public RoomController(RoomService roomService, ParticipantService participantService, SimpMessagingTemplate messagingTemplate) {
+    public RoomController(
+            RoomService roomService,
+            ParticipantService participantService,
+            SimpMessagingTemplate messagingTemplate,
+            GameService gameService
+    ) {
         this.roomService = roomService;
         this.participantService = participantService;
         this.messagingTemplate = messagingTemplate;
+        this.gameService = gameService;
     }
 
     @MessageMapping("/createRoom")
@@ -43,7 +52,14 @@ public class RoomController {
     @MessageMapping("/leaveRoom")
     public void leaveRoom(@Payload String roomId, SimpMessageHeaderAccessor headerAccessor) {
         String sessionId = headerAccessor.getSessionId();
-        roomService.removeParticipantFromRoom(roomId, participantService.findParticipantBySessionId(sessionId));
+        Participant p = participantService.findParticipantBySessionId(sessionId);
+        if (p == null) return;
+        Room room = roomService.getRoom(roomId);
+        if (room == null) return;
+        if (room.getGame().isDrawer(sessionId)) {
+            gameService.stopHintProgression(roomId);
+        }
+        roomService.removeParticipantFromRoom(roomId, p);
     }
 
     @MessageMapping("/getRooms")

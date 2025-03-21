@@ -6,11 +6,9 @@ function LeaderboardOverlay({ onClose }) {
   return (
     <div className="leaderboard-overlay">
       <div className="leaderboard-modal">
-        {/* Close Button */}
         <button className="close-button" onClick={onClose}>
           X
         </button>
-        {/* The actual leaderboard */}
         <Leaderboard />
       </div>
     </div>

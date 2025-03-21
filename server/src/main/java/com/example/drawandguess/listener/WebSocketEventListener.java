@@ -1,33 +1,25 @@
 package com.example.drawandguess.listener;
 
-import com.example.drawandguess.model.Participant;
-import com.example.drawandguess.service.ParticipantService;
-import com.example.drawandguess.service.RoomService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
+import com.example.drawandguess.service.GameService;
 
 @Component
 public class WebSocketEventListener {
-    private final RoomService roomService;
-    private final ParticipantService participantService;
+    private final GameService gameService;
 
     @Autowired
-    public WebSocketEventListener(RoomService roomService, ParticipantService participantService) {
-        this.roomService = roomService;
-        this.participantService = participantService;
+    public WebSocketEventListener(GameService gameService) {
+        this.gameService = gameService;
     }
 
     @EventListener
     public void handleSessionDisconnect(SessionDisconnectEvent event) {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
         String sessionId = accessor.getSessionId();
-        Participant participant = participantService.findParticipantBySessionId(sessionId);
-        if (participant != null) {
-            roomService.removeParticipantFromAllRooms(participant);
-            participantService.removeParticipant(sessionId);
-        }
+        gameService.handleDisconnect(sessionId);
     }
 }
