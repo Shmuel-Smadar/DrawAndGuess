@@ -3,9 +3,10 @@ package com.example.drawandguess.service;
 import com.example.drawandguess.model.Game;
 import com.example.drawandguess.model.Room;
 import com.example.drawandguess.model.Participant;
+import com.example.drawandguess.model.ChatMessage;
+import com.example.drawandguess.model.MessageType;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
-
 import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
@@ -20,15 +21,13 @@ public class RoomService {
     private final ParticipantService participantService;
     private final ChatService chatService;
     private final SimpMessagingTemplate messagingTemplate;
+    private final MessageService messageService;
 
-    public RoomService(
-            ParticipantService participantService,
-            ChatService chatService,
-            SimpMessagingTemplate messagingTemplate
-    ) {
+    public RoomService(ParticipantService participantService, ChatService chatService, SimpMessagingTemplate messagingTemplate, MessageService messageService) {
         this.participantService = participantService;
         this.chatService = chatService;
         this.messagingTemplate = messagingTemplate;
+        this.messageService = messageService;
     }
 
     public Room createRoom(String roomName) {
@@ -63,7 +62,8 @@ public class RoomService {
             participantService.setDrawer(newDrawerId, true);
         }
         String nickname = participantService.findParticipantBySessionId(sessionId).getUsername();
-        chatService.sendChatMessage(roomId, newParticipantMessage(nickname));
+        ChatMessage msg = messageService.systemMessage(MessageType.PARTICIPANT_JOINED, nickname);
+        chatService.sendChatMessage(roomId, msg);
         broadcastParticipants(roomId);
         broadcastRooms();
     }
@@ -100,13 +100,5 @@ public class RoomService {
         if (room == null) return new ArrayList<>();
         List<String> ids = room.getGame().getParticipantSessionIds();
         return participantService.getParticipantsBySessionIds(ids);
-    }
-
-    private com.example.drawandguess.model.ChatMessage newParticipantMessage(String nickname) {
-        com.example.drawandguess.model.ChatMessage msg = new com.example.drawandguess.model.ChatMessage();
-        msg.setSenderSessionId("system");
-        msg.setText(nickname + " has joined the room.");
-        msg.setType("system");
-        return msg;
     }
 }

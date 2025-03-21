@@ -12,7 +12,6 @@ public class LeaderboardConsumer {
 
     @JmsListener(destination = "leaderboardQueue")
     public void receiveScoreUpdate(String message) {
-        System.out.println("Received: " + message);
         String[] parts = message.split(":");
         String username = parts[0];
         int score = Integer.parseInt(parts[1]);

@@ -20,7 +20,7 @@ public class Game {
     private Map<String, Integer> scores = new HashMap<>();
     private int roundCount = 0;
     private boolean gameOver = false;
-    private final int totalRounds = 5;
+    private final int totalRounds = 6;
 
     public void addParticipant(String sessionId) {
         if (!participantSessionIds.contains(sessionId)) {

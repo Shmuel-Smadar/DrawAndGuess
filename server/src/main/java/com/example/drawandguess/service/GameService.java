@@ -5,6 +5,7 @@ import com.example.drawandguess.model.Game;
 import com.example.drawandguess.model.Participant;
 import com.example.drawandguess.model.Room;
 import com.example.drawandguess.model.WordOptions;
+import com.example.drawandguess.model.MessageType;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
@@ -21,26 +22,23 @@ public class GameService {
     private final TaskScheduler taskScheduler;
     private final ConcurrentHashMap<String, ScheduledFuture<?>> hintTasks = new ConcurrentHashMap<>();
     private final JmsTemplate jmsTemplate;
+    private final MessageService messageService;
 
-    public GameService(
-            ChatService chatService,
-            ParticipantService participantService,
-            RoomService roomService,
-            TaskScheduler taskScheduler,
-            JmsTemplate jmsTemplate
-    ) {
+    public GameService(ChatService chatService, ParticipantService participantService, RoomService roomService, TaskScheduler taskScheduler, JmsTemplate jmsTemplate, MessageService messageService) {
         this.chatService = chatService;
         this.participantService = participantService;
         this.roomService = roomService;
         this.taskScheduler = taskScheduler;
         this.jmsTemplate = jmsTemplate;
+        this.messageService = messageService;
     }
 
     public WordOptions requestWords(String roomId, String sessionId) {
         Room room = roomService.getRoom(roomId);
         if (room == null) return new WordOptions();
         Game game = room.getGame();
-        return game.isDrawer(sessionId) ? game.getRandomWords() : new WordOptions();
+        if (game.isDrawer(sessionId)) return game.getRandomWords();
+        return new WordOptions();
     }
 
     public void chooseWord(String roomId, String sessionId, String chosenWord) {
@@ -49,12 +47,7 @@ public class GameService {
         Game game = room.getGame();
         if (game.isDrawer(sessionId)) {
             game.setChosenWord(chosenWord);
-            ChatMessage msg = new ChatMessage();
-            msg.setSenderSessionId("system");
-            msg.setText("A new round has started. The drawer is "
-                    + participantService.findParticipantBySessionId(sessionId).getUsername()
-                    + ". (Round " + (game.getRoundCount() + 1) + "/" + game.getTotalRounds() + ")");
-            msg.setType("system");
+            ChatMessage msg = messageService.systemMessage(MessageType.ROUND_STARTED, participantService.findParticipantBySessionId(sessionId).getUsername(), String.valueOf(game.getRoundCount() + 1), String.valueOf(game.getTotalRounds()));
             chatService.sendChatMessage(roomId, msg);
             startHintProgression(roomId);
         }
@@ -75,12 +68,23 @@ public class GameService {
             stopHintProgression(roomId);
             game.nextRound();
             if (game.isGameOver()) {
-                announceScoresAndReset(roomId, "The game has ended after " + game.getTotalRounds() + " rounds. Final scores:");
+                StringBuilder sb = new StringBuilder("The game has ended after ").append(game.getTotalRounds()).append(" rounds. Final scores: ");
+                for (String pid : game.getParticipantSessionIds()) {
+                    sb.append(participantService.findParticipantBySessionId(pid).getUsername()).append("=").append(game.getScore(pid)).append("  ");
+                }
+                ChatMessage m = messageService.systemMessage(MessageType.GAME_ENDED, sb.toString());
+                chatService.sendChatMessage(roomId, m);
+                game.resetGame();
+                if (!game.getParticipantSessionIds().isEmpty()) {
+                    String firstDrawerId = game.getCurrentDrawer();
+                    participantService.getAllParticipants().values().forEach(p -> participantService.setDrawer(p.getSessionId(), p.getSessionId().equals(firstDrawerId)));
+                    ChatMessage newGameMsg = messageService.systemMessage(MessageType.NEW_GAME_STARTED, String.valueOf(game.getRoundCount() + 1), String.valueOf(game.getTotalRounds()), participantService.findParticipantBySessionId(firstDrawerId).getUsername());
+                    chatService.sendChatMessage(roomId, newGameMsg);
+                    roomService.broadcastParticipants(roomId);
+                    updateDrawerAndBroadcast(roomId, game);
+                }
             } else {
-                ChatMessage msg = new ChatMessage();
-                msg.setSenderSessionId("system");
-                msg.setText(username + " guessed the word!");
-                msg.setType("system");
+                ChatMessage msg = messageService.systemMessage(MessageType.WORD_GUESSED, username);
                 chatService.sendChatMessage(roomId, msg);
                 updateDrawerAndBroadcast(roomId, game);
             }
@@ -116,46 +120,24 @@ public class GameService {
         stopHintProgression(roomId);
         game.nextRound();
         if (game.isGameOver()) {
-            announceScoresAndReset(roomId, "No one guessed the word. The game has ended after " + game.getTotalRounds() + " rounds. Final scores:");
+            StringBuilder sb = new StringBuilder("No one guessed the word. The game has ended after ").append(game.getTotalRounds()).append(" rounds. Final scores: ");
+            for (String pid : game.getParticipantSessionIds()) {
+                sb.append(participantService.findParticipantBySessionId(pid).getUsername()).append("=").append(game.getScore(pid)).append("  ");
+            }
+            ChatMessage m = messageService.systemMessage(MessageType.GAME_ENDED, sb.toString());
+            chatService.sendChatMessage(roomId, m);
+            game.resetGame();
+            if (!game.getParticipantSessionIds().isEmpty()) {
+                String firstDrawerId = game.getCurrentDrawer();
+                participantService.getAllParticipants().values().forEach(p -> participantService.setDrawer(p.getSessionId(), p.getSessionId().equals(firstDrawerId)));
+                ChatMessage newGameMsg = messageService.systemMessage(MessageType.NEW_GAME_STARTED, String.valueOf(game.getRoundCount() + 1), String.valueOf(game.getTotalRounds()), participantService.findParticipantBySessionId(firstDrawerId).getUsername());
+                chatService.sendChatMessage(roomId, newGameMsg);
+                roomService.broadcastParticipants(roomId);
+            }
         } else {
-            ChatMessage msg = new ChatMessage();
-            msg.setSenderSessionId("system");
-            msg.setText("No one guessed the word.");
-            msg.setType("system");
+            ChatMessage msg = messageService.systemMessage(MessageType.NO_GUESS);
             chatService.sendChatMessage(roomId, msg);
             updateDrawerAndBroadcast(roomId, game);
-        }
-    }
-
-    private void announceScoresAndReset(String roomId, String endMessage) {
-        Room room = roomService.getRoom(roomId);
-        if (room == null) return;
-        Game game = room.getGame();
-        StringBuilder sb = new StringBuilder(endMessage).append(" ");
-        for (String pid : game.getParticipantSessionIds()) {
-            String uname = participantService.findParticipantBySessionId(pid).getUsername();
-            sb.append(uname).append("=").append(game.getScore(pid)).append("  ");
-        }
-        ChatMessage m = new ChatMessage();
-        m.setSenderSessionId("system");
-        m.setText(sb.toString());
-        m.setType("system");
-        chatService.sendChatMessage(roomId, m);
-        game.resetGame();
-        if (!game.getParticipantSessionIds().isEmpty()) {
-            String firstDrawerId = game.getCurrentDrawer();
-            participantService.getAllParticipants().values().forEach(p ->
-                    participantService.setDrawer(p.getSessionId(), p.getSessionId().equals(firstDrawerId))
-            );
-            ChatMessage newGameMsg = new ChatMessage();
-            newGameMsg.setSenderSessionId("system");
-            newGameMsg.setText(
-                    "A new game has started. (Round " + (game.getRoundCount() + 1) + "/" + game.getTotalRounds()
-                            + ") The drawer is " + participantService.findParticipantBySessionId(firstDrawerId).getUsername() + "."
-            );
-            newGameMsg.setType("system");
-            chatService.sendChatMessage(roomId, newGameMsg);
-            roomService.broadcastParticipants(roomId);
         }
     }
 
@@ -169,9 +151,7 @@ public class GameService {
 
     private void updateDrawerAndBroadcast(String roomId, Game g) {
         String d = g.getCurrentDrawer();
-        participantService.getAllParticipants().values().forEach(p ->
-                participantService.setDrawer(p.getSessionId(), p.getSessionId().equals(d))
-        );
+        participantService.getAllParticipants().values().forEach(p -> participantService.setDrawer(p.getSessionId(), p.getSessionId().equals(d)));
         roomService.broadcastParticipants(roomId);
     }
 
@@ -183,10 +163,7 @@ public class GameService {
         if (p == null) return;
         boolean wasDrawer = game.isDrawer(sessionId);
         game.removeParticipant(sessionId);
-        ChatMessage leaveMsg = new ChatMessage();
-        leaveMsg.setSenderSessionId("system");
-        leaveMsg.setText(p.getUsername() + " has left the room.");
-        leaveMsg.setType("system");
+        ChatMessage leaveMsg = messageService.systemMessage(MessageType.PARTICIPANT_LEFT, p.getUsername());
         chatService.sendChatMessage(roomId, leaveMsg);
         if (wasDrawer) {
             game.resetRound();
@@ -195,21 +172,13 @@ public class GameService {
                 String newDrawerId = game.getCurrentDrawer();
                 if (newDrawerId != null) {
                     participantService.setDrawer(newDrawerId, true);
-                    ChatMessage resetMsg = new ChatMessage();
-                    resetMsg.setSenderSessionId("system");
-                    resetMsg.setText(
-                            "The previous drawer quit abruptly. The round has been reset. New drawer is: "
-                                    + participantService.findParticipantBySessionId(newDrawerId).getUsername()
-                    );
-                    resetMsg.setType("system");
+                    ChatMessage resetMsg = messageService.systemMessage(MessageType.PREVIOUS_DRAWER_QUIT, participantService.findParticipantBySessionId(newDrawerId).getUsername());
                     chatService.sendChatMessage(roomId, resetMsg);
                 }
             }
         } else {
             String currentDrawerId = game.getCurrentDrawer();
-            participantService.getAllParticipants().values().forEach(pp ->
-                    participantService.setDrawer(pp.getSessionId(), pp.getSessionId().equals(currentDrawerId))
-            );
+            participantService.getAllParticipants().values().forEach(participant -> participantService.setDrawer(participant.getSessionId(), participant.getSessionId().equals(currentDrawerId)));
         }
         roomService.broadcastParticipants(roomId);
         roomService.broadcastRooms();
