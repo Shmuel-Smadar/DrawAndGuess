@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useDispatch } from 'react-redux'
-import { setUsername, setNicknameError, setSessionId } from '../store/userSlice'
+import { setUsername, setNicknameError, setSessionId } from '../../store/userSlice'
 import './NicknamePrompt.css'
 
 const NicknamePrompt = ({ client, connected, error }) => {
