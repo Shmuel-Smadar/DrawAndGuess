@@ -1,47 +1,46 @@
 import React, { useEffect, useState } from 'react'
-import './RoomPrompt.css'
-import LeaderboardOverlay from './LeaderboardOverlay'
+import './Lobby.css'
+import LeaderboardOverlay from '../Leaderboard/LeaderboardOverlay'
+import RoomTable from './RoomTable'
 
-const RoomPrompt = ({ client, connected, setRoom }) => {
+function Lobby({ client, connected, setRoom }) {
   const [newRoomName, setNewRoomName] = useState('')
   const [error, setError] = useState('')
   const [rooms, setRooms] = useState([])
-  const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [showLeaderboard, setShowLeaderboard] = useState(false)
 
   useEffect(() => {
     if (!client || !connected) return
     const subscription = client.subscribe('/topic/rooms', (message) => {
       const data = JSON.parse(message.body)
-
-      /* sort the rooms according to player count (bigger first)
-       and rooms with the same player count will be sorted by A-Z  */
       const sorted = data.sort((a, b) => {
         if (b.numberOfParticipants !== a.numberOfParticipants) {
           return b.numberOfParticipants - a.numberOfParticipants
         }
         return a.roomName.localeCompare(b.roomName)
       })
-  
       setRooms(sorted)
     })
+
     client.publish({
       destination: '/app/getRooms',
       body: ''
     })
+
     return () => subscription.unsubscribe()
   }, [client, connected])
 
-  const handleJoinRoom = (room) => {
+  function handleJoinRoom(room) {
     if (client && connected) {
       client.publish({
         destination: '/app/joinRoom',
         body: room.roomId,
       })
+      setRoom(room)
     }
-    setRoom(room)
   }
 
-  const handleCreateRoom = (e) => {
+  function handleCreateRoom(e) {
     e.preventDefault()
     if (newRoomName.trim() === '') {
       setError('Room name cannot be empty.')
@@ -64,27 +63,10 @@ const RoomPrompt = ({ client, connected, setRoom }) => {
   }
 
   return (
-    <div className="room-prompt">
+    <div className="lobby">
       <h2>Select a Room</h2>
 
-      <div className="scrollable-rooms">
-        <div className="room-list">
-          {rooms.map((room) => (
-            <div className="room-item" key={room.roomId}>
-              <div className="room-info">
-                <span className="room-name">{room.roomName}</span>
-                <span className="participants">{room.numberOfParticipants}/10</span>
-              </div>
-              <button
-                className="join-button"
-                onClick={() => handleJoinRoom(room)}
-              >
-                Join
-              </button>
-            </div>
-          ))}
-        </div>
-      </div>
+      <RoomTable rooms={rooms} onJoinRoom={handleJoinRoom} />
 
       <form onSubmit={handleCreateRoom} className="new-room-form">
         <input
@@ -113,4 +95,4 @@ const RoomPrompt = ({ client, connected, setRoom }) => {
   )
 }
 
-export default RoomPrompt
+export default Lobby

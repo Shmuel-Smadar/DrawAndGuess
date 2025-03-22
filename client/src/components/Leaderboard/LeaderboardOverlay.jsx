@@ -1,6 +1,6 @@
 import React from 'react';
 import Leaderboard from './Leaderboard'; 
-import './LeaderboardOverlay.css'; // We'll style here.
+import './LeaderboardOverlay.css';
 
 function LeaderboardOverlay({ onClose }) {
   return (

@@ -1,8 +1,8 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
 import Canvas from './Canvas'
-import ColorPicker from './ColorPicker'
-import WordHint from './WordHint'
+import ColorPicker from '../DrawingPanel/ColorPicker'
+import WordHint from '../DrawingPanel/WordHint'
 
 function DrawingArea({ client, userID, roomId }) {
   const isDrawer = useSelector(state => state.game.isDrawer)

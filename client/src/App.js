@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import useStompClient from './utils/useStompClient'
-import DrawingArea from './components/DrawingArea'
+import DrawingArea from './components/Drawing/DrawingArea'
 import NicknamePrompt from './components/NicknamePrompt'
-import RoomPrompt from './components/RoomPrompt'
-import RightSidebar from './components/RightSidebar'
+import Lobby from './components/Lobby/Lobby'
+import RightSidebar from './components/Sidebar/RightSidebar'
 import WordSelection from './components/WordSelection'
 import { setUsername, setNicknameError } from './store/userSlice'
 import { setRoom } from './store/roomSlice'
@@ -71,7 +71,7 @@ function App() {
 
   if (!room) {
     return (
-      <RoomPrompt
+      <Lobby
         client={client}
         connected={connected}
         setRoom={(val) => dispatch(setRoom(val))}

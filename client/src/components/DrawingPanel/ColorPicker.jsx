@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { setColor, setBrushSize, setIsFillMode } from '../store/drawSlice'
-import ClearIcon from '../assets/trash-bin.png'
-import BrushIcon from '../assets/paint-brush.png'
-import BucketIcon from '../assets/paint-bucket.png'
+import { setColor, setBrushSize, setIsFillMode } from '../../store/drawSlice'
+import ClearIcon from '../../assets/trash-bin.png'
+import BrushIcon from '../../assets/paint-brush.png'
+import BucketIcon from '../../assets/paint-bucket.png'
 import './ColorPicker.css'
 
 const colors = [
