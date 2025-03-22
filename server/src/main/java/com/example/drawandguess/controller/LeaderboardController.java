@@ -1,6 +1,6 @@
 package com.example.drawandguess.controller;
 
-import com.example.drawandguess.service.LeaderboardConsumer;
+import com.example.drawandguess.service.LeaderboardService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -13,16 +13,16 @@ import java.util.Map;
 @RestController
 @CrossOrigin(origins = "http://localhost:3000")
 public class LeaderboardController {
-    private final LeaderboardConsumer leaderboardConsumer;
+    private final LeaderboardService leaderboardService;
 
-    public LeaderboardController(LeaderboardConsumer leaderboardConsumer) {
-        this.leaderboardConsumer = leaderboardConsumer;
+    public LeaderboardController(LeaderboardService leaderboardService) {
+        this.leaderboardService = leaderboardService;
     }
 
     @GetMapping("/leaderboard")
     public List<String> getLeaderboard() {
         List<String> data = new ArrayList<>();
-        for (Map.Entry<String,Integer> e : leaderboardConsumer.getLeaderboard().entrySet()) {
+        for (Map.Entry<String,Integer> e : leaderboardService.getLeaderboard().entrySet()) {
             data.add(e.getKey() + ":" + e.getValue());
         }
         data.sort(new Comparator<String>() {
