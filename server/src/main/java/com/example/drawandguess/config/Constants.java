@@ -4,7 +4,7 @@ public final class Constants {
     private Constants() {}
 
     public static final String VM_CONNECTOR = "vm://localhost";
-    public static final String ALLOWED_ORIGINS = "http://localhost:3000";
+    public static final String ALLOWED_ORIGINS = "*";
     public static final String STOMP_ENDPOINT = "/draw-and-guess";
     public static final String APP_PREFIX = "/app";
     public static final String TOPIC_PREFIX = "/topic";
