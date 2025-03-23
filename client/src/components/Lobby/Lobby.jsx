@@ -30,6 +30,16 @@ function Lobby({ client, connected, setRoom }) {
     return () => subscription.unsubscribe()
   }, [client, connected])
 
+
+  useEffect(() => {
+    if (!client || !connected) return
+    const sub = client.subscribe('/user/topic/roomCreated', (message) => {
+      const room = JSON.parse(message.body)
+      setRoom(room)
+    })
+    return () => sub.unsubscribe()
+  }, [client, connected, setRoom])
+  
   function handleJoinRoom(room) {
     if (client && connected) {
       client.publish({

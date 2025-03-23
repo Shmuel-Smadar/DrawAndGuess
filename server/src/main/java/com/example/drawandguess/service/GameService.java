@@ -192,6 +192,10 @@ public class GameService {
             );
         }
         roomService.broadcastParticipants(roomId);
+        // if all participants left the room, delete it.
+        if (game.getParticipantSessionIds().isEmpty()) {
+            roomService.deleteRoom(roomId);
+        }
         roomService.broadcastRooms();
     }
 

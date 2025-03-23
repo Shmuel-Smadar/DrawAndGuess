@@ -1,18 +1,18 @@
 package com.example.drawandguess.controller;
 
 import com.example.drawandguess.model.Participant;
+import com.example.drawandguess.model.Room;
 import com.example.drawandguess.service.ParticipantService;
 import com.example.drawandguess.service.RoomService;
 import com.example.drawandguess.service.GameService;
-import com.example.drawandguess.model.Room;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -39,8 +39,12 @@ public class RoomController {
     }
 
     @MessageMapping("/createRoom")
-    public void createRoom(@Payload String roomName) {
-        roomService.createRoom(roomName);
+    @SendToUser("/topic/roomCreated")
+    public Room createRoom(@Payload String roomName, SimpMessageHeaderAccessor headerAccessor) {
+        Room room = roomService.createRoom(roomName);
+        String sessionId = headerAccessor.getSessionId();
+        roomService.joinRoom(sessionId, room.getRoomId());
+        return room;
     }
 
     @MessageMapping("/joinRoom")
