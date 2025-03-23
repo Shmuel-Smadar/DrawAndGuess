@@ -4,6 +4,7 @@
 # Allow directories
 !*/
 
+
 # Allow specific extentions
 !*.jsx
 !*.js
@@ -19,11 +20,12 @@
 !.gitignore
 !manifest.json
 
-# dependencies
+# ignore
 /client/node_modules
 /.idea/.gitignore
 /.pnp
 .pnp.js
+**/server/src/main/resources/
 
 # testing
 /client/coverage
