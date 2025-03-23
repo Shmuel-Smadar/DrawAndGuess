@@ -1,13 +1,20 @@
 import { useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import { floodFill } from '../utils/floodFill';
 import { VIRTUAL_WIDTH, VIRTUAL_HEIGHT } from '../utils/constants';
 
 export const useCanvasSubscriptions = ({ client, roomId, canvasRef, lastPositions }) => {
+
+  const isDrawer = useSelector((state) => state.game.isDrawer);
+
   useEffect(() => {
     if (!client || !client.connected) return;
 
     const drawingSub = client.subscribe(`/topic/room/${roomId}/drawing`, (msg) => {
       const data = JSON.parse(msg.body);
+      
+      if (isDrawer && data.eventType !== 'FILL') return;
+
       const canvas = canvasRef.current;
       if (!canvas) return;
       const ctx = canvas.getContext('2d');
@@ -23,7 +30,6 @@ export const useCanvasSubscriptions = ({ client, roomId, canvasRef, lastPosition
           ctx.strokeStyle = data.color;
           lastPositions.current[data.userID] = { x: offsetX, y: offsetY };
           break;
-
         case 'DRAW':
           ctx.lineWidth = data.brushSize;
           const lastPos = lastPositions.current[data.userID];
@@ -37,15 +43,12 @@ export const useCanvasSubscriptions = ({ client, roomId, canvasRef, lastPosition
           ctx.stroke();
           lastPositions.current[data.userID] = { x: offsetX, y: offsetY };
           break;
-
         case 'STOP':
           delete lastPositions.current[data.userID];
           break;
-
         case 'FILL':
           floodFill(ctx, Math.floor(offsetX), Math.floor(offsetY), data.color);
           break;
-
         default:
           break;
       }
@@ -63,5 +66,5 @@ export const useCanvasSubscriptions = ({ client, roomId, canvasRef, lastPosition
       drawingSub.unsubscribe();
       clearSub.unsubscribe();
     };
-  }, [client, roomId, canvasRef, lastPositions]);
+  }, [client, roomId, canvasRef, lastPositions, isDrawer]);
 };
