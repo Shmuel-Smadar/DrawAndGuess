@@ -91,7 +91,9 @@ export const useDrawingHandlers = ({
   const draw = useCallback(
     (event) => {
       if (!isDrawing || !isDrawingAllowed || !client || isFillMode) return;
-      event.preventDefault();
+      if (event.cancelable) {
+        event.preventDefault();
+      }
 
       const { offsetX, offsetY } = getEventCoordinates(event, canvasRef);
       const { width, height } = canvasRef.current;
