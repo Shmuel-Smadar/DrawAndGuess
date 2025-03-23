@@ -1,55 +1,107 @@
 .scrollable-rooms {
-    width: 100%;
-    max-width: 700px;
-    min-height: 600px;
-    max-height: 600px;
-    overflow-y: auto;
-    margin-bottom: 20px;
-    border: 2px solid #444;
-    border-radius: 5px;
-    padding: 10px;
+  width: 100%;
+  max-width: 700px;
+  min-height: 600px;
+  max-height: 600px;
+  overflow-y: auto;
+  margin-bottom: 20px;
+  border: 2px solid #444;
+  border-radius: 5px;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.room-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.room-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #fafafa;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.room-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.room-name {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.participants {
+  font-size: 14px;
+  color: #555;
+}
+
+.empty-room-message,
+.empty-room-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border-radius: 8px;
+  border: 2px #ccc;
+  margin: 20px auto;
+  padding: 40px;
+  max-width: 700px;
+  box-sizing: border-box;
+}
+
+.empty-room-image {
+  width: 150px;
+  margin-bottom: 20px;
+}
+
+.empty-room-heading {
+  font-size: 1.8em;
+  margin-bottom: 10px;
+}
+
+.empty-room-text {
+  font-size: 1.2em;
+  color: #666;
+  margin-bottom: 20px;
+}
+
+@media screen and (max-width: 768px) {
+  .scrollable-rooms {
+    min-height: 400px;
+    max-height: 400px;
+    padding: 5px;
   }
-  
-  .room-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    width: 100%;
-  }
-  
-  .room-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    background-color: #fafafa;
-    max-width: 700px;
-    width: 100%;
-    box-sizing: border-box;
-  }
-  
-  .room-info {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-  
   .room-name {
-    font-size: 18px;
-    font-weight: bold;
+    font-size: 16px;
   }
-  
   .participants {
-    font-size: 14px;
-    color: #555;
+    font-size: 12px;
   }
-  
-  @media screen and (max-width: 768px) {
-    .scrollable-rooms {
-      min-height: 400px;
-      max-height: 400px;
-    }
+  .empty-room-message,
+  .empty-room-container {
+    padding: 20px;
+    margin: 20px auto;
+    max-width: 90%;
   }
-  
+  .empty-room-image {
+    width: 100px;
+  }
+  .empty-room-heading {
+    font-size: 1.5em;
+  }
+  .empty-room-text {
+    font-size: 1em;
+  }
+}
