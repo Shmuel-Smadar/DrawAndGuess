@@ -1,73 +1,84 @@
 .lobby {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 20px;
-    box-sizing: border-box;
-    max-width: 800px;
-    margin: 0 auto;
-  }
-  
-  .lobby h2 {
-    margin-bottom: 20px;
-    text-align: center;
-  }
-  
-  .lobby button {
-    padding: 8px 16px;
-    font-size: 14px;
-    background-color: #6200ea;
-    color: #ffffff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    flex-shrink: 0;
-    margin-bottom: 10px;
-  }
-  
-  .lobby button:hover {
-    background-color: #3700b3;
-  }
-  
-  .lobby button:active {
-    background-color: #290e9e;
-  }
-  
-  .leaderboard-button {
-    align-self: flex-start;
-  }
-  
-  .new-room-form {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-top: 10px;
-    width: 100%;
-    max-width: 700px;
-    box-sizing: border-box;
-  }
-  
-  .new-room-form input {
-    width: 60%;
-    max-width: 400px;
-    padding: 10px;
-    margin-bottom: 15px;
-    font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    display: block;
-  }
-  
-  .new-room-form input:focus {
-    outline: none;
-    border-color: #6200ea;
-    box-shadow: 0 0 5px rgba(98, 0, 234, 0.5);
-  }
-  
-  .error {
-    color: red;
-    margin-top: 10px;
-    width: 100%;
-    text-align: center;
-  }
-  
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  box-sizing: border-box;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.lobby h2 {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.lobby button {
+  padding: 8px 16px;
+  font-size: 14px;
+  background-color: #6200ea;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  flex-shrink: 0;
+  margin-bottom: 10px;
+}
+
+.lobby button:hover {
+  background-color: #3700b3;
+}
+
+.lobby button:active {
+  background-color: #290e9e;
+}
+
+.leaderboard-button {
+  /* This button stays on the left */
+}
+
+.new-room-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 10px;
+  width: 100%;
+  max-width: 700px;
+  box-sizing: border-box;
+}
+
+.new-room-form input {
+  width: 60%;
+  max-width: 400px;
+  padding: 10px;
+  margin-bottom: 15px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  display: block;
+}
+
+.new-room-form input:focus {
+  outline: none;
+  border-color: #6200ea;
+  box-shadow: 0 0 5px rgba(98, 0, 234, 0.5);
+}
+
+.error {
+  color: red;
+  margin-top: 10px;
+  width: 100%;
+  text-align: center;
+}
+
+.button-group {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+  width: 100%;
+}
+
+.credits-button {
+  margin-left: auto;
+  margin-right: 20px;
+}

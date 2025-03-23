@@ -2,12 +2,14 @@ import React, { useEffect, useState } from 'react'
 import './Lobby.css'
 import LeaderboardOverlay from '../Leaderboard/LeaderboardOverlay'
 import RoomTable from './RoomTable'
+import CreditsOverlay from './CreditsOverlay'
 
 function Lobby({ client, connected, setRoom }) {
   const [newRoomName, setNewRoomName] = useState('')
   const [error, setError] = useState('')
   const [rooms, setRooms] = useState([])
   const [showLeaderboard, setShowLeaderboard] = useState(false)
+  const [showCredits, setShowCredits] = useState(false)
 
   useEffect(() => {
     if (!client || !connected) return
@@ -30,7 +32,6 @@ function Lobby({ client, connected, setRoom }) {
     return () => subscription.unsubscribe()
   }, [client, connected])
 
-
   useEffect(() => {
     if (!client || !connected) return
     const sub = client.subscribe('/user/topic/roomCreated', (message) => {
@@ -39,7 +40,7 @@ function Lobby({ client, connected, setRoom }) {
     })
     return () => sub.unsubscribe()
   }, [client, connected, setRoom])
-  
+
   function handleJoinRoom(room) {
     if (client && connected) {
       client.publish({
@@ -75,9 +76,7 @@ function Lobby({ client, connected, setRoom }) {
   return (
     <div className="lobby">
       <h2>Select a Room</h2>
-
       <RoomTable rooms={rooms} onJoinRoom={handleJoinRoom} />
-
       <form onSubmit={handleCreateRoom} className="new-room-form">
         <input
           type="text"
@@ -90,16 +89,25 @@ function Lobby({ client, connected, setRoom }) {
         <button type="submit">Create Room</button>
         {error && <div className="error">{error}</div>}
       </form>
-
-      <button
-        className="leaderboard-button"
-        onClick={() => setShowLeaderboard(true)}
-      >
-        Leaderboard
-      </button>
-
+      <div className="button-group">
+        <button
+          className="leaderboard-button"
+          onClick={() => setShowLeaderboard(true)}
+        >
+          Leaderboard
+        </button>
+        <button
+          className="credits-button"
+          onClick={() => setShowCredits(true)}
+        >
+          Credits
+        </button>
+      </div>
       {showLeaderboard && (
         <LeaderboardOverlay onClose={() => setShowLeaderboard(false)} />
+      )}
+      {showCredits && (
+        <CreditsOverlay onClose={() => setShowCredits(false)} />
       )}
     </div>
   )
