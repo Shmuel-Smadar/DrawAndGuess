@@ -86,7 +86,7 @@ function Lobby({ client, connected, setRoom }) {
           maxLength={20}
           required
         />
-        <button type="submit">Create New Room & Join</button>
+        <button type="submit">Create Room & Join</button>
         {error && <div className="error">{error}</div>}
       </form>
       <div className="button-group">
