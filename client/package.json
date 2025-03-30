@@ -27,7 +27,7 @@
     "build": "react-scripts build",
      "postbuild": "rm -rf /root/stuff/DrawAndGuess/server/src/main/resources/static/drawandguess/* && cp -r build/* /root/stuff/DrawAndGuess/server/src/main/resources/static/drawandguess/",
     "obfuscate": "javascript-obfuscator build --output build --config obfuscator-config.json",
-    "build:obfuscated": "npm run build && npm run obfuscate && npm run postbuild",
+    "build:o": "npm run build && npm run obfuscate && npm run postbuild",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
