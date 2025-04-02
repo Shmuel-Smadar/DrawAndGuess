@@ -26,6 +26,7 @@ public class GameService {
     private final ConcurrentHashMap<String, ScheduledFuture<?>> hintTasks = new ConcurrentHashMap<>();
     private final LeaderboardService leaderboardService;
     private final MessageService messageService;
+    private final WordService wordService;
 
     public GameService(
             ChatService chatService,
@@ -33,7 +34,8 @@ public class GameService {
             RoomService roomService,
             TaskScheduler taskScheduler,
             LeaderboardService leaderboardService,
-            MessageService messageService
+            MessageService messageService,
+            WordService wordService
     ) {
         this.chatService = chatService;
         this.participantService = participantService;
@@ -41,13 +43,16 @@ public class GameService {
         this.taskScheduler = taskScheduler;
         this.leaderboardService = leaderboardService;
         this.messageService = messageService;
+        this.wordService = wordService;
     }
 
     public WordOptions requestWords(String roomId, String sessionId) {
         Room room = roomService.getRoom(roomId);
         if (room == null) return new WordOptions();
         Game game = room.getGame();
-        if (game.isDrawer(sessionId)) return game.getRandomWords();
+        if (game.isDrawer(sessionId)) {
+            return wordService.getRandomWords();
+        }
         return new WordOptions();
     }
 
@@ -192,7 +197,6 @@ public class GameService {
             );
         }
         roomService.broadcastParticipants(roomId);
-        // if all participants left the room, delete it.
         if (game.getParticipantSessionIds().isEmpty()) {
             roomService.deleteRoom(roomId);
         }

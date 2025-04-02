@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 
 import static com.example.drawandguess.config.Constants.TOTAL_ROUNDS;
 
@@ -15,9 +14,6 @@ public class Game {
     private String chosenWord;
     private StringBuilder currentHintBuilder = new StringBuilder();
     private boolean isFirstHint;
-    private final List<String> wordPool = List.of(
-            "Cat", "Computer", "Pizza", "Bicycle", "Tree", "Car", "House", "Sun", "Moon", "Banana"
-    );
     private List<Integer> revealOrder = new ArrayList<>();
     private Map<String, Integer> scores = new HashMap<>();
     private int roundCount = 0;
@@ -108,15 +104,6 @@ public class Game {
 
     public int getTotalRounds() {
         return totalRounds;
-    }
-
-    public WordOptions getRandomWords() {
-        Random r = new Random();
-        return new WordOptions(
-                wordPool.get(r.nextInt(wordPool.size())),
-                wordPool.get(r.nextInt(wordPool.size())),
-                wordPool.get(r.nextInt(wordPool.size()))
-        );
     }
 
     public boolean hasMoreHints() {
