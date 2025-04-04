@@ -18,6 +18,7 @@ public class MessageService {
         ChatMessage msg = new ChatMessage();
         msg.setSenderSessionId("system");
         msg.setType("system");
+        msg.setMessageType(type);
         switch (type) {
             case ROUND_STARTED ->
                     msg.setText(ROUND_STARTED_MSG_PREFIX + args[0] + ". (Round " + args[1] + "/" + args[2] + ")");
@@ -44,6 +45,7 @@ public class MessageService {
         msg.setSenderSessionId(sessionId);
         msg.setText(text);
         msg.setType("user");
+        msg.setMessageType(null);
         return msg;
     }
 }

@@ -3,6 +3,29 @@ import DOMPurify from 'dompurify';
 import { useSelector } from 'react-redux';
 import './Chat.css';
 
+function getSystemMessageColor(messageType) {
+  switch (messageType) {
+    case 'PARTICIPANT_JOINED':
+      return 'forestgreen'
+    case 'PARTICIPANT_LEFT':
+      return 'crimson'
+    case 'WORD_GUESSED':
+      return 'darkorange'
+    case 'NO_GUESS':
+      return 'mediumpurple'
+    case 'GAME_ENDED':
+      return 'darkslategray'
+    case 'PREVIOUS_DRAWER_QUIT':
+      return 'firebrick'
+    case 'ROUND_STARTED':
+      return 'royalblue'
+    case 'NEW_GAME_STARTED':
+      return 'seagreen'
+    default:
+      return 'gray'
+  }
+}
+
 const Chat = ({ client, roomId, username, canChat, width, height }) => {
   const sessionId = useSelector((state) => state.user.sessionId)
   const [messages, setMessages] = useState([]);
@@ -22,10 +45,10 @@ const Chat = ({ client, roomId, username, canChat, width, height }) => {
         setShowScrollButton(true);
         setUnreadCount((prevCount) => prevCount + 1);
       }
-    });
+    })
     return () => {
       subscription.unsubscribe();
-    };
+    }
   }, [client, roomId, isAtBottom]);
 
   useEffect(() => {
@@ -71,7 +94,6 @@ const Chat = ({ client, roomId, username, canChat, width, height }) => {
       senderUsername: username,
       type: 'user'
     }
-    console.log(username)
     client.publish({
       destination: `/app/room/${roomId}/chat`,
       body: JSON.stringify(messageData)
@@ -93,7 +115,11 @@ const Chat = ({ client, roomId, username, canChat, width, height }) => {
               className={`chat-message ${message.type === 'system' ? 'system-message' : 'user-message'}`}
             >
               {message.type === 'system' ? (
-                <span className="chat-text system-text" dangerouslySetInnerHTML={{ __html: sanitizedText }} />
+                <span
+                  className="chat-text system-text"
+                  style={{ color: getSystemMessageColor(message.messageType) }}
+                  dangerouslySetInnerHTML={{ __html: sanitizedText }}
+                />
               ) : (
                 <>
                   <span className="chat-sender">{username}: </span>
@@ -129,7 +155,7 @@ const Chat = ({ client, roomId, username, canChat, width, height }) => {
         </button>
       </div>
     </div>
-  );
-};
+  )
+}
 
 export default Chat;
