@@ -17,19 +17,21 @@ export const useDrawingHandlers = ({
   lastPositions,
   isDrawing
 }) => {
+  const computeCoords = (event) => {
+    const { offsetX, offsetY } = getEventCoordinates(event, canvasRef);
+    const { width, height } = canvasRef.current;
+    const normX = (offsetX / width) * VIRTUAL_WIDTH;
+    const normY = (offsetY / height) * VIRTUAL_HEIGHT;
+    return { offsetX, offsetY, normX, normY };
+  };
+
   const startDrawing = useCallback(
     (event) => {
       event.preventDefault();
       if (!isDrawingAllowed || !client) return;
-
       const ctx = canvasRef.current.getContext('2d');
-
       if (isFillMode) {
-        const { offsetX, offsetY } = getEventCoordinates(event, canvasRef);
-        const { width, height } = canvasRef.current;
-        const normX = (offsetX / width) * VIRTUAL_WIDTH;
-        const normY = (offsetY / height) * VIRTUAL_HEIGHT;
-
+        const { normX, normY } = computeCoords(event);
         const msg = {
           normX,
           normY,
@@ -47,11 +49,7 @@ export const useDrawingHandlers = ({
         return;
       }
 
-      const { offsetX, offsetY } = getEventCoordinates(event, canvasRef);
-      const { width, height } = canvasRef.current;
-      const normX = (offsetX / width) * VIRTUAL_WIDTH;
-      const normY = (offsetY / height) * VIRTUAL_HEIGHT;
-
+      const { offsetX, offsetY, normX, normY } = computeCoords(event);
       ctx.beginPath();
       ctx.moveTo(offsetX, offsetY);
       ctx.lineTo(offsetX, offsetY);
@@ -84,25 +82,19 @@ export const useDrawingHandlers = ({
       canvasRef,
       dispatch,
       setIsDrawing,
-      lastPositions
+      lastPositions,
+      computeCoords
     ]
   );
 
   const draw = useCallback(
     (event) => {
       if (!isDrawing || !isDrawingAllowed || !client || isFillMode) return;
-
-      const { offsetX, offsetY } = getEventCoordinates(event, canvasRef);
-      const { width, height } = canvasRef.current;
-      const normX = (offsetX / width) * VIRTUAL_WIDTH;
-      const normY = (offsetY / height) * VIRTUAL_HEIGHT;
-
+      const { offsetX, offsetY, normX, normY } = computeCoords(event);
       const ctx = canvasRef.current.getContext('2d');
       ctx.lineTo(offsetX, offsetY);
       ctx.stroke();
-
       lastPositions.current[userID] = { x: offsetX, y: offsetY };
-
       const msg = {
         normX,
         normY,
@@ -125,7 +117,8 @@ export const useDrawingHandlers = ({
       roomId,
       userID,
       canvasRef,
-      lastPositions
+      lastPositions,
+      computeCoords
     ]
   );
 

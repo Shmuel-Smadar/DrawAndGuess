@@ -13,7 +13,7 @@ const useCanvas = ({ client, userID, roomId }) => {
 
   const canvasRef = useRef(null);
   const lastPositions = useRef({});
-  const [isDrawing, setIsDrawing] = useState(false); // <-- isDrawing state
+  const [isDrawing, setIsDrawing] = useState(false);
 
   const resizeCanvas = useCanvasResize(canvasRef);
 
@@ -23,19 +23,11 @@ const useCanvas = ({ client, userID, roomId }) => {
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (canvas) {
-      const ctx = canvas.getContext('2d');
-      ctx.strokeStyle = color;
-    }
-  }, [color]);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (canvas) {
-      const ctx = canvas.getContext('2d');
-      ctx.lineWidth = brushSize;
-    }
-  }, [brushSize]);
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    ctx.strokeStyle = color;
+    ctx.lineWidth = brushSize;
+  }, [color, brushSize]);
 
   useCanvasSubscriptions({ client, roomId, canvasRef, lastPositions });
 
@@ -51,7 +43,7 @@ const useCanvas = ({ client, userID, roomId }) => {
     dispatch,
     setIsDrawing,
     lastPositions,
-    isDrawing,
+    isDrawing
   });
 
   return {
@@ -62,7 +54,7 @@ const useCanvas = ({ client, userID, roomId }) => {
     handleMouseLeave: stopDrawing,
     handleTouchStart: startDrawing,
     handleTouchMove: draw,
-    handleTouchEnd: stopDrawing,
+    handleTouchEnd: stopDrawing
   };
 };
 
