@@ -81,7 +81,7 @@ public class RoomService {
                 List<String> ids = room.getGame().getParticipantSessionIds();
                 List<Participant> list = participantService.getParticipantsBySessionIds(ids);
                 for (Participant p : list) {
-                    p.setScore(room.getGame().getScore(p.getSessionId()));
+                    p.setScore(room.getGame().getScore(p.getUsername()));
                 }
                 messagingTemplate.convertAndSend(TOPIC_ROOM_PREFIX + roomId + "/participants", list);
             }

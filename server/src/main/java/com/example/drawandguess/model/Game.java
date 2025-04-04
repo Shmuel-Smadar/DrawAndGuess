@@ -19,6 +19,7 @@ public class Game {
     private int roundCount = 0;
     private boolean gameOver = false;
     private final int totalRounds = TOTAL_ROUNDS;
+    private int hintsUsed = 0;
 
     public void addParticipant(String sessionId) {
         if (!participantSessionIds.contains(sessionId)) {
@@ -86,6 +87,7 @@ public class Game {
         this.isFirstHint = true;
         this.currentHintBuilder.setLength(0);
         this.revealOrder.clear();
+        this.hintsUsed = 0;
     }
 
     public void resetGame() {
@@ -128,6 +130,7 @@ public class Game {
             isFirstHint = false;
             return currentHintBuilder.toString();
         }
+        hintsUsed++;
         int nextIndex = revealOrder.remove(0);
         currentHintBuilder.setCharAt(nextIndex, chosenWord.charAt(nextIndex));
         return currentHintBuilder.toString();
@@ -151,5 +154,9 @@ public class Game {
 
     public Map<String, Integer> getAllScores() {
         return scores;
+    }
+
+    public int getHintsUsed() {
+        return hintsUsed;
     }
 }

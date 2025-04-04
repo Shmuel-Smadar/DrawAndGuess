@@ -1,5 +1,6 @@
 package com.example.drawandguess.service;
 
+import com.example.drawandguess.config.Constants;
 import com.example.drawandguess.model.ChatMessage;
 import com.example.drawandguess.model.Game;
 import com.example.drawandguess.model.Participant;
@@ -12,7 +13,6 @@ import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
-
 import static com.example.drawandguess.config.Constants.HINT_INTERVAL_SECONDS;
 import static com.example.drawandguess.config.Constants.GAME_ENDED_MSG;
 import static com.example.drawandguess.config.Constants.NO_ONE_GUESSED_MSG;
@@ -78,15 +78,16 @@ public class GameService {
         Game game = room.getGame();
         if (game.isCorrectGuess(guess)) {
             String username = participantService.findParticipantBySessionId(sessionId).getUsername();
-            game.addScore(username, 10);
+            int used = game.getHintsUsed();
+            int multiplier = Math.max(1, Constants.MULTIPLIER_BASE - used);
+            int guesserPoints = Constants.GUESSER_BASE_POINTS * multiplier;
+            game.addScore(username, guesserPoints);
             if (game.getCurrentDrawer() != null) {
                 String drawerId = game.getCurrentDrawer();
-                String DrawerName =  participantService.findParticipantBySessionId(drawerId).getUsername();
-                game.addScore(DrawerName, 5);
-                if (drawerId != null) {
-                    String drawerUsername = participantService.findParticipantBySessionId(drawerId).getUsername();
-                    leaderboardService.updateScore(drawerUsername, game.getScore(drawerId));
-                }
+                String drawerName = participantService.findParticipantBySessionId(drawerId).getUsername();
+                int drawerPoints = Constants.DRAWER_BASE_POINTS * multiplier;
+                game.addScore(drawerName, drawerPoints);
+                leaderboardService.updateScore(drawerName, game.getScore(drawerId));
             }
             leaderboardService.updateScore(username, game.getScore(sessionId));
             stopHintProgression(roomId);
@@ -218,7 +219,7 @@ public class GameService {
                 .append(game.getTotalRounds()).append(" rounds. Final scores: ");
         for (String pid : game.getParticipantSessionIds()) {
             String username = participantService.findParticipantBySessionId(pid).getUsername();
-            sb.append(participantService.findParticipantBySessionId(pid).getUsername())
+            sb.append(username)
                     .append("=")
                     .append(game.getScore(username))
                     .append("  ");

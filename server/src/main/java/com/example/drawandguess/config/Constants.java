@@ -20,6 +20,10 @@ public final class Constants {
 
     public static final int TOTAL_ROUNDS = 6;
 
+    public static final int GUESSER_BASE_POINTS = 10;
+    public static final int DRAWER_BASE_POINTS = 5;
+    public static final int MULTIPLIER_BASE = 5;
+
     public static final String ROUND_STARTED_MSG_PREFIX = "A new round has started. The drawer is ";
     public static final String NO_GUESS_MSG = "No one guessed the word.";
     public static final String GAME_ENDED_MSG = "The game has ended";
