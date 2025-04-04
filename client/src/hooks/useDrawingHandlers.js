@@ -1,7 +1,14 @@
-import { useCallback } from 'react';
-import { setIsFillMode } from '../store/drawSlice';
-import { getEventCoordinates } from '../utils/helpers';
-import { VIRTUAL_WIDTH, VIRTUAL_HEIGHT } from '../utils/constants';
+import { useCallback } from 'react'
+import { setIsFillMode } from '../store/drawSlice'
+import { getEventCoordinates } from '../utils/helpers'
+import {
+  VIRTUAL_WIDTH,
+  VIRTUAL_HEIGHT,
+  EVENT_TYPE_START,
+  EVENT_TYPE_DRAW,
+  EVENT_TYPE_STOP,
+  EVENT_TYPE_FILL
+} from '../utils/constants'
 
 export const useDrawingHandlers = ({
   client,
@@ -30,36 +37,36 @@ export const useDrawingHandlers = ({
 
   const startDrawing = useCallback(
     (event) => {
-      event.preventDefault();
-      if (!isDrawingAllowed || !client) return;
-      const ctx = canvasRef.current.getContext('2d');
+      event.preventDefault()
+      if (!isDrawingAllowed || !client) return
+      const ctx = canvasRef.current.getContext('2d')
       if (isFillMode) {
-        const { normX, normY } = computeCoords(event);
+        const { normX, normY } = computeCoords(event)
         const msg = {
           normX,
           normY,
           color,
           userID: String(userID),
-          eventType: 'FILL'
-        };
+          eventType: EVENT_TYPE_FILL
+        }
 
         client.publish({
           destination: `/app/room/${roomId}/fill`,
           body: JSON.stringify(msg)
-        });
+        })
 
-        dispatch(setIsFillMode(false));
-        return;
+        dispatch(setIsFillMode(false))
+        return
       }
 
-      const { offsetX, offsetY, normX, normY } = computeCoords(event);
-      ctx.beginPath();
-      ctx.moveTo(offsetX, offsetY);
-      ctx.lineTo(offsetX, offsetY);
-      ctx.strokeStyle = color;
-      ctx.stroke();
-      setIsDrawing(true);
-      lastPositions.current[userID] = { x: offsetX, y: offsetY };
+      const { offsetX, offsetY, normX, normY } = computeCoords(event)
+      ctx.beginPath()
+      ctx.moveTo(offsetX, offsetY)
+      ctx.lineTo(offsetX, offsetY)
+      ctx.strokeStyle = color
+      ctx.stroke()
+      setIsDrawing(true)
+      lastPositions.current[userID] = { x: offsetX, y: offsetY }
 
       const message = {
         normX,
@@ -67,12 +74,12 @@ export const useDrawingHandlers = ({
         color,
         brushSize,
         userID: String(userID),
-        eventType: 'START'
-      };
+        eventType: EVENT_TYPE_START
+      }
       client.publish({
         destination: `/app/room/${roomId}/startDrawing`,
         body: JSON.stringify(message)
-      });
+      })
     },
     [
       isDrawingAllowed,
@@ -88,28 +95,28 @@ export const useDrawingHandlers = ({
       lastPositions,
       computeCoords
     ]
-  );
+  )
 
   const draw = useCallback(
     (event) => {
-      if (!isDrawing || !isDrawingAllowed || !client || isFillMode) return;
-      const { offsetX, offsetY, normX, normY } = computeCoords(event);
-      const ctx = canvasRef.current.getContext('2d');
-      ctx.lineTo(offsetX, offsetY);
-      ctx.stroke();
-      lastPositions.current[userID] = { x: offsetX, y: offsetY };
+      if (!isDrawing || !isDrawingAllowed || !client || isFillMode) return
+      const { offsetX, offsetY, normX, normY } = computeCoords(event)
+      const ctx = canvasRef.current.getContext('2d')
+      ctx.lineTo(offsetX, offsetY)
+      ctx.stroke()
+      lastPositions.current[userID] = { x: offsetX, y: offsetY }
       const msg = {
         normX,
         normY,
         brushSize,
         userID: String(userID),
-        eventType: 'DRAW'
-      };
+        eventType: EVENT_TYPE_DRAW
+      }
 
       client.publish({
         destination: `/app/room/${roomId}/draw`,
         body: JSON.stringify(msg)
-      });
+      })
     },
     [
       isDrawing,
@@ -123,25 +130,25 @@ export const useDrawingHandlers = ({
       lastPositions,
       computeCoords
     ]
-  );
+  )
 
   const stopDrawing = useCallback(
     (event) => {
-      event.preventDefault();
-      if (!isDrawingAllowed || !client) return;
+      event.preventDefault()
+      if (!isDrawingAllowed || !client) return
 
-      setIsDrawing(false);
-      delete lastPositions.current[userID];
+      setIsDrawing(false)
+      delete lastPositions.current[userID]
 
-      const msg = { userID: String(userID), eventType: 'STOP' };
+      const msg = { userID: String(userID), eventType: EVENT_TYPE_STOP }
 
       client.publish({
         destination: `/app/room/${roomId}/stopDrawing`,
         body: JSON.stringify(msg)
-      });
+      })
     },
     [isDrawingAllowed, client, roomId, userID, setIsDrawing, lastPositions]
-  );
+  )
 
-  return { startDrawing, draw, stopDrawing };
-};
+  return { startDrawing, draw, stopDrawing }
+}

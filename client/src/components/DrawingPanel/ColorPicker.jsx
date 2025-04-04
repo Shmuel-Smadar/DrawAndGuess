@@ -4,28 +4,8 @@ import { setColor, setBrushSize, setIsFillMode } from '../../store/drawSlice'
 import ClearIcon from '../../assets/trash-bin.png'
 import BrushIcon from '../../assets/paint-brush.png'
 import BucketIcon from '../../assets/paint-bucket.png'
+import { COLOR_OPTIONS, BRUSH_SIZES } from '../../utils/constants'
 import './ColorPicker.css'
-
-const colors = [
-  { code: '#000000' },
-  { code: '#FF0000' },
-  { code: '#00FF00' },
-  { code: '#0000FF' },
-  { code: '#FFFF00' },
-  { code: '#A52A2A' },
-  { code: '#800080' },
-  { code: '#FFA500' },
-  { code: '#FFC0CB' },
-  { code: '#808080' },
-  { code: '#00FFFF' },
-  { code: '#FF00FF' },
-  { code: '#8950F7' }
-]
-const brushSizes = [
-  { name: 'S', size: 2 },
-  { name: 'M', size: 5 },
-  { name: 'L', size: 10 }
-]
 
 function ColorPicker({ client, userID, roomId, isDrawer }) {
   const dispatch = useDispatch()
@@ -64,7 +44,7 @@ function ColorPicker({ client, userID, roomId, isDrawer }) {
             </button>
             {showSizeList && (
               <div className="brush-size-list">
-                {brushSizes.map(b => (
+                {BRUSH_SIZES.map(b => (
                   <button
                     key={b.size}
                     onClick={() => {
@@ -78,7 +58,7 @@ function ColorPicker({ client, userID, roomId, isDrawer }) {
               </div>
             )}
           </div>
-          {colors.map(c => (
+          {COLOR_OPTIONS.map(c => (
             <button
               key={c.code}
               style={{ backgroundColor: c.code }}
@@ -91,4 +71,5 @@ function ColorPicker({ client, userID, roomId, isDrawer }) {
     </div>
   )
 }
+
 export default ColorPicker

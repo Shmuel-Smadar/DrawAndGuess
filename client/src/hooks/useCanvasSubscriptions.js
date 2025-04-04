@@ -1,7 +1,16 @@
 import { useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { floodFill } from '../utils/floodFill'
-import { VIRTUAL_WIDTH, VIRTUAL_HEIGHT, topicRoomDrawing, topicRoomClearCanvas } from '../utils/constants'
+import {
+  VIRTUAL_WIDTH,
+  VIRTUAL_HEIGHT,
+  topicRoomDrawing,
+  topicRoomClearCanvas,
+  EVENT_TYPE_START,
+  EVENT_TYPE_DRAW,
+  EVENT_TYPE_STOP,
+  EVENT_TYPE_FILL
+} from '../utils/constants'
 
 export const useCanvasSubscriptions = ({ client, roomId, canvasRef, lastPositions }) => {
   const isDrawer = useSelector((state) => state.game.isDrawer)
@@ -11,7 +20,7 @@ export const useCanvasSubscriptions = ({ client, roomId, canvasRef, lastPosition
 
     const drawingSub = client.subscribe(topicRoomDrawing(roomId), (msg) => {
       const data = JSON.parse(msg.body)
-      if (isDrawer && data.eventType !== 'FILL') return
+      if (isDrawer && data.eventType !== EVENT_TYPE_FILL) return
       const canvas = canvasRef.current
       if (!canvas) return
       const ctx = canvas.getContext('2d')
@@ -19,7 +28,7 @@ export const useCanvasSubscriptions = ({ client, roomId, canvasRef, lastPosition
       const offsetX = (data.normX / VIRTUAL_WIDTH) * width
       const offsetY = (data.normY / VIRTUAL_HEIGHT) * height
       switch (data.eventType) {
-        case 'START':
+        case EVENT_TYPE_START:
           ctx.lineWidth = data.brushSize
           ctx.beginPath()
           ctx.moveTo(offsetX, offsetY)
@@ -28,7 +37,7 @@ export const useCanvasSubscriptions = ({ client, roomId, canvasRef, lastPosition
           ctx.stroke()
           lastPositions.current[data.userID] = { x: offsetX, y: offsetY }
           break
-        case 'DRAW':
+        case EVENT_TYPE_DRAW:
           ctx.lineWidth = data.brushSize
           const lastPos = lastPositions.current[data.userID]
           ctx.beginPath()
@@ -41,10 +50,10 @@ export const useCanvasSubscriptions = ({ client, roomId, canvasRef, lastPosition
           ctx.stroke()
           lastPositions.current[data.userID] = { x: offsetX, y: offsetY }
           break
-        case 'STOP':
+        case EVENT_TYPE_STOP:
           delete lastPositions.current[data.userID]
           break
-        case 'FILL':
+        case EVENT_TYPE_FILL:
           floodFill(ctx, Math.floor(offsetX), Math.floor(offsetY), data.color)
           break
         default:

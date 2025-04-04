@@ -15,3 +15,41 @@ export const topicRoomClearCanvas = (roomId) => `/topic/room/${roomId}/clearCanv
 export const topicRoomParticipants = (roomId) => `/topic/room/${roomId}/participants`
 export const topicRoomWordHint = (roomId) => `/topic/room/${roomId}/wordHint`
 export const appGetCurrentHint = (roomId) => `/app/room/${roomId}/getCurrentHint`
+
+export const EVENT_TYPE_START = 'START'
+export const EVENT_TYPE_DRAW = 'DRAW'
+export const EVENT_TYPE_STOP = 'STOP'
+export const EVENT_TYPE_FILL = 'FILL'
+
+export const SYSTEM_MESSAGE_COLORS = {
+  PARTICIPANT_JOINED: 'forestgreen',
+  PARTICIPANT_LEFT: 'crimson',
+  WORD_GUESSED: 'darkorange',
+  NO_GUESS: 'mediumpurple',
+  GAME_ENDED: 'darkslategray',
+  PREVIOUS_DRAWER_QUIT: 'firebrick',
+  ROUND_STARTED: 'royalblue',
+  NEW_GAME_STARTED: 'seagreen'
+}
+
+export const COLOR_OPTIONS = [
+  { code: '#000000' },
+  { code: '#FF0000' },
+  { code: '#00FF00' },
+  { code: '#0000FF' },
+  { code: '#FFFF00' },
+  { code: '#A52A2A' },
+  { code: '#800080' },
+  { code: '#FFA500' },
+  { code: '#FFC0CB' },
+  { code: '#808080' },
+  { code: '#00FFFF' },
+  { code: '#FF00FF' },
+  { code: '#8950F7' }
+]
+
+export const BRUSH_SIZES = [
+  { name: 'S', size: 2 },
+  { name: 'M', size: 5 },
+  { name: 'L', size: 10 }
+]

@@ -33,10 +33,6 @@
   background-color: #290e9e;
 }
 
-.leaderboard-button {
-  /* This button stays on the left */
-}
-
 .new-room-form {
   display: flex;
   flex-direction: column;

@@ -1,30 +1,11 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import DOMPurify from 'dompurify'
 import { useSelector } from 'react-redux'
-import { topicRoomChat } from '../../utils/constants'
+import { topicRoomChat, SYSTEM_MESSAGE_COLORS } from '../../utils/constants'
 import './Chat.css'
 
 function getSystemMessageColor(messageType) {
-  switch (messageType) {
-    case 'PARTICIPANT_JOINED':
-      return 'forestgreen'
-    case 'PARTICIPANT_LEFT':
-      return 'crimson'
-    case 'WORD_GUESSED':
-      return 'darkorange'
-    case 'NO_GUESS':
-      return 'mediumpurple'
-    case 'GAME_ENDED':
-      return 'darkslategray'
-    case 'PREVIOUS_DRAWER_QUIT':
-      return 'firebrick'
-    case 'ROUND_STARTED':
-      return 'royalblue'
-    case 'NEW_GAME_STARTED':
-      return 'seagreen'
-    default:
-      return 'gray'
-  }
+  return SYSTEM_MESSAGE_COLORS[messageType] || 'gray'
 }
 
 const Chat = ({ client, roomId, username, canChat, width, height }) => {
@@ -33,7 +14,6 @@ const Chat = ({ client, roomId, username, canChat, width, height }) => {
   const [newMessage, setNewMessage] = useState('')
   const [isAtBottom, setIsAtBottom] = useState(true)
   const [showScrollButton, setShowScrollButton] = useState(false)
-  const [error, setError] = useState(null)
   const [unreadCount, setUnreadCount] = useState(0)
   const chatWindowRef = useRef(null)
 
@@ -141,7 +121,6 @@ const Chat = ({ client, roomId, username, canChat, width, height }) => {
         </button>
       )}
       <div className="chat-input">
-        {error && <div className="error-message">{error}</div>}
         <input
           type="text"
           value={newMessage}
