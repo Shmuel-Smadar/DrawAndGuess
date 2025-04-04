@@ -19,7 +19,7 @@ function App() {
   const isDrawer = useSelector(state => state.game.isDrawer)
   const showWordSelection = useSelector(state => state.game.showWordSelection)
   const wordOptions = useSelector(state => state.game.wordOptions)
-  const { client, connected } = useStompClient(process.env.REACT_APP_SOCKET_URL)
+  const { client, connected } = useStompClient(process.env.REACT_APP_SOCKET_URL || 'http://localhost:8080/draw-and-guess');
 
   const handleDrawerChange = (drawerState) => {
     if (drawerState !== isDrawer) {

@@ -7,7 +7,7 @@ function Leaderboard() {
   useEffect(() => {
     const fetchScores = async () => {
       try {
-        const res = await fetch('http://localhost:8080/leaderboard');
+        const res = await fetch(process.env.REACT_APP_LEADERBOARD_URL || 'http://localhost:8080/leaderboard');
         const data = await res.json();
         const formattedScores = data.map(item => {
           const [username, score] = item.split(':');
