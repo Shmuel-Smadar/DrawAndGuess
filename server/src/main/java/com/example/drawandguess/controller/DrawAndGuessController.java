@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 public class DrawAndGuessController {
 
-    @RequestMapping({"/drawandguess", "/drawandguess/"})
+    @RequestMapping({"/drawandguess", "/drawandguess/", "/home"})
     public String forwardToIndex() {
         return "forward:/drawandguess/index.html";
     }
