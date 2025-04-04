@@ -17,13 +17,16 @@ export const useDrawingHandlers = ({
   lastPositions,
   isDrawing
 }) => {
-  const computeCoords = (event) => {
-    const { offsetX, offsetY } = getEventCoordinates(event, canvasRef);
-    const { width, height } = canvasRef.current;
-    const normX = (offsetX / width) * VIRTUAL_WIDTH;
-    const normY = (offsetY / height) * VIRTUAL_HEIGHT;
-    return { offsetX, offsetY, normX, normY };
-  };
+  const computeCoords = useCallback(
+    (event) => {
+      const { offsetX, offsetY } = getEventCoordinates(event, canvasRef)
+      const { width, height } = canvasRef.current
+      const normX = (offsetX / width) * VIRTUAL_WIDTH
+      const normY = (offsetY / height) * VIRTUAL_HEIGHT
+      return { offsetX, offsetY, normX, normY }
+    },
+    [canvasRef]
+  )
 
   const startDrawing = useCallback(
     (event) => {
