@@ -15,7 +15,7 @@ export const useDrawingHandlers = ({
   dispatch,
   setIsDrawing,
   lastPositions,
-  isDrawing,
+  isDrawing
 }) => {
   const startDrawing = useCallback(
     (event) => {
@@ -35,12 +35,12 @@ export const useDrawingHandlers = ({
           normY,
           color,
           userID: String(userID),
-          eventType: 'FILL',
+          eventType: 'FILL'
         };
 
         client.publish({
           destination: `/app/room/${roomId}/fill`,
-          body: JSON.stringify(msg),
+          body: JSON.stringify(msg)
         });
 
         dispatch(setIsFillMode(false));
@@ -54,8 +54,9 @@ export const useDrawingHandlers = ({
 
       ctx.beginPath();
       ctx.moveTo(offsetX, offsetY);
+      ctx.lineTo(offsetX, offsetY);
       ctx.strokeStyle = color;
-
+      ctx.stroke();
       setIsDrawing(true);
       lastPositions.current[userID] = { x: offsetX, y: offsetY };
 
@@ -65,12 +66,11 @@ export const useDrawingHandlers = ({
         color,
         brushSize,
         userID: String(userID),
-        eventType: 'START',
+        eventType: 'START'
       };
-
       client.publish({
         destination: `/app/room/${roomId}/startDrawing`,
-        body: JSON.stringify(message),
+        body: JSON.stringify(message)
       });
     },
     [
@@ -84,7 +84,7 @@ export const useDrawingHandlers = ({
       canvasRef,
       dispatch,
       setIsDrawing,
-      lastPositions,
+      lastPositions
     ]
   );
 
@@ -108,12 +108,12 @@ export const useDrawingHandlers = ({
         normY,
         brushSize,
         userID: String(userID),
-        eventType: 'DRAW',
+        eventType: 'DRAW'
       };
 
       client.publish({
         destination: `/app/room/${roomId}/draw`,
-        body: JSON.stringify(msg),
+        body: JSON.stringify(msg)
       });
     },
     [
@@ -125,7 +125,7 @@ export const useDrawingHandlers = ({
       roomId,
       userID,
       canvasRef,
-      lastPositions,
+      lastPositions
     ]
   );
 
@@ -141,7 +141,7 @@ export const useDrawingHandlers = ({
 
       client.publish({
         destination: `/app/room/${roomId}/stopDrawing`,
-        body: JSON.stringify(msg),
+        body: JSON.stringify(msg)
       });
     },
     [isDrawingAllowed, client, roomId, userID, setIsDrawing, lastPositions]

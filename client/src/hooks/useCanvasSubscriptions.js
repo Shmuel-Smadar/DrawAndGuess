@@ -28,6 +28,8 @@ export const useCanvasSubscriptions = ({ client, roomId, canvasRef, lastPosition
           ctx.beginPath();
           ctx.moveTo(offsetX, offsetY);
           ctx.strokeStyle = data.color;
+          ctx.lineTo(offsetX, offsetY)
+          ctx.stroke()
           lastPositions.current[data.userID] = { x: offsetX, y: offsetY };
           break;
         case 'DRAW':
