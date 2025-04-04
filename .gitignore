@@ -16,7 +16,7 @@
 !*.svg
 !pom.xml
 !package.json
-# Keep .gitignore itself
+!*.example
 !.gitignore
 !manifest.json
 
