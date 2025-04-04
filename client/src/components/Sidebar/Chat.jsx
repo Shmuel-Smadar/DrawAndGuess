@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import DOMPurify from 'dompurify';
-import { useSelector } from 'react-redux';
-import './Chat.css';
+import React, { useState, useEffect, useRef, useCallback } from 'react'
+import DOMPurify from 'dompurify'
+import { useSelector } from 'react-redux'
+import { topicRoomChat } from '../../utils/constants'
+import './Chat.css'
 
 function getSystemMessageColor(messageType) {
   switch (messageType) {
@@ -28,63 +29,63 @@ function getSystemMessageColor(messageType) {
 
 const Chat = ({ client, roomId, username, canChat, width, height }) => {
   const sessionId = useSelector((state) => state.user.sessionId)
-  const [messages, setMessages] = useState([]);
-  const [newMessage, setNewMessage] = useState('');
-  const [isAtBottom, setIsAtBottom] = useState(true);
-  const [showScrollButton, setShowScrollButton] = useState(false);
-  const [error, setError] = useState(null);
-  const [unreadCount, setUnreadCount] = useState(0);
-  const chatWindowRef = useRef(null);
+  const [messages, setMessages] = useState([])
+  const [newMessage, setNewMessage] = useState('')
+  const [isAtBottom, setIsAtBottom] = useState(true)
+  const [showScrollButton, setShowScrollButton] = useState(false)
+  const [error, setError] = useState(null)
+  const [unreadCount, setUnreadCount] = useState(0)
+  const chatWindowRef = useRef(null)
 
   useEffect(() => {
-    if (!client || !client.connected || !roomId) return;
-    const subscription = client.subscribe(`/topic/room/${roomId}/chat`, (message) => {
-      const chatMessage = JSON.parse(message.body);
-      setMessages((prev) => [...prev, chatMessage]);
+    if (!client || !client.connected || !roomId) return
+    const subscription = client.subscribe(topicRoomChat(roomId), (message) => {
+      const chatMessage = JSON.parse(message.body)
+      setMessages((prev) => [...prev, chatMessage])
       if (!isAtBottom) {
-        setShowScrollButton(true);
-        setUnreadCount((prevCount) => prevCount + 1);
+        setShowScrollButton(true)
+        setUnreadCount((prevCount) => prevCount + 1)
       }
     })
     return () => {
-      subscription.unsubscribe();
+      subscription.unsubscribe()
     }
-  }, [client, roomId, isAtBottom]);
+  }, [client, roomId, isAtBottom])
 
   useEffect(() => {
     if (isAtBottom && chatWindowRef.current) {
-      chatWindowRef.current.scrollTop = chatWindowRef.current.scrollHeight;
+      chatWindowRef.current.scrollTop = chatWindowRef.current.scrollHeight
     }
-  }, [messages, isAtBottom]);
+  }, [messages, isAtBottom])
 
   useEffect(() => {
-    const chatWindow = chatWindowRef.current;
-    if (!chatWindow) return;
+    const chatWindow = chatWindowRef.current
+    if (!chatWindow) return
     const handleScroll = () => {
-      const { scrollTop, scrollHeight, clientHeight } = chatWindow;
-      const atBottom = scrollHeight - scrollTop - clientHeight < 100;
-      setIsAtBottom(atBottom);
+      const { scrollTop, scrollHeight, clientHeight } = chatWindow
+      const atBottom = scrollHeight - scrollTop - clientHeight < 100
+      setIsAtBottom(atBottom)
       if (atBottom) {
-        setShowScrollButton(false);
-        setUnreadCount(0);
+        setShowScrollButton(false)
+        setUnreadCount(0)
       }
-    };
-    chatWindow.addEventListener('scroll', handleScroll);
+    }
+    chatWindow.addEventListener('scroll', handleScroll)
     return () => {
-      chatWindow.removeEventListener('scroll', handleScroll);
-    };
-  }, []);
+      chatWindow.removeEventListener('scroll', handleScroll)
+    }
+  }, [])
 
   const scrollToBottom = useCallback(() => {
-    if (!chatWindowRef.current) return;
+    if (!chatWindowRef.current) return
     chatWindowRef.current.scrollTo({
       top: chatWindowRef.current.scrollHeight,
       behavior: 'smooth'
-    });
-    setShowScrollButton(false);
-    setIsAtBottom(true);
-    setUnreadCount(0);
-  }, []);
+    })
+    setShowScrollButton(false)
+    setIsAtBottom(true)
+    setUnreadCount(0)
+  }, [])
 
   const handleSendMessage = () => {
     if (!client || !roomId || newMessage.trim() === '' || !sessionId) return
@@ -98,7 +99,7 @@ const Chat = ({ client, roomId, username, canChat, width, height }) => {
       destination: `/app/room/${roomId}/chat`,
       body: JSON.stringify(messageData)
     })
-    setNewMessage('');
+    setNewMessage('')
   }
 
   return (
@@ -108,7 +109,7 @@ const Chat = ({ client, roomId, username, canChat, width, height }) => {
       </div>
       <div className="chat-window" ref={chatWindowRef}>
         {messages.map((message, index) => {
-          const sanitizedText = DOMPurify.sanitize(message.text);
+          const sanitizedText = DOMPurify.sanitize(message.text)
           return (
             <div
               key={index}
@@ -127,7 +128,7 @@ const Chat = ({ client, roomId, username, canChat, width, height }) => {
                 </>
               )}
             </div>
-          );
+          )
         })}
       </div>
       {showScrollButton && (
@@ -158,4 +159,4 @@ const Chat = ({ client, roomId, username, canChat, width, height }) => {
   )
 }
 
-export default Chat;
+export default Chat

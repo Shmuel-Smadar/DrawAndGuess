@@ -3,6 +3,13 @@ import './Lobby.css'
 import LeaderboardOverlay from '../Leaderboard/LeaderboardOverlay'
 import RoomTable from './RoomTable'
 import CreditsOverlay from './CreditsOverlay'
+import {
+  TOPIC_ROOMS,
+  APP_GET_ROOMS,
+  APP_CREATE_ROOM,
+  APP_JOIN_ROOM,
+  USER_TOPIC_ROOM_CREATED
+} from '../../utils/constants'
 
 function Lobby({ client, connected, setRoom }) {
   const [newRoomName, setNewRoomName] = useState('')
@@ -13,7 +20,7 @@ function Lobby({ client, connected, setRoom }) {
 
   useEffect(() => {
     if (!client || !connected) return
-    const subscription = client.subscribe('/topic/rooms', (message) => {
+    const subscription = client.subscribe(TOPIC_ROOMS, (message) => {
       const data = JSON.parse(message.body)
       const sorted = data.sort((a, b) => {
         if (b.numberOfParticipants !== a.numberOfParticipants) {
@@ -25,7 +32,7 @@ function Lobby({ client, connected, setRoom }) {
     })
 
     client.publish({
-      destination: '/app/getRooms',
+      destination: APP_GET_ROOMS,
       body: ''
     })
 
@@ -34,7 +41,7 @@ function Lobby({ client, connected, setRoom }) {
 
   useEffect(() => {
     if (!client || !connected) return
-    const sub = client.subscribe('/user/topic/roomCreated', (message) => {
+    const sub = client.subscribe(USER_TOPIC_ROOM_CREATED, (message) => {
       const room = JSON.parse(message.body)
       setRoom(room)
     })
@@ -44,7 +51,7 @@ function Lobby({ client, connected, setRoom }) {
   function handleJoinRoom(room) {
     if (client && connected) {
       client.publish({
-        destination: '/app/joinRoom',
+        destination: APP_JOIN_ROOM,
         body: room.roomId,
       })
       setRoom(room)
@@ -59,11 +66,11 @@ function Lobby({ client, connected, setRoom }) {
     }
     if (client && connected) {
       client.publish({
-        destination: '/app/createRoom',
+        destination: APP_CREATE_ROOM,
         body: newRoomName.trim(),
       })
       client.publish({
-        destination: '/app/getRooms',
+        destination: APP_GET_ROOMS,
         body: ''
       })
       setNewRoomName('')

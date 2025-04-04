@@ -1,29 +1,30 @@
-import React, { useState, useEffect } from 'react';
-import './WordHint.css';
+import React, { useState, useEffect } from 'react'
+import { topicRoomWordHint, appGetCurrentHint } from '../../utils/constants'
+import './WordHint.css'
 
 const WordHint = ({ client, roomId, isDrawer }) => {
-  const [currentHint, setCurrentHint] = useState('');
+  const [currentHint, setCurrentHint] = useState('')
 
   useEffect(() => {
-    if (!client || !client.connected || isDrawer) return;
-    const subscription = client.subscribe(`/topic/room/${roomId}/wordHint`, (message) => {
-      const hint = message.body;
-      setCurrentHint(hint);
-    });
+    if (!client || !client.connected || isDrawer) return
+    const subscription = client.subscribe(topicRoomWordHint(roomId), (message) => {
+      const hint = message.body
+      setCurrentHint(hint)
+    })
     return () => {
-      subscription.unsubscribe();
-    };
-  }, [client, roomId, isDrawer]);
+      subscription.unsubscribe()
+    }
+  }, [client, roomId, isDrawer])
 
   useEffect(() => {
-    if (!client || !roomId) return;
-    
+    if (!client || !roomId) return
     client.publish({
-      destination: `/app/room/${roomId}/getCurrentHint`,
+      destination: appGetCurrentHint(roomId),
       body: ''
-    });
-  }, [client, roomId]);
-  if (isDrawer) return null;
+    })
+  }, [client, roomId])
+
+  if (isDrawer) return null
 
   return (
     <div className="word-hint-container">
@@ -31,12 +32,12 @@ const WordHint = ({ client, roomId, isDrawer }) => {
       <div className="word-hint">
         {currentHint.split('').map((char, index) => (
           <span key={index} className="word-letter">
-            {(char === ' ' ||char === '_') ? '\u00A0' : char}
+            {(char === ' ' || char === '_') ? '\u00A0' : char}
           </span>
         ))}
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default WordHint;
+export default WordHint

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useDispatch } from 'react-redux'
 import { setUsername, setNicknameError, setSessionId } from '../../store/userSlice'
+import { USER_TOPIC_NICKNAME } from '../../utils/constants'
 import './NicknamePrompt.css'
 
 const NicknamePrompt = ({ client, connected, error }) => {
@@ -10,7 +11,7 @@ const NicknamePrompt = ({ client, connected, error }) => {
 
   useEffect(() => {
     if (client && connected) {
-      const subscription = client.subscribe('/user/topic/nickname', (message) => {
+      const subscription = client.subscribe(USER_TOPIC_NICKNAME, (message) => {
         const data = JSON.parse(message.body)
         if (data.success) {
           dispatch(setUsername(currentNickname.current))

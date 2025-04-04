@@ -9,6 +9,7 @@ import WordSelection from './components/Prompt/WordSelection'
 import { setUsername, setNicknameError } from './store/userSlice'
 import { setRoom } from './store/roomSlice'
 import { setIsDrawer, setShowWordSelection, setWordOptions } from './store/gameSlice'
+import { USER_TOPIC_WORD_OPTIONS } from './utils/constants'
 import './App.css'
 
 function App() {
@@ -40,7 +41,7 @@ function App() {
 
   useEffect(() => {
     if (!client || !connected) return
-    const sub = client.subscribe('/user/topic/wordOptions', (msg) => {
+    const sub = client.subscribe(USER_TOPIC_WORD_OPTIONS, (msg) => {
       const data = JSON.parse(msg.body)
       dispatch(setWordOptions([data.word1, data.word2, data.word3]))
       dispatch(setShowWordSelection(true))

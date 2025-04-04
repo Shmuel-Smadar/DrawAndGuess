@@ -1,31 +1,32 @@
-import React, { useState, useEffect, useRef } from 'react';
-import './ParticipantsList.css';
+import React, { useState, useEffect, useRef } from 'react'
+import { topicRoomParticipants } from '../../utils/constants'
+import './ParticipantsList.css'
 
 const ParticipantsList = ({ client, height, roomId, username, onDrawerChange }) => {
-  const [userList, setUserList] = useState([]);
-  const participantsWindowRef = useRef(null);
+  const [userList, setUserList] = useState([])
+  const participantsWindowRef = useRef(null)
 
   useEffect(() => {
-    if (!client || !roomId) return;
-    const destination = `/topic/room/${roomId}/participants`;
+    if (!client || !roomId) return
+    const destination = topicRoomParticipants(roomId)
     const subscription = client.subscribe(destination, (message) => {
-      const participants = JSON.parse(message.body);
-      setUserList(participants);
-      const me = participants.find((p) => p.username === username);
-      onDrawerChange(me && me.isDrawer);
-    });
+      const participants = JSON.parse(message.body)
+      setUserList(participants)
+      const me = participants.find((p) => p.username === username)
+      onDrawerChange(me && me.isDrawer)
+    })
     return () => {
-      subscription.unsubscribe();
-    };
-  }, [client, roomId, username, onDrawerChange]);
+      subscription.unsubscribe()
+    }
+  }, [client, roomId, username, onDrawerChange])
 
   useEffect(() => {
-    if (!client || !roomId) return;
+    if (!client || !roomId) return
     client.publish({
       destination: `/app/room/${roomId}/getParticipants`,
       body: ''
-    });
-  }, [client, roomId]);
+    })
+  }, [client, roomId])
 
   return (
     <div className="participants-container" style={{ height: `${height}px` }}>
@@ -45,7 +46,7 @@ const ParticipantsList = ({ client, height, roomId, username, onDrawerChange }) 
         ))}
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default ParticipantsList;
+export default ParticipantsList
