@@ -78,14 +78,13 @@ public class GameService {
         Game game = room.getGame();
         if (game.isCorrectGuess(guess)) {
             String username = participantService.findParticipantBySessionId(sessionId).getUsername();
-            game.addScore(sessionId, 10);
+            game.addScore(username, 10);
             if (game.getCurrentDrawer() != null) {
-                game.addScore(game.getCurrentDrawer(), 5);
                 String drawerId = game.getCurrentDrawer();
-                String drawerUsername = drawerId == null
-                        ? ""
-                        : participantService.findParticipantBySessionId(drawerId).getUsername();
-                if (!drawerUsername.isEmpty()) {
+                String DrawerName =  participantService.findParticipantBySessionId(drawerId).getUsername();
+                game.addScore(DrawerName, 5);
+                if (drawerId != null) {
+                    String drawerUsername = participantService.findParticipantBySessionId(drawerId).getUsername();
                     leaderboardService.updateScore(drawerUsername, game.getScore(drawerId));
                 }
             }
@@ -218,13 +217,15 @@ public class GameService {
         StringBuilder sb = new StringBuilder(messagePrefix).append(" after ")
                 .append(game.getTotalRounds()).append(" rounds. Final scores: ");
         for (String pid : game.getParticipantSessionIds()) {
+            String username = participantService.findParticipantBySessionId(pid).getUsername();
             sb.append(participantService.findParticipantBySessionId(pid).getUsername())
                     .append("=")
-                    .append(game.getScore(pid))
+                    .append(game.getScore(username))
                     .append("  ");
         }
         ChatMessage m = messageService.systemMessage(MessageType.GAME_ENDED, sb.toString());
         chatService.sendChatMessage(roomId, m);
+        leaderboardService.saveScores(game.getAllScores());
         game.resetGame();
         if (!game.getParticipantSessionIds().isEmpty()) {
             String firstDrawerId = game.getCurrentDrawer();

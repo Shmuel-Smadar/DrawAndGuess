@@ -1,25 +1,33 @@
 package com.example.drawandguess.service;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.jms.core.JmsTemplate;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.LinkedHashMap;
 
 import static com.example.drawandguess.config.Constants.LEADERBOARD_QUEUE;
 
 @Service
 public class LeaderboardService {
     private final JmsTemplate jmsTemplate;
-    private final Map<String,Integer> leaderboard = new ConcurrentHashMap<>();
+    private final JdbcTemplate jdbcTemplate;
+    private final boolean useDatabase;
+    private final Map<String, Integer> leaderboard = new ConcurrentHashMap<>();
 
-    public LeaderboardService(JmsTemplate jmsTemplate) {
+    public LeaderboardService(
+        JmsTemplate jmsTemplate,
+        JdbcTemplate jdbcTemplate,
+        @Value("${USE_DB:false}") boolean useDatabase
+    ) {
         this.jmsTemplate = jmsTemplate;
-    }
-
-    public void updateScore(String username, int score) {
-        jmsTemplate.convertAndSend(LEADERBOARD_QUEUE, username + ":" + score);
+        this.jdbcTemplate = jdbcTemplate;
+        this.useDatabase = useDatabase;
     }
 
     @JmsListener(destination = LEADERBOARD_QUEUE)
@@ -30,7 +38,60 @@ public class LeaderboardService {
         leaderboard.put(user, score);
     }
 
-    public Map<String,Integer> getLeaderboard() {
-        return leaderboard;
+    public void updateScore(String username, int score) {
+        jmsTemplate.convertAndSend(LEADERBOARD_QUEUE, username + ":" + score);
+    }
+
+    public void saveScores(Map<String, Integer> scores) {
+        if (!useDatabase) {
+            return;
+        }
+
+        for (Map.Entry<String, Integer> e : scores.entrySet()) {
+            String username = e.getKey();
+            int finalScore = e.getValue();
+            Integer existingScore;
+            try {
+                existingScore = jdbcTemplate.queryForObject(
+                        "SELECT score FROM leaderboard WHERE username = ?",
+                        Integer.class,
+                        username
+                );
+            } catch (EmptyResultDataAccessException ex) {
+                existingScore = null;
+            }
+            if (existingScore == null) {
+                jdbcTemplate.update(
+                        "INSERT INTO leaderboard (username, score) VALUES (?, ?)",
+                        username,
+                        finalScore
+                );
+            } else {
+                jdbcTemplate.update(
+                        "UPDATE leaderboard SET score = ? WHERE username = ?",
+                        Math.max(finalScore, existingScore),
+                        username
+                );
+            }
+        }
+    }
+
+    public Map<String, Integer> getLeaderboard() {
+        if (!useDatabase) {
+            LinkedHashMap<String, Integer> copySorted = new LinkedHashMap<>();
+            leaderboard.entrySet().stream()
+                    .sorted((a, b) -> Integer.compare(b.getValue(), a.getValue()))
+                    .forEachOrdered(e -> copySorted.put(e.getKey(), e.getValue()));
+            return copySorted;
+        }
+
+        Map<String, Integer> dbResult = new LinkedHashMap<>();
+        jdbcTemplate.query(
+                "SELECT username, score FROM leaderboard ORDER BY score DESC",
+                rs -> {
+                    dbResult.put(rs.getString("username"), rs.getInt("score"));
+                }
+        );
+        return dbResult;
     }
 }
