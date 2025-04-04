@@ -7,6 +7,7 @@ import com.example.drawandguess.model.Participant;
 import com.example.drawandguess.model.Room;
 import com.example.drawandguess.model.WordOptions;
 import com.example.drawandguess.model.MessageType;
+import com.example.drawandguess.model.ClearCanvasMessage;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 import java.time.Duration;
@@ -27,6 +28,7 @@ public class GameService {
     private final LeaderboardService leaderboardService;
     private final MessageService messageService;
     private final WordService wordService;
+    private final DrawingService drawingService;
 
     public GameService(
             ChatService chatService,
@@ -35,7 +37,8 @@ public class GameService {
             TaskScheduler taskScheduler,
             LeaderboardService leaderboardService,
             MessageService messageService,
-            WordService wordService
+            WordService wordService,
+            DrawingService drawingService
     ) {
         this.chatService = chatService;
         this.participantService = participantService;
@@ -44,6 +47,7 @@ public class GameService {
         this.leaderboardService = leaderboardService;
         this.messageService = messageService;
         this.wordService = wordService;
+        this.drawingService = drawingService;
     }
 
     public WordOptions requestWords(String roomId, String sessionId) {
@@ -91,6 +95,7 @@ public class GameService {
             }
             leaderboardService.updateScore(username, game.getScore(sessionId));
             stopHintProgression(roomId);
+            drawingService.clearCanvas(roomId, new ClearCanvasMessage("system"));
             game.nextRound();
             if (game.isGameOver()) {
                 endGameAndStartNew(roomId, game, GAME_ENDED_MSG);
@@ -132,6 +137,7 @@ public class GameService {
 
     private void handleNoGuess(String roomId, Game game) {
         stopHintProgression(roomId);
+        drawingService.clearCanvas(roomId, new ClearCanvasMessage("system"));
         game.nextRound();
         if (game.isGameOver()) {
             endGameAndStartNew(roomId, game, NO_ONE_GUESSED_MSG);
@@ -215,6 +221,7 @@ public class GameService {
     }
 
     private void endGameAndStartNew(String roomId, Game game, String messagePrefix) {
+        drawingService.clearCanvas(roomId, new ClearCanvasMessage("system"));
         StringBuilder sb = new StringBuilder(messagePrefix).append(" after ")
                 .append(game.getTotalRounds()).append(" rounds. Final scores: ");
         for (String pid : game.getParticipantSessionIds()) {
