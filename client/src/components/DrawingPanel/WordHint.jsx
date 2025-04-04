@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { topicRoomWordHint, appGetCurrentHint } from '../../utils/constants'
+import { TOPIC_ROOM_WORD_HINT, APP_GET_CURRENT_HINT } from '../../utils/constants'
 import './WordHint.css'
 
 const WordHint = ({ client, roomId, isDrawer }) => {
@@ -7,7 +7,7 @@ const WordHint = ({ client, roomId, isDrawer }) => {
 
   useEffect(() => {
     if (!client || !client.connected || isDrawer) return
-    const subscription = client.subscribe(topicRoomWordHint(roomId), (message) => {
+    const subscription = client.subscribe(TOPIC_ROOM_WORD_HINT(roomId), (message) => {
       const hint = message.body
       setCurrentHint(hint)
     })
@@ -19,7 +19,7 @@ const WordHint = ({ client, roomId, isDrawer }) => {
   useEffect(() => {
     if (!client || !roomId) return
     client.publish({
-      destination: appGetCurrentHint(roomId),
+      destination: APP_GET_CURRENT_HINT(roomId),
       body: ''
     })
   }, [client, roomId])

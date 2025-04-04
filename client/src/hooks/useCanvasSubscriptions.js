@@ -4,8 +4,8 @@ import { floodFill } from '../utils/floodFill'
 import {
   VIRTUAL_WIDTH,
   VIRTUAL_HEIGHT,
-  topicRoomDrawing,
-  topicRoomClearCanvas,
+  TOPIC_ROOM_DRAWING,
+  TOPIC_ROOM_CLEAR_CANVAS,
   EVENT_TYPE_START,
   EVENT_TYPE_DRAW,
   EVENT_TYPE_STOP,
@@ -18,7 +18,7 @@ export const useCanvasSubscriptions = ({ client, roomId, canvasRef, lastPosition
   useEffect(() => {
     if (!client || !client.connected) return
 
-    const drawingSub = client.subscribe(topicRoomDrawing(roomId), (msg) => {
+    const drawingSub = client.subscribe(TOPIC_ROOM_DRAWING(roomId), (msg) => {
       const data = JSON.parse(msg.body)
       if (isDrawer && data.eventType !== EVENT_TYPE_FILL) return
       const canvas = canvasRef.current
@@ -61,7 +61,7 @@ export const useCanvasSubscriptions = ({ client, roomId, canvasRef, lastPosition
       }
     })
 
-    const clearSub = client.subscribe(topicRoomClearCanvas(roomId), () => {
+    const clearSub = client.subscribe(TOPIC_ROOM_CLEAR_CANVAS(roomId), () => {
       const canvas = canvasRef.current
       if (canvas) {
         const ctx = canvas.getContext('2d')

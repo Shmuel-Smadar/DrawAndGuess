@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import DOMPurify from 'dompurify'
 import { useSelector } from 'react-redux'
-import { topicRoomChat, SYSTEM_MESSAGE_COLORS } from '../../utils/constants'
+import { TOPIC_ROOM_CHAT, SYSTEM_MESSAGE_COLORS } from '../../utils/constants'
 import './Chat.css'
 
 function getSystemMessageColor(messageType) {
@@ -19,7 +19,7 @@ const Chat = ({ client, roomId, username, canChat, width, height }) => {
 
   useEffect(() => {
     if (!client || !client.connected || !roomId) return
-    const subscription = client.subscribe(topicRoomChat(roomId), (message) => {
+    const subscription = client.subscribe(TOPIC_ROOM_CHAT(roomId), (message) => {
       const chatMessage = JSON.parse(message.body)
       setMessages((prev) => [...prev, chatMessage])
       if (!isAtBottom) {

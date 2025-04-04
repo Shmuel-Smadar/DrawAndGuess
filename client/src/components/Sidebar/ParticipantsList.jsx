@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { topicRoomParticipants } from '../../utils/constants'
+import { TOPIC_ROOM_PARTICIPANTS } from '../../utils/constants'
 import './ParticipantsList.css'
 
 const ParticipantsList = ({ client, height, roomId, username, onDrawerChange }) => {
@@ -8,7 +8,7 @@ const ParticipantsList = ({ client, height, roomId, username, onDrawerChange }) 
 
   useEffect(() => {
     if (!client || !roomId) return
-    const destination = topicRoomParticipants(roomId)
+    const destination = TOPIC_ROOM_PARTICIPANTS(roomId)
     const subscription = client.subscribe(destination, (message) => {
       const participants = JSON.parse(message.body)
       setUserList(participants)
