@@ -60,7 +60,14 @@ public class RoomService {
     public void joinRoom(String sessionId, String roomId) {
         Room room = rooms.get(roomId);
         if (room == null) return;
-        room.getGame().addParticipant(sessionId);
+        
+        Game game = room.getGame();
+        game.addParticipant(sessionId);
+        if(game.isGameOver()) {
+            broadcastParticipants(roomId);
+            broadcastRooms();
+            return;
+        }
         String newDrawerId = room.getGame().getCurrentDrawer();
         if (newDrawerId != null) {
             participantService.setDrawer(newDrawerId, true);

@@ -179,6 +179,14 @@ public class GameService {
         game.removeParticipant(sessionId);
         ChatMessage leaveMsg = messageService.systemMessage(MessageType.PARTICIPANT_LEFT, p.getUsername());
         chatService.sendChatMessage(roomId, leaveMsg);
+        if(game.isGameOver()) {
+            roomService.broadcastParticipants(roomId);
+            if (game.getParticipantSessionIds().isEmpty()) {
+                roomService.deleteRoom(roomId);
+            }
+            roomService.broadcastRooms();
+            return;
+        }
         if (wasDrawer) {
             game.resetRound();
             stopHintProgression(roomId);

@@ -39,6 +39,15 @@ function App() {
     })
   }
 
+  const handleWordSelect = (selectedWord) => {
+    if (!client || !connected || !room) return
+    client.publish({
+      destination: `/app/room/${room.roomId}/chooseWord`,
+      body: selectedWord
+    })
+    dispatch(setShowWordSelection(false))
+  }
+
   useEffect(() => {
     if (!client || !connected) return
     const sub = client.subscribe(USER_TOPIC_WORD_OPTIONS, (msg) => {
@@ -49,14 +58,16 @@ function App() {
     return () => sub.unsubscribe()
   }, [client, connected, dispatch])
 
-  const handleWordSelect = (selectedWord) => {
+  useEffect(() => {
     if (!client || !connected || !room) return
-    client.publish({
-      destination: `/app/room/${room.roomId}/chooseWord`,
-      body: selectedWord
+    const chatSub = client.subscribe(`/topic/room/${room.roomId}/chat`, (msg) => {
+      const message = JSON.parse(msg.body)
+      if (message.type === 'system' && message.messageType === 'NEW_GAME_STARTED' && isDrawer) {
+        requestWordOptions()
+      }
     })
-    dispatch(setShowWordSelection(false))
-  }
+    return () => chatSub.unsubscribe()
+  }, [client, connected, room, isDrawer])
 
   if (!username) {
     return (
