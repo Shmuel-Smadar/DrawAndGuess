@@ -1,11 +1,12 @@
 package com.example.drawandguess.config;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.event.EventListener;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
-import org.springframework.beans.factory.annotation.Value;
-
 import javax.sql.DataSource;
 
 @Configuration
@@ -26,6 +27,11 @@ public class DatabaseConfig {
     @Value("${DB_PASS:1}")
     private String pass;
 
+    @Value("${USE_DB:false}")
+    private boolean useDatabase;
+
+    private JdbcTemplate jdbcTemplate;
+
     @Bean
     public DataSource dataSource() {
         DriverManagerDataSource ds = new DriverManagerDataSource();
@@ -38,6 +44,15 @@ public class DatabaseConfig {
 
     @Bean
     public JdbcTemplate jdbcTemplate(DataSource ds) {
-        return new JdbcTemplate(ds);
+        this.jdbcTemplate = new JdbcTemplate(ds);
+        return this.jdbcTemplate;
+    }
+
+    @EventListener(ApplicationReadyEvent.class)
+    public void createTablesIfNotExists() {
+        if (useDatabase && jdbcTemplate != null) {
+            jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS leaderboard (username VARCHAR(255) PRIMARY KEY, score INT NOT NULL, winner_message VARCHAR(255))");
+            jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS words (english_word VARCHAR(255))");
+        }
     }
 }
