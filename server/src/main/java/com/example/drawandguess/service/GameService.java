@@ -12,6 +12,8 @@ import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
 import static com.example.drawandguess.config.Constants.HINT_INTERVAL_SECONDS;
@@ -97,10 +99,8 @@ public class GameService {
             String drawerName = participantService.findParticipantBySessionId(drawerId).getUsername();
             int drawerPoints = Constants.DRAWER_BASE_POINTS * multiplier;
             game.addScore(drawerName, drawerPoints);
-            leaderboardService.updateScore(drawerName, game.getScore(drawerId));
         }
         roomService.broadcastParticipants(roomId);
-        leaderboardService.updateScore(username, game.getScore(sessionId));
         stopHintProgression(roomId);
         drawingService.clearCanvas(roomId, new ClearCanvasMessage("system"));
         game.nextRound();
@@ -230,7 +230,6 @@ public class GameService {
         }
         ChatMessage m = messageService.systemMessage(MessageType.GAME_ENDED, sb.toString());
         chatService.sendChatMessage(roomId, m);
-        leaderboardService.saveScores(game.getAllScores());
         handleWinnerAnnouncement(roomId, game);
         hintTasks.remove(roomId);
         scheduleNewGame(roomId, game);
@@ -253,6 +252,10 @@ public class GameService {
         }
         if (singleTopUserSessionId != null && !tie) {
             String winnerName = participantService.findParticipantBySessionId(singleTopUserSessionId).getUsername();
+            int winnerScore = game.getScore(winnerName);
+            Map<String,Integer> singleMap = new HashMap<>();
+            singleMap.put(winnerName, winnerScore);
+            leaderboardService.saveScores(singleMap);
             ChatMessage winner = messageService.winnerAnnounce(singleTopUserSessionId, winnerName + " is the winner!");
             chatService.sendChatMessage(roomId, winner);
         }
