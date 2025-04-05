@@ -6,16 +6,18 @@ public class ChatMessage {
     private String senderUsername;
     private String type;
     private MessageType messageType;
+    private String winnerSessionId;
 
     public ChatMessage() {
     }
 
-    public ChatMessage(String text, String senderSessionId, String senderUsername, String type, MessageType messageType) {
+    public ChatMessage(String text, String senderSessionId, String senderUsername, String type, MessageType messageType, String winnerSessionId) {
         this.text = text;
         this.senderSessionId = senderSessionId;
         this.senderUsername = senderUsername;
         this.type = type;
         this.messageType = messageType;
+        this.winnerSessionId = winnerSessionId;
     }
 
     public String getText() {
@@ -56,5 +58,13 @@ public class ChatMessage {
 
     public void setMessageType(MessageType messageType) {
         this.messageType = messageType;
+    }
+
+    public String getWinnerSessionId() {
+        return winnerSessionId;
+    }
+
+    public void setWinnerSessionId(String winnerSessionId) {
+        this.winnerSessionId = winnerSessionId;
     }
 }

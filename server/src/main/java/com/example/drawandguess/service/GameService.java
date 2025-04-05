@@ -93,6 +93,7 @@ public class GameService {
                 game.addScore(drawerName, drawerPoints);
                 leaderboardService.updateScore(drawerName, game.getScore(drawerId));
             }
+            roomService.broadcastParticipants(roomId);
             leaderboardService.updateScore(username, game.getScore(sessionId));
             stopHintProgression(roomId);
             drawingService.clearCanvas(roomId, new ClearCanvasMessage("system"));
@@ -226,32 +227,50 @@ public class GameService {
                 .append(game.getTotalRounds()).append(" rounds. Final scores: ");
         for (String pid : game.getParticipantSessionIds()) {
             String username = participantService.findParticipantBySessionId(pid).getUsername();
-            sb.append(username)
-                    .append("=")
-                    .append(game.getScore(username))
-                    .append("  ");
+            sb.append(username).append("=").append(game.getScore(username)).append("  ");
         }
         ChatMessage m = messageService.systemMessage(MessageType.GAME_ENDED, sb.toString());
         chatService.sendChatMessage(roomId, m);
         leaderboardService.saveScores(game.getAllScores());
-        game.resetGame();
-        if (!game.getParticipantSessionIds().isEmpty()) {
-            String firstDrawerId = game.getCurrentDrawer();
-            participantService.getAllParticipants().values().forEach(
-                    p -> participantService.setDrawer(
-                            p.getSessionId(),
-                            p.getSessionId().equals(firstDrawerId)
-                    )
-            );
-            ChatMessage newGameMsg = messageService.systemMessage(
-                    MessageType.NEW_GAME_STARTED,
-                    String.valueOf(game.getRoundCount() + 1),
-                    String.valueOf(game.getTotalRounds()),
-                    participantService.findParticipantBySessionId(firstDrawerId).getUsername()
-            );
-            chatService.sendChatMessage(roomId, newGameMsg);
-            roomService.broadcastParticipants(roomId);
-            updateDrawerAndBroadcast(roomId, game);
+        String singleTopUserSessionId = null;
+        int maxScore = -1;
+        boolean tie = false;
+        for (String pid : game.getParticipantSessionIds()) {
+            String uname = participantService.findParticipantBySessionId(pid).getUsername();
+            int sc = game.getScore(uname);
+            if (sc > maxScore) {
+                maxScore = sc;
+                singleTopUserSessionId = pid;
+                tie = false;
+            } else if (sc == maxScore) {
+                tie = true;
+            }
         }
+        if (singleTopUserSessionId != null && !tie) {
+            ChatMessage winner = messageService.winnerAnnounce(singleTopUserSessionId, "You are the winner!");
+            chatService.sendChatMessage(roomId, winner);
+        }
+        hintTasks.remove(roomId);
+        taskScheduler.schedule(() -> {
+            game.resetGame();
+            if (!game.getParticipantSessionIds().isEmpty()) {
+                String firstDrawerId = game.getCurrentDrawer();
+                participantService.getAllParticipants().values().forEach(
+                        p -> participantService.setDrawer(
+                                p.getSessionId(),
+                                p.getSessionId().equals(firstDrawerId)
+                        )
+                );
+                ChatMessage newGameMsg = messageService.systemMessage(
+                        MessageType.NEW_GAME_STARTED,
+                        String.valueOf(game.getRoundCount() + 1),
+                        String.valueOf(game.getTotalRounds()),
+                        participantService.findParticipantBySessionId(firstDrawerId).getUsername()
+                );
+                chatService.sendChatMessage(roomId, newGameMsg);
+                roomService.broadcastParticipants(roomId);
+                updateDrawerAndBroadcast(roomId, game);
+            }
+        }, java.util.Date.from(java.time.Instant.now().plusSeconds(10)));
     }
 }

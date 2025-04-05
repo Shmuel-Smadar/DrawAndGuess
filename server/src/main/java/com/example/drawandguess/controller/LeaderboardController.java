@@ -2,9 +2,10 @@ package com.example.drawandguess.controller;
 
 import com.example.drawandguess.service.LeaderboardService;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.CrossOrigin;
-
+import org.springframework.web.bind.annotation.RequestBody;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -22,17 +23,32 @@ public class LeaderboardController {
     @GetMapping("/leaderboard")
     public List<String> getLeaderboard() {
         List<String> data = new ArrayList<>();
-        for (Map.Entry<String,Integer> e : leaderboardService.getLeaderboard().entrySet()) {
-            data.add(e.getKey() + ":" + e.getValue());
+        for (Map.Entry<String,String> e : leaderboardService.getLeaderboard().entrySet()) {
+            String username = e.getKey();
+            String[] parts = e.getValue().split(":");
+            String score = parts[0];
+            String msg = parts.length > 1 ? parts[1] : "";
+            data.add(username + ":" + score + ":" + msg);
         }
         data.sort(new Comparator<String>() {
             @Override
             public int compare(String a, String b) {
-                int sa = Integer.parseInt(a.split(":")[1]);
-                int sb = Integer.parseInt(b.split(":")[1]);
+                String[] aa = a.split(":");
+                String[] bb = b.split(":");
+                int sa = Integer.parseInt(aa[1]);
+                int sb = Integer.parseInt(bb[1]);
                 return Integer.compare(sb, sa);
             }
         });
         return data;
+    }
+
+    @PostMapping("/leaderboard/winner-message")
+    public void setWinnerMessage(@RequestBody Map<String, String> body) {
+        String user = body.get("user");
+        String message = body.get("message");
+        if (user != null) {
+            leaderboardService.updateWinnerMessage(user, message);
+        }
     }
 }
