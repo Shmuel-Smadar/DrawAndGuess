@@ -16,12 +16,12 @@ public class LeaderboardService {
     private final JmsTemplate jmsTemplate;
     private final JdbcTemplate jdbcTemplate;
     private final boolean useDatabase;
-    private final Map<String, Integer> leaderboard = new ConcurrentHashMap<>();
+    private final Map<String, String> inMemoryLeaderboard = new ConcurrentHashMap<>();
 
     public LeaderboardService(
-        JmsTemplate jmsTemplate,
-        JdbcTemplate jdbcTemplate,
-        @Value("${USE_DB:false}") boolean useDatabase
+            JmsTemplate jmsTemplate,
+            JdbcTemplate jdbcTemplate,
+            @Value("${USE_DB:false}") boolean useDatabase
     ) {
         this.jmsTemplate = jmsTemplate;
         this.jdbcTemplate = jdbcTemplate;
@@ -31,42 +31,65 @@ public class LeaderboardService {
     @JmsListener(destination = LEADERBOARD_QUEUE)
     public void receiveScoreUpdate(String message) {
         String[] parts = message.split(":");
-        String user = parts[0];
+        if (parts.length != 2) {
+            return;
+        }
+        String username = parts[0];
         int score = Integer.parseInt(parts[1]);
-        leaderboard.put(user, score);
+        updateScoreInMemory(username, score);
     }
 
     public void updateScore(String username, int score) {
         jmsTemplate.convertAndSend(LEADERBOARD_QUEUE, username + ":" + score);
     }
 
+    private void updateScoreInMemory(String username, int newScore) {
+        String existingValue = inMemoryLeaderboard.get(username);
+        if (existingValue == null) {
+            inMemoryLeaderboard.put(username, newScore + ":");
+        } else {
+            String[] arr = existingValue.split(":", 2);
+            int oldScore = Integer.parseInt(arr[0]);
+            String oldMsg = arr.length > 1 ? arr[1] : "";
+            int mergedScore = Math.max(oldScore, newScore);
+            inMemoryLeaderboard.put(username, mergedScore + ":" + oldMsg);
+        }
+    }
+
+    private Integer getExistingScore(String username) {
+        try {
+            return jdbcTemplate.queryForObject(
+                    "SELECT score FROM leaderboard WHERE username = ?",
+                    Integer.class,
+                    username
+            );
+        } catch (EmptyResultDataAccessException ex) {
+            return null;
+        }
+    }
+
     public void saveScores(Map<String, Integer> scores) {
         if (!useDatabase) {
+            for (Map.Entry<String, Integer> e : scores.entrySet()) {
+                updateScoreInMemory(e.getKey(), e.getValue());
+            }
             return;
         }
-        for (Map.Entry<String, Integer> e : scores.entrySet()) {
-            String username = e.getKey();
-            int finalScore = e.getValue();
-            Integer existingScore;
-            try {
-                existingScore = jdbcTemplate.queryForObject(
-                        "SELECT score FROM leaderboard WHERE username = ?",
-                        Integer.class,
-                        username
-                );
-            } catch (EmptyResultDataAccessException ex) {
-                existingScore = null;
-            }
-            if (existingScore == null) {
+        for (Map.Entry<String, Integer> entry : scores.entrySet()) {
+            String username = entry.getKey();
+            int newScore = entry.getValue();
+            Integer currentScore = getExistingScore(username);
+            if (currentScore == null) {
                 jdbcTemplate.update(
                         "INSERT INTO leaderboard (username, score) VALUES (?, ?)",
                         username,
-                        finalScore
+                        newScore
                 );
             } else {
+                int maxScore = Math.max(newScore, currentScore);
                 jdbcTemplate.update(
                         "UPDATE leaderboard SET score = ? WHERE username = ?",
-                        Math.max(finalScore, existingScore),
+                        maxScore,
                         username
                 );
             }
@@ -75,19 +98,18 @@ public class LeaderboardService {
 
     public void updateWinnerMessage(String username, String message) {
         if (!useDatabase) {
+            String existingValue = inMemoryLeaderboard.get(username);
+            if (existingValue == null) {
+                inMemoryLeaderboard.put(username, "0:" + message);
+            } else {
+                String[] arr = existingValue.split(":", 2);
+                String sscore = arr[0];
+                inMemoryLeaderboard.put(username, sscore + ":" + message);
+            }
             return;
         }
         String winnerMessage = message == null ? "" : message;
-        Integer existingScore;
-        try {
-            existingScore = jdbcTemplate.queryForObject(
-                    "SELECT score FROM leaderboard WHERE username = ?",
-                    Integer.class,
-                    username
-            );
-        } catch (EmptyResultDataAccessException ex) {
-            existingScore = null;
-        }
+        Integer existingScore = getExistingScore(username);
         if (existingScore != null) {
             jdbcTemplate.update(
                     "UPDATE leaderboard SET winner_message = ? WHERE username = ?",
@@ -99,22 +121,28 @@ public class LeaderboardService {
 
     public Map<String, String> getLeaderboard() {
         if (!useDatabase) {
-            LinkedHashMap<String, String> copySorted = new LinkedHashMap<>();
-            leaderboard.entrySet().stream()
-                    .sorted((a, b) -> Integer.compare(b.getValue(), a.getValue()))
-                    .forEachOrdered(e -> copySorted.put(e.getKey(), e.getValue() + ":"));
-            return copySorted;
+            LinkedHashMap<String, String> sortedLeaderboard = new LinkedHashMap<>();
+            inMemoryLeaderboard.entrySet().stream()
+                    .sorted((a, b) -> {
+                        String[] aa = a.getValue().split(":", 2);
+                        String[] bb = b.getValue().split(":", 2);
+                        int sa = Integer.parseInt(aa[0]);
+                        int sb = Integer.parseInt(bb[0]);
+                        return Integer.compare(sb, sa);
+                    })
+                    .forEachOrdered(e -> sortedLeaderboard.put(e.getKey(), e.getValue()));
+            return sortedLeaderboard;
         }
-        Map<String, String> dbResult = new LinkedHashMap<>();
+        Map<String, String> dbLeaderboard = new LinkedHashMap<>();
         jdbcTemplate.query(
-                "SELECT username, score, COALESCE(winner_message,'') AS wm FROM leaderboard ORDER BY score DESC",
+                "SELECT username, score, COALESCE(winner_message,'') AS winner_message FROM leaderboard ORDER BY score DESC",
                 rs -> {
-                    String u = rs.getString("username");
-                    int s = rs.getInt("score");
-                    String m = rs.getString("wm");
-                    dbResult.put(u, s + ":" + m);
+                    String username = rs.getString("username");
+                    int score = rs.getInt("score");
+                    String winnerMessage = rs.getString("winner_message");
+                    dbLeaderboard.put(username, score + ":" + winnerMessage);
                 }
         );
-        return dbResult;
+        return dbLeaderboard;
     }
 }
