@@ -18,7 +18,7 @@ public final class Constants {
     public static final int HINT_INTERVAL_SECONDS = 10;
     public static final int TIMER_DELAY_MS = 100;
 
-    public static final int TOTAL_ROUNDS = 6;
+    public static final int TOTAL_ROUNDS = 2;
 
     public static final int GUESSER_BASE_POINTS = 10;
     public static final int DRAWER_BASE_POINTS = 5;

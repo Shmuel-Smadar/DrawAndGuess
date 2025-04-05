@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react'
 import DOMPurify from 'dompurify'
 import { useSelector } from 'react-redux'
 import { TOPIC_ROOM_CHAT, SYSTEM_MESSAGE_COLORS } from '../../utils/constants'
+import WinnerPrompt from '../Prompt/WinnerPrompt'
 import './Chat.css'
 
 function getSystemMessageColor(messageType) {
@@ -15,6 +16,7 @@ const Chat = ({ client, roomId, username, canChat, width, height }) => {
   const [isAtBottom, setIsAtBottom] = useState(true)
   const [showScrollButton, setShowScrollButton] = useState(false)
   const [unreadCount, setUnreadCount] = useState(0)
+  const [showWinnerPrompt, setShowWinnerPrompt] = useState(false)
   const chatWindowRef = useRef(null)
 
   useEffect(() => {
@@ -26,11 +28,16 @@ const Chat = ({ client, roomId, username, canChat, width, height }) => {
         setShowScrollButton(true)
         setUnreadCount((prevCount) => prevCount + 1)
       }
+      if (chatMessage.type === 'system' && chatMessage.messageType === 'WINNER_ANNOUNCED') {
+        if (chatMessage.winnerSessionId === sessionId) {
+          setShowWinnerPrompt(true)
+        }
+      }
     })
     return () => {
       subscription.unsubscribe()
     }
-  }, [client, roomId, isAtBottom])
+  }, [client, roomId, isAtBottom, sessionId])
 
   useEffect(() => {
     if (isAtBottom && chatWindowRef.current) {
@@ -90,23 +97,27 @@ const Chat = ({ client, roomId, username, canChat, width, height }) => {
       <div className="chat-window" ref={chatWindowRef}>
         {messages.map((message, index) => {
           const sanitizedText = DOMPurify.sanitize(message.text)
-          return (
-            <div
-              key={index}
-              className={`chat-message ${message.type === 'system' ? 'system-message' : 'user-message'}`}
-            >
-              {message.type === 'system' ? (
+          if (message.type === 'system') {
+            return (
+              <div
+                key={index}
+                className="chat-message system-message"
+              >
                 <span
                   className="chat-text system-text"
                   style={{ color: getSystemMessageColor(message.messageType) }}
                   dangerouslySetInnerHTML={{ __html: sanitizedText }}
                 />
-              ) : (
-                <>
-                  <span className="chat-sender">{username}: </span>
-                  <span className="chat-text" dangerouslySetInnerHTML={{ __html: sanitizedText }} />
-                </>
-              )}
+              </div>
+            )
+          }
+          return (
+            <div
+              key={index}
+              className="chat-message user-message"
+            >
+              <span className="chat-sender">{message.senderUsername}: </span>
+              <span className="chat-text" dangerouslySetInnerHTML={{ __html: sanitizedText }} />
             </div>
           )
         })}
@@ -134,6 +145,14 @@ const Chat = ({ client, roomId, username, canChat, width, height }) => {
           Send
         </button>
       </div>
+      {showWinnerPrompt && (
+        <WinnerPrompt
+          username={username}
+          client={client}
+          connected={client && client.connected}
+          onClose={() => setShowWinnerPrompt(false)}
+        />
+      )}
     </div>
   )
 }

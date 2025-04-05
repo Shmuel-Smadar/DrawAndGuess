@@ -6,11 +6,9 @@ import org.springframework.jms.annotation.JmsListener;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
-
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.LinkedHashMap;
-
 import static com.example.drawandguess.config.Constants.LEADERBOARD_QUEUE;
 
 @Service
@@ -46,7 +44,6 @@ public class LeaderboardService {
         if (!useDatabase) {
             return;
         }
-
         for (Map.Entry<String, Integer> e : scores.entrySet()) {
             String username = e.getKey();
             int finalScore = e.getValue();
@@ -76,20 +73,46 @@ public class LeaderboardService {
         }
     }
 
-    public Map<String, Integer> getLeaderboard() {
+    public void updateWinnerMessage(String username, String message) {
         if (!useDatabase) {
-            LinkedHashMap<String, Integer> copySorted = new LinkedHashMap<>();
+            return;
+        }
+        String winnerMessage = message == null ? "" : message;
+        Integer existingScore;
+        try {
+            existingScore = jdbcTemplate.queryForObject(
+                    "SELECT score FROM leaderboard WHERE username = ?",
+                    Integer.class,
+                    username
+            );
+        } catch (EmptyResultDataAccessException ex) {
+            existingScore = null;
+        }
+        if (existingScore != null) {
+            jdbcTemplate.update(
+                    "UPDATE leaderboard SET winner_message = ? WHERE username = ?",
+                    winnerMessage,
+                    username
+            );
+        }
+    }
+
+    public Map<String, String> getLeaderboard() {
+        if (!useDatabase) {
+            LinkedHashMap<String, String> copySorted = new LinkedHashMap<>();
             leaderboard.entrySet().stream()
                     .sorted((a, b) -> Integer.compare(b.getValue(), a.getValue()))
-                    .forEachOrdered(e -> copySorted.put(e.getKey(), e.getValue()));
+                    .forEachOrdered(e -> copySorted.put(e.getKey(), e.getValue() + ":"));
             return copySorted;
         }
-
-        Map<String, Integer> dbResult = new LinkedHashMap<>();
+        Map<String, String> dbResult = new LinkedHashMap<>();
         jdbcTemplate.query(
-                "SELECT username, score FROM leaderboard ORDER BY score DESC",
+                "SELECT username, score, COALESCE(winner_message,'') AS wm FROM leaderboard ORDER BY score DESC",
                 rs -> {
-                    dbResult.put(rs.getString("username"), rs.getInt("score"));
+                    String u = rs.getString("username");
+                    int s = rs.getInt("score");
+                    String m = rs.getString("wm");
+                    dbResult.put(u, s + ":" + m);
                 }
         );
         return dbResult;
