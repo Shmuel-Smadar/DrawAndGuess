@@ -1,20 +1,15 @@
 import React, { useState } from 'react'
 
-export default function WinnerPrompt({ username, onClose }) {
+export default function WinnerPrompt({ username, client, connected, onClose }) {
   const [winnerMessage, setWinnerMessage] = useState('')
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault()
-    if (!username) return
-    try {
-      await fetch('http://localhost:8080/leaderboard/winner-message', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user: username, message: winnerMessage })
-      })
-    } catch (err) {
-      console.error(err)
-    }
+    if (!username || !client || !connected) return
+    client.publish({
+      destination: '/app/winnerMessage',
+      body: JSON.stringify({ user: username, message: winnerMessage })
+    })
     onClose()
   }
 

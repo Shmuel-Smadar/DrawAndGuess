@@ -145,7 +145,14 @@ const Chat = ({ client, roomId, username, canChat, width, height }) => {
           Send
         </button>
       </div>
-      {showWinnerPrompt && <WinnerPrompt username={username} onClose={() => setShowWinnerPrompt(false)} />}
+      {showWinnerPrompt && (
+        <WinnerPrompt
+          username={username}
+          client={client}
+          connected={client && client.connected}
+          onClose={() => setShowWinnerPrompt(false)}
+        />
+      )}
     </div>
   )
 }
