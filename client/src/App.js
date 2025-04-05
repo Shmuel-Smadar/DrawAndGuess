@@ -6,7 +6,6 @@ import Lobby from './components/Lobby/Lobby'
 import Game from './components/Game'
 import { setUsername, setNicknameError } from './store/userSlice'
 import { setRoom } from './store/roomSlice'
-import './App.css'
 
 function App() {
   const dispatch = useDispatch()

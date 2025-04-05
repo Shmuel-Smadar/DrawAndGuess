@@ -6,6 +6,7 @@ import WordSelection from './Prompt/WordSelection'
 import useGameSubscriptions from '../hooks/useGameSubscriptions'
 import { setIsDrawer, setShowWordSelection } from '../store/gameSlice'
 import { APP_REQUEST_WORDS, APP_CHOOSE_WORD } from '../utils/constants'
+import './Game.css'
 
 function Game({ client, connected, username, room }) {
   const dispatch = useDispatch()
@@ -42,7 +43,7 @@ function Game({ client, connected, username, room }) {
   useGameSubscriptions(client, connected, room, isDrawer, requestWordOptions)
 
   return (
-    <div className="app">
+    <div className="game">
       <h1>What's Being Drawn?</h1>
       <div className="gameArea">
         {connected && client && (
