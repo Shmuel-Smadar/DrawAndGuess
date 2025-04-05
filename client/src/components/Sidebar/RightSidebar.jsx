@@ -13,8 +13,8 @@ const RightSidebar = ({
   height,
   onDrawerChange
 }) => {
-  const chatHeight = height * 0.75;
-  const participantsHeight = height * 0.25;
+  const chatHeight = height * 0.7;
+  const participantsHeight = height * 0.3;
   return (
     <div className="right-sidebar" style={{ height: `${height}px` }}>
       <Chat

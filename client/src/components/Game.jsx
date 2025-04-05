@@ -45,7 +45,7 @@ function Game({ client, connected, username, room }) {
   return (
     <div className="game">
       <h1>What's Being Drawn?</h1>
-      <div className="gameArea">
+      <div className="game-area">
         {connected && client && (
           <DrawingArea
             client={client}
