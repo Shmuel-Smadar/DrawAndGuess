@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react'
+import React, { useCallback } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import useStompClient from './utils/useStompClient'
 import DrawingArea from './components/Drawing/DrawingArea'
@@ -6,10 +6,11 @@ import NicknamePrompt from './components/Prompt/NicknamePrompt'
 import Lobby from './components/Lobby/Lobby'
 import RightSidebar from './components/Sidebar/RightSidebar'
 import WordSelection from './components/Prompt/WordSelection'
+import useGameSubscriptions from './hooks/useGameSubscriptions'
 import { setUsername, setNicknameError } from './store/userSlice'
 import { setRoom } from './store/roomSlice'
-import { setIsDrawer, setShowWordSelection, setWordOptions } from './store/gameSlice'
-import { USER_TOPIC_WORD_OPTIONS, APP_REQUEST_WORDS, APP_CHOOSE_WORD, TOPIC_ROOM_CHAT } from './utils/constants'
+import { setIsDrawer, setShowWordSelection } from './store/gameSlice'
+import { APP_REQUEST_WORDS, APP_CHOOSE_WORD } from './utils/constants'
 import './App.css'
 
 function App() {
@@ -48,26 +49,7 @@ function App() {
     dispatch(setShowWordSelection(false))
   }
 
-  useEffect(() => {
-    if (!client || !connected) return
-    const sub = client.subscribe(USER_TOPIC_WORD_OPTIONS, (msg) => {
-      const data = JSON.parse(msg.body)
-      dispatch(setWordOptions([data.word1, data.word2, data.word3]))
-      dispatch(setShowWordSelection(true))
-    })
-    return () => sub.unsubscribe()
-  }, [client, connected, dispatch])
-
-  useEffect(() => {
-    if (!client || !connected || !room) return
-    const chatSub = client.subscribe(TOPIC_ROOM_CHAT(room.roomId), (msg) => {
-      const message = JSON.parse(msg.body)
-      if (message.type === 'system' && message.messageType === 'NEW_GAME_STARTED' && isDrawer) {
-        requestWordOptions()
-      }
-    })
-    return () => chatSub.unsubscribe()
-  }, [client, connected, room, isDrawer, requestWordOptions])
+  useGameSubscriptions(client, connected, room, isDrawer, requestWordOptions)
 
   if (!username) {
     return (
