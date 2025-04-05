@@ -247,7 +247,8 @@ public class GameService {
             }
         }
         if (singleTopUserSessionId != null && !tie) {
-            ChatMessage winner = messageService.winnerAnnounce(singleTopUserSessionId, "You are the winner!");
+            String winnerName = participantService.findParticipantBySessionId(singleTopUserSessionId).getUsername();
+            ChatMessage winner = messageService.winnerAnnounce(singleTopUserSessionId, winnerName + " is the winner!");
             chatService.sendChatMessage(roomId, winner);
         }
         hintTasks.remove(roomId);
