@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useCallback } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import useStompClient from './utils/useStompClient'
 import DrawingArea from './components/Drawing/DrawingArea'
@@ -9,7 +9,7 @@ import WordSelection from './components/Prompt/WordSelection'
 import { setUsername, setNicknameError } from './store/userSlice'
 import { setRoom } from './store/roomSlice'
 import { setIsDrawer, setShowWordSelection, setWordOptions } from './store/gameSlice'
-import { USER_TOPIC_WORD_OPTIONS } from './utils/constants'
+import { USER_TOPIC_WORD_OPTIONS, APP_REQUEST_WORDS, APP_CHOOSE_WORD, TOPIC_ROOM_CHAT } from './utils/constants'
 import './App.css'
 
 function App() {
@@ -20,7 +20,15 @@ function App() {
   const isDrawer = useSelector(state => state.game.isDrawer)
   const showWordSelection = useSelector(state => state.game.showWordSelection)
   const wordOptions = useSelector(state => state.game.wordOptions)
-  const { client, connected } = useStompClient(process.env.REACT_APP_SOCKET_URL || 'http://localhost:8080/draw-and-guess');
+  const { client, connected } = useStompClient(process.env.REACT_APP_SOCKET_URL || 'http://localhost:8080/draw-and-guess')
+
+  const requestWordOptions = useCallback(() => {
+    if (!client || !connected || !room) return
+    client.publish({
+      destination: APP_REQUEST_WORDS(room.roomId),
+      body: ''
+    })
+  }, [client, connected, room])
 
   const handleDrawerChange = (drawerState) => {
     if (drawerState !== isDrawer) {
@@ -31,18 +39,10 @@ function App() {
     }
   }
 
-  const requestWordOptions = () => {
-    if (!client || !connected || !room) return
-    client.publish({
-      destination: `/app/room/${room.roomId}/requestWords`,
-      body: ''
-    })
-  }
-
   const handleWordSelect = (selectedWord) => {
     if (!client || !connected || !room) return
     client.publish({
-      destination: `/app/room/${room.roomId}/chooseWord`,
+      destination: APP_CHOOSE_WORD(room.roomId),
       body: selectedWord
     })
     dispatch(setShowWordSelection(false))
@@ -60,14 +60,14 @@ function App() {
 
   useEffect(() => {
     if (!client || !connected || !room) return
-    const chatSub = client.subscribe(`/topic/room/${room.roomId}/chat`, (msg) => {
+    const chatSub = client.subscribe(TOPIC_ROOM_CHAT(room.roomId), (msg) => {
       const message = JSON.parse(msg.body)
       if (message.type === 'system' && message.messageType === 'NEW_GAME_STARTED' && isDrawer) {
         requestWordOptions()
       }
     })
     return () => chatSub.unsubscribe()
-  }, [client, connected, room, isDrawer])
+  }, [client, connected, room, isDrawer, requestWordOptions])
 
   if (!username) {
     return (

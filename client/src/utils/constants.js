@@ -7,6 +7,8 @@ export const APP_GET_ROOMS = '/app/getRooms'
 export const APP_CREATE_ROOM = '/app/createRoom'
 export const APP_JOIN_ROOM = '/app/joinRoom'
 export const APP_GET_CURRENT_HINT = (roomId) => `/app/room/${roomId}/getCurrentHint`
+export const APP_REQUEST_WORDS = (roomId) => `/app/room/${roomId}/requestWords`
+export const APP_CHOOSE_WORD = (roomId) => `/app/room/${roomId}/chooseWord`
 export const USER_TOPIC_ROOM_CREATED = '/user/topic/roomCreated'
 export const USER_TOPIC_NICKNAME = '/user/topic/nickname'
 export const USER_TOPIC_WORD_OPTIONS = '/user/topic/wordOptions'
