@@ -10,7 +10,6 @@ export default function useStompClient(baseUrl) {
     const stompClient = new Client({
       brokerURL: baseUrl.replace('http', 'ws'),
       webSocketFactory: () => new SockJS(baseUrl),
-      debug: (str) => console.log(str),
       onConnect: () => {
         setConnected(true)
       },

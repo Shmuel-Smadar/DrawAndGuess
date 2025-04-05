@@ -5,7 +5,6 @@ import EmptyIcon from '../../assets/empty-pockets.png'
 function EmptyRoomState({ onCreateRoom }) {
   return (
     <div className="empty-room-container">
-      {/* Replace with your own illustration/icon */}
       <img
         src={EmptyIcon}
         alt="No rooms available"

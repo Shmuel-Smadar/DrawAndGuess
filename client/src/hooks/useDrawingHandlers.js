@@ -37,7 +37,6 @@ export const useDrawingHandlers = ({
 
   const startDrawing = useCallback(
     (event) => {
-      event.preventDefault()
       if (!isDrawingAllowed || !client) return
       const ctx = canvasRef.current.getContext('2d')
       if (isFillMode) {
@@ -134,7 +133,6 @@ export const useDrawingHandlers = ({
 
   const stopDrawing = useCallback(
     (event) => {
-      event.preventDefault()
       if (!isDrawingAllowed || !client) return
 
       setIsDrawing(false)
