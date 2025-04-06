@@ -5,7 +5,7 @@ import RightSidebar from './Sidebar/RightSidebar'
 import WordSelection from './Prompt/WordSelection'
 import useGameSubscriptions from '../hooks/useGameSubscriptions'
 import { setIsDrawer, setShowWordSelection } from '../store/gameSlice'
-import { APP_REQUEST_WORDS, APP_CHOOSE_WORD, CANVAS_WIDTH_RATIO, CANVAS_HEIGHT_RATIO } from '../utils/constants'
+import { APP_REQUEST_WORDS, APP_CHOOSE_WORD, CANVAS_WIDTH_RATIO, CANVAS_HEIGHT_RATIO, GAME_TITLE } from '../utils/constants'
 import './Game.css'
 
 function Game({ client, connected, username, room }) {
@@ -44,7 +44,7 @@ function Game({ client, connected, username, room }) {
 
   return (
     <div className="game">
-      <h1>What's Being Drawn?</h1>
+      <h1>{GAME_TITLE}</h1>
       <div className="game-area">
         {connected && client && (
           <DrawingArea

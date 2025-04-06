@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import DOMPurify from 'dompurify'
 import { useSelector } from 'react-redux'
-import { TOPIC_ROOM_CHAT, SYSTEM_MESSAGE_COLORS } from '../../utils/constants'
+import { TOPIC_ROOM_CHAT, SYSTEM_MESSAGE_COLORS, CHAT_TITLE, SCROLL_BUTTON_LABEL, NEW_MESSAGES_LABEL, CHAT_PLACEHOLDER, SEND_BUTTON_TEXT } from '../../utils/constants'
 import WinnerPrompt from '../Prompt/WinnerPrompt'
 import './Chat.css'
 
@@ -92,7 +92,7 @@ const Chat = ({ client, roomId, username, canChat, width, height }) => {
   return (
     <div className="chat-container" style={{ height: `${height}px` }}>
       <div className="chat-header">
-        <h2>Chat</h2>
+        <h2>{CHAT_TITLE}</h2>
       </div>
       <div className="chat-window" ref={chatWindowRef}>
         {messages.map((message, index) => {
@@ -126,9 +126,9 @@ const Chat = ({ client, roomId, username, canChat, width, height }) => {
         <button
           className="scroll-button"
           onClick={scrollToBottom}
-          aria-label="Scroll to the latest messages"
+          aria-label={SCROLL_BUTTON_LABEL}
         >
-          ↓ {unreadCount > 0 ? `${unreadCount} New Messages` : 'New Messages'}
+          ↓ {unreadCount > 0 ? `${unreadCount} ${NEW_MESSAGES_LABEL}` : NEW_MESSAGES_LABEL}
         </button>
       )}
       <div className="chat-input">
@@ -136,13 +136,13 @@ const Chat = ({ client, roomId, username, canChat, width, height }) => {
           type="text"
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
-          placeholder="Type a message..."
+          placeholder={CHAT_PLACEHOLDER}
           onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
           disabled={!canChat}
           aria-label="Type your message"
         />
         <button onClick={handleSendMessage} disabled={!canChat}>
-          Send
+          {SEND_BUTTON_TEXT}
         </button>
       </div>
       {showWinnerPrompt && (

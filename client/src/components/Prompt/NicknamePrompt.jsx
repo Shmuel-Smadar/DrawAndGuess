@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useDispatch } from 'react-redux'
 import { setUsername, setNicknameError, setSessionId } from '../../store/userSlice'
-import { USER_TOPIC_NICKNAME, MAX_NICKNAME_LENGTH } from '../../utils/constants'
+import { USER_TOPIC_NICKNAME, MAX_NICKNAME_LENGTH, NICKNAME_PROMPT_TITLE, NICKNAME_PLACEHOLDER, JOIN_BUTTON_TEXT } from '../../utils/constants'
 import './NicknamePrompt.css'
 
 const NicknamePrompt = ({ client, connected, error }) => {
@@ -41,15 +41,15 @@ const NicknamePrompt = ({ client, connected, error }) => {
   return (
     <div className="nickname-prompt">
       <form onSubmit={handleSubmit}>
-        <h2>Enter Your Nickname</h2>
+        <h2>{NICKNAME_PROMPT_TITLE}</h2>
         <input
           type="text"
           value={nicknameInput}
           onChange={(e) => setNicknameInput(e.target.value)}
-          placeholder="Nickname"
+          placeholder={NICKNAME_PLACEHOLDER}
           maxLength={MAX_NICKNAME_LENGTH}
         />
-        <button type="submit">Join</button>
+        <button type="submit">{JOIN_BUTTON_TEXT}</button>
         {error && <p className="error-message">{error}</p>}
       </form>
     </div>

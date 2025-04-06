@@ -9,7 +9,12 @@ import {
   APP_CREATE_ROOM,
   APP_JOIN_ROOM,
   USER_TOPIC_ROOM_CREATED,
-  MAX_ROOM_NAME_LENGTH
+  MAX_ROOM_NAME_LENGTH,
+  LOBBY_TITLE,
+  NEW_ROOM_PLACEHOLDER,
+  CREATE_ROOM_BUTTON_TEXT,
+  ROOM_NAME_EMPTY_ERROR,
+  SERVER_CONNECTION_ERROR
 } from '../../utils/constants'
 
 function Lobby({ client, connected, setRoom }) {
@@ -62,7 +67,7 @@ function Lobby({ client, connected, setRoom }) {
   function handleCreateRoom(e) {
     e.preventDefault()
     if (newRoomName.trim() === '') {
-      setError('Room name cannot be empty.')
+      setError(ROOM_NAME_EMPTY_ERROR)
       return
     }
     if (client && connected) {
@@ -77,24 +82,24 @@ function Lobby({ client, connected, setRoom }) {
       setNewRoomName('')
       setError('')
     } else {
-      setError('Unable to connect to the server.')
+      setError(SERVER_CONNECTION_ERROR)
     }
   }
 
   return (
     <div className="lobby">
-      <h2>Select a Room</h2>
+      <h2>{LOBBY_TITLE}</h2>
       <RoomTable rooms={rooms} onJoinRoom={handleJoinRoom} />
       <form onSubmit={handleCreateRoom} className="new-room-form">
         <input
           type="text"
           value={newRoomName}
           onChange={(e) => setNewRoomName(e.target.value)}
-          placeholder="New Room Name"
+          placeholder={NEW_ROOM_PLACEHOLDER}
           maxLength={MAX_ROOM_NAME_LENGTH}
           required
         />
-        <button type="submit">Create Room & Join</button>
+        <button type="submit">{CREATE_ROOM_BUTTON_TEXT}</button>
         {error && <div className="error">{error}</div>}
       </form>
       <div className="button-group">

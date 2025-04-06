@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { WINNER_PROMPT_TITLE, WINNER_PROMPT_LABEL, WINNER_PROMPT_SAVE } from '../../utils/constants'
 import './WinnerPrompt.css'
 
 export default function WinnerPrompt({ username, client, connected, onClose }) {
@@ -17,9 +18,9 @@ export default function WinnerPrompt({ username, client, connected, onClose }) {
   return (
     <div className="winner-prompt-overlay">
       <div className="winner-prompt-container">
-        <h2>You Won!</h2>
+        <h2>{WINNER_PROMPT_TITLE}</h2>
         <form onSubmit={handleSubmit}>
-          <label htmlFor="winner-message">Add a message for the leaderboard:</label>
+          <label htmlFor="winner-message">{WINNER_PROMPT_LABEL}</label>
           <input
             id="winner-message"
             type="text"
@@ -27,7 +28,7 @@ export default function WinnerPrompt({ username, client, connected, onClose }) {
             onChange={(e) => setWinnerMessage(e.target.value)}
             maxLength={50}
           />
-          <button type="submit">Save</button>
+          <button type="submit">{WINNER_PROMPT_SAVE}</button>
         </form>
       </div>
     </div>

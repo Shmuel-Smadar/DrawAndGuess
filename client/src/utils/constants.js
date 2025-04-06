@@ -14,6 +14,33 @@ export const PARTICIPANTS_HEIGHT_RATIO = 0.3
 export const FIRST_PLACE_ICON = "🏆"
 export const SECOND_PLACE_ICON = "🥈"
 export const THIRD_PLACE_ICON = "🥉"
+export const BUCKET_ICON_CURSOR_OFFSET = "16 16"
+export const DEFAULT_CURSOR = "crosshair"
+export const GAME_TITLE = "What's Being Drawn?"
+export const CLOSE_BUTTON_TEXT = "X"
+export const NICKNAME_PROMPT_TITLE = "Enter Your Nickname"
+export const NICKNAME_PLACEHOLDER = "Nickname"
+export const JOIN_BUTTON_TEXT = "Join"
+export const WINNER_PROMPT_TITLE = "You Won!"
+export const WINNER_PROMPT_LABEL = "Add a message for the leaderboard:"
+export const WINNER_PROMPT_SAVE = "Save"
+export const WORD_SELECTION_TITLE = "Choose a Word to Draw"
+export const LOBBY_TITLE = "Select a Room"
+export const NEW_ROOM_PLACEHOLDER = "New Room Name"
+export const CREATE_ROOM_BUTTON_TEXT = "Create Room & Join"
+export const ROOM_NAME_EMPTY_ERROR = "Room name cannot be empty."
+export const SERVER_CONNECTION_ERROR = "Unable to connect to the server."
+export const EMPTY_ROOM_HEADING = "No Rooms Found"
+export const EMPTY_ROOM_TEXT = "Looks like there are no rooms available right now. Create a new room and invite your friends to join!"
+export const JOIN_ROOM_BUTTON_TEXT = "Join"
+export const CHAT_TITLE = "Chat"
+export const SCROLL_BUTTON_LABEL = "Scroll to the latest messages"
+export const NEW_MESSAGES_LABEL = "New Messages"
+export const CHAT_PLACEHOLDER = "Type a message..."
+export const SEND_BUTTON_TEXT = "Send"
+export const PARTICIPANTS_TITLE = "Participants"
+export const DRAWING_INDICATOR_TEXT = " (Drawing)"
+export const CREDITS_TITLE = "Credits"
 
 export const APP_GET_ROOMS = '/app/getRooms'
 export const APP_CREATE_ROOM = '/app/createRoom'
@@ -31,7 +58,6 @@ export const TOPIC_ROOM_DRAWING = (roomId) => `/topic/room/${roomId}/drawing`
 export const TOPIC_ROOM_CLEAR_CANVAS = (roomId) => `/topic/room/${roomId}/clearCanvas`
 export const TOPIC_ROOM_PARTICIPANTS = (roomId) => `/topic/room/${roomId}/participants`
 export const TOPIC_ROOM_WORD_HINT = (roomId) => `/topic/room/${roomId}/wordHint`
-
 
 export const EVENT_TYPE_START = 'START'
 export const EVENT_TYPE_DRAW = 'DRAW'

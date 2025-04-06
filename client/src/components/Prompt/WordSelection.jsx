@@ -1,11 +1,12 @@
 import React from 'react';
+import { WORD_SELECTION_TITLE } from '../../utils/constants'
 import './WordSelection.css';
 
 const WordSelection = ({ words, onWordSelect }) => {
   return (
     <div className="word-selection-overlay">
       <div className="word-selection-container">
-        <h2 className="word-selection-title">Choose a Word to Draw</h2>
+        <h2 className="word-selection-title">{WORD_SELECTION_TITLE}</h2>
         <div className="word-selection-buttons">
           {words.map((word, index) => (
             <button

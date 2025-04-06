@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { TOPIC_ROOM_PARTICIPANTS } from '../../utils/constants'
+import { PARTICIPANTS_TITLE, DRAWING_INDICATOR_TEXT } from '../../utils/constants'
 import './ParticipantsList.css'
 
 const ParticipantsList = ({ client, height, roomId, username, onDrawerChange }) => {
@@ -31,7 +32,7 @@ const ParticipantsList = ({ client, height, roomId, username, onDrawerChange }) 
   return (
     <div className="participants-container" style={{ height: `${height}px` }}>
       <div className="participants-header">
-        <h2>Participants</h2>
+        <h2>{PARTICIPANTS_TITLE}</h2>
       </div>
       <div className="participants-window" ref={participantsWindowRef}>
         {userList.map((user) => (
@@ -40,7 +41,7 @@ const ParticipantsList = ({ client, height, roomId, username, onDrawerChange }) 
               {user.username} ({user.score})
             </span>
             {user.isDrawer && (
-              <span className="drawer-indicator"> (Drawing)</span>
+              <span className="drawer-indicator">{DRAWING_INDICATOR_TEXT}</span>
             )}
           </div>
         ))}

@@ -2,6 +2,7 @@ import React from 'react'
 import { useSelector } from 'react-redux'
 import useCanvas from '../../hooks/useCanvas'
 import BucketIcon from '../../assets/paint-bucket.png'
+import { BUCKET_ICON_CURSOR_OFFSET, DEFAULT_CURSOR } from '../../utils/constants'
 import './Canvas.css'
 
 function Canvas({ client, userID, roomId }) {
@@ -24,8 +25,8 @@ function Canvas({ client, userID, roomId }) {
       className="myCanvas"
       style={{
         cursor: isFillMode
-          ? `url(${BucketIcon}) 16 16, auto`
-          : 'crosshair'
+          ? `url(${BucketIcon}) ${BUCKET_ICON_CURSOR_OFFSET}, auto`
+          : DEFAULT_CURSOR
       }}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}

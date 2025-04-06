@@ -1,6 +1,7 @@
 import React from 'react'
 import './RoomTable.css'
 import EmptyIcon from '../../assets/empty-pockets.png'
+import { EMPTY_ROOM_HEADING, EMPTY_ROOM_TEXT, JOIN_ROOM_BUTTON_TEXT } from '../../utils/constants'
 
 function EmptyRoomState({ onCreateRoom }) {
   return (
@@ -10,9 +11,9 @@ function EmptyRoomState({ onCreateRoom }) {
         alt="No rooms available"
         className="empty-room-image"
       />
-      <h2 className="empty-room-heading">No Rooms Found</h2>
+      <h2 className="empty-room-heading">{EMPTY_ROOM_HEADING}</h2>
       <p className="empty-room-text">
-        Looks like there are no rooms available right now. Create a new room and invite your friends to join!
+        {EMPTY_ROOM_TEXT}
       </p>
     </div>
   )
@@ -32,7 +33,7 @@ function RoomTable({ rooms, onJoinRoom, onCreateRoom }) {
                 <span className="participants">{room.numberOfParticipants}/10</span>
               </div>
               <button className="join-button" onClick={() => onJoinRoom(room)}>
-                Join
+                {JOIN_ROOM_BUTTON_TEXT}
               </button>
             </div>
           ))}

@@ -1,12 +1,13 @@
 import React from 'react'
+import { CLOSE_BUTTON_TEXT, CREDITS_TITLE } from '../../utils/constants'
 import './CreditsOverlay.css'
 
 function CreditsOverlay({ onClose }) {
   return (
     <div className="credits-overlay">
       <div className="credits-modal">
-        <button className="close-button" onClick={onClose}>X</button>
-        <h2>Credits</h2>
+        <button className="close-button" onClick={onClose}>{CLOSE_BUTTON_TEXT}</button>
+        <h2>{CREDITS_TITLE}</h2>
         <ul className="credits-list">
           <li>
             <a href="https://www.flaticon.com/free-icons/paint-brush" title="paint brush icons" target="_blank" rel="noopener noreferrer">
