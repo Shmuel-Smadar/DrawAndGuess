@@ -1,13 +1,13 @@
 import { useCallback } from 'react';
-import { ASPECT_RATIO } from '../utils/constants';
+import { ASPECT_RATIO, CANVAS_WIDTH_RATIO, CANVAS_HEIGHT_RATIO } from '../utils/constants';
 
 export const useCanvasResize = (canvasRef) => {
   const resizeCanvas = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
-    const maxWidth = window.innerWidth * 0.9;
-    const maxHeight = window.innerHeight * 0.8;
+    const maxWidth = window.innerWidth * CANVAS_WIDTH_RATIO;
+    const maxHeight = window.innerHeight * CANVAS_HEIGHT_RATIO;
     let width, height;
 
     if (maxWidth / maxHeight > ASPECT_RATIO) {

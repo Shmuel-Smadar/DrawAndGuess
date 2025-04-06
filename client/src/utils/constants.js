@@ -1,7 +1,19 @@
 export const VIRTUAL_WIDTH = 10
 export const VIRTUAL_HEIGHT = 16
 export const ASPECT_RATIO = VIRTUAL_WIDTH / VIRTUAL_HEIGHT
-
+export const DEFAULT_SOCKET_URL = "http://localhost:8080/draw-and-guess"
+export const DEFAULT_LEADERBOARD_URL = "http://localhost:8080/leaderboard"
+export const LEADERBOARD_REFRESH_INTERVAL = 100
+export const MAX_NICKNAME_LENGTH = 20
+export const MAX_ROOM_NAME_LENGTH = 20
+export const MAX_WINNER_MESSAGE_LENGTH = 50
+export const CANVAS_WIDTH_RATIO = 0.9
+export const CANVAS_HEIGHT_RATIO = 0.8
+export const CHAT_HEIGHT_RATIO = 0.7
+export const PARTICIPANTS_HEIGHT_RATIO = 0.3
+export const FIRST_PLACE_ICON = "🏆"
+export const SECOND_PLACE_ICON = "🥈"
+export const THIRD_PLACE_ICON = "🥉"
 
 export const APP_GET_ROOMS = '/app/getRooms'
 export const APP_CREATE_ROOM = '/app/createRoom'
@@ -58,3 +70,5 @@ export const BRUSH_SIZES = [
   { name: 'M', size: 5 },
   { name: 'L', size: 10 }
 ]
+
+

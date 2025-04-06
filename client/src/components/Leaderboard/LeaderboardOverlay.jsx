@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './LeaderboardOverlay.css';
+import { DEFAULT_LEADERBOARD_URL, LEADERBOARD_REFRESH_INTERVAL, FIRST_PLACE_ICON, SECOND_PLACE_ICON, THIRD_PLACE_ICON } from '../../utils/constants';
 
 function MessageModal({ record, onClose }) {
   return (
@@ -20,7 +21,7 @@ function LeaderboardOverlay({ onClose }) {
   useEffect(() => {
     const fetchScores = async () => {
       try {
-        const res = await fetch(process.env.REACT_APP_LEADERBOARD_URL || 'http://localhost:8080/leaderboard');
+        const res = await fetch(process.env.REACT_APP_LEADERBOARD_URL || DEFAULT_LEADERBOARD_URL);
         const data = await res.json();
         const formattedScores = data.map(item => {
           const parts = item.split(':');
@@ -32,14 +33,13 @@ function LeaderboardOverlay({ onClose }) {
       }
     };
     fetchScores();
-    const interval = setInterval(fetchScores, 100);
+    const interval = setInterval(fetchScores, LEADERBOARD_REFRESH_INTERVAL);
     return () => clearInterval(interval);
   }, []);
-
   const getRankIcon = (index) => {
-    if (index === 0) return '🏆';
-    if (index === 1) return '🥈';
-    if (index === 2) return '🥉';
+    if (index === 0) return FIRST_PLACE_ICON;
+    if (index === 1) return SECOND_PLACE_ICON;
+    if (index === 2) return THIRD_PLACE_ICON;
     return null;
   };
 

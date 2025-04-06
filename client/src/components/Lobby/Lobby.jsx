@@ -8,7 +8,8 @@ import {
   APP_GET_ROOMS,
   APP_CREATE_ROOM,
   APP_JOIN_ROOM,
-  USER_TOPIC_ROOM_CREATED
+  USER_TOPIC_ROOM_CREATED,
+  MAX_ROOM_NAME_LENGTH
 } from '../../utils/constants'
 
 function Lobby({ client, connected, setRoom }) {
@@ -90,7 +91,7 @@ function Lobby({ client, connected, setRoom }) {
           value={newRoomName}
           onChange={(e) => setNewRoomName(e.target.value)}
           placeholder="New Room Name"
-          maxLength={20}
+          maxLength={MAX_ROOM_NAME_LENGTH}
           required
         />
         <button type="submit">Create Room & Join</button>

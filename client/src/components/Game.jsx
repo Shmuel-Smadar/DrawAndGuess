@@ -5,7 +5,7 @@ import RightSidebar from './Sidebar/RightSidebar'
 import WordSelection from './Prompt/WordSelection'
 import useGameSubscriptions from '../hooks/useGameSubscriptions'
 import { setIsDrawer, setShowWordSelection } from '../store/gameSlice'
-import { APP_REQUEST_WORDS, APP_CHOOSE_WORD } from '../utils/constants'
+import { APP_REQUEST_WORDS, APP_CHOOSE_WORD, CANVAS_WIDTH_RATIO, CANVAS_HEIGHT_RATIO } from '../utils/constants'
 import './Game.css'
 
 function Game({ client, connected, username, room }) {
@@ -58,8 +58,8 @@ function Game({ client, connected, username, room }) {
           roomId={room.roomId}
           username={username}
           canChat={!isDrawer}
-          width={window.innerWidth * 0.9}
-          height={window.innerHeight * 0.80}
+          width={window.innerWidth * CANVAS_WIDTH_RATIO}
+          height={window.innerHeight * CANVAS_HEIGHT_RATIO}
           onDrawerChange={handleDrawerChange}
         />
       </div>

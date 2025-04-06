@@ -1,8 +1,8 @@
-
 import React from 'react';
 import Chat from './Chat';
 import ParticipantsList from './ParticipantsList';
-import './RightSidebar.css';
+import './RightSidebar.css'
+import { CHAT_HEIGHT_RATIO, PARTICIPANTS_HEIGHT_RATIO } from '../../utils/constants';
 
 const RightSidebar = ({
   client,
@@ -13,8 +13,8 @@ const RightSidebar = ({
   height,
   onDrawerChange
 }) => {
-  const chatHeight = height * 0.7;
-  const participantsHeight = height * 0.3;
+  const chatHeight = height * CHAT_HEIGHT_RATIO;
+  const participantsHeight = height * PARTICIPANTS_HEIGHT_RATIO;
   return (
     <div className="right-sidebar" style={{ height: `${height}px` }}>
       <Chat

@@ -6,13 +6,14 @@ import Lobby from './components/Lobby/Lobby'
 import Game from './components/Game'
 import { setUsername, setNicknameError } from './store/userSlice'
 import { setRoom } from './store/roomSlice'
+import { DEFAULT_SOCKET_URL } from './utils/constants'
 
 function App() {
   const dispatch = useDispatch()
   const username = useSelector(state => state.user.username)
   const nicknameError = useSelector(state => state.user.nicknameError)
   const room = useSelector(state => state.room.room)
-  const { client, connected } = useStompClient(process.env.REACT_APP_SOCKET_URL || 'http://localhost:8080/draw-and-guess')
+  const { client, connected } = useStompClient(process.env.REACT_APP_SOCKET_URL || DEFAULT_SOCKET_URL)
 
   if (!username) {
     return (
