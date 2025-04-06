@@ -1,9 +1,9 @@
 package com.example.drawandguess.model;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.example.drawandguess.config.Constants.TOTAL_ROUNDS;
@@ -11,7 +11,8 @@ import static com.example.drawandguess.config.Constants.TOTAL_ROUNDS;
 public class Game {
     private final List<String> participantSessionIds = new ArrayList<>();
     private int currentDrawerIndex = -1;
-    private String chosenWord;
+    private String chosenWordEnglish;
+    private String chosenWordHebrew;
     private StringBuilder currentHintBuilder = new StringBuilder();
     private boolean isFirstHint;
     private List<Integer> revealOrder = new ArrayList<>();
@@ -62,17 +63,20 @@ public class Game {
         }
     }
 
-    public void setChosenWord(String chosenWord) {
-        this.chosenWord = chosenWord;
+    public void setChosenWord(String chosenWordCombined) {
+        String[] parts = chosenWordCombined.split(" : ");
+        this.chosenWordEnglish = parts[0];
+        this.chosenWordHebrew = parts.length > 1 ? parts[1] : "";
         initializeHint();
     }
 
-    public String getChosenWord() {
-        return chosenWord;
+    public String getChosenWordEnglish() {
+        return chosenWordEnglish;
     }
 
     public boolean isCorrectGuess(String guess) {
-        return chosenWord != null && chosenWord.equalsIgnoreCase(guess);
+        return (chosenWordEnglish != null && chosenWordEnglish.equalsIgnoreCase(guess)) ||
+                (chosenWordHebrew != null && chosenWordHebrew.equalsIgnoreCase(guess));
     }
 
     public void nextRound() {
@@ -83,7 +87,8 @@ public class Game {
     }
 
     public void resetRound() {
-        this.chosenWord = null;
+        this.chosenWordEnglish = null;
+        this.chosenWordHebrew = null;
         this.isFirstHint = true;
         this.currentHintBuilder.setLength(0);
         this.revealOrder.clear();
@@ -93,7 +98,8 @@ public class Game {
     public void resetGame() {
         roundCount = 0;
         gameOver = false;
-        chosenWord = null;
+        chosenWordEnglish = null;
+        chosenWordHebrew = null;
         revealOrder.clear();
         currentHintBuilder.setLength(0);
         currentDrawerIndex = 0;
@@ -113,7 +119,7 @@ public class Game {
     }
 
     private void initializeHint() {
-        int length = chosenWord.length();
+        int length = chosenWordEnglish.length();
         currentHintBuilder.setLength(0);
         currentHintBuilder.append("_".repeat(length));
         List<Integer> clues = new ArrayList<>();
@@ -132,7 +138,7 @@ public class Game {
         }
         hintsUsed++;
         int nextIndex = revealOrder.remove(0);
-        currentHintBuilder.setCharAt(nextIndex, chosenWord.charAt(nextIndex));
+        currentHintBuilder.setCharAt(nextIndex, chosenWordEnglish.charAt(nextIndex));
         return currentHintBuilder.toString();
     }
 

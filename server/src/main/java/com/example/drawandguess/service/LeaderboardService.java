@@ -112,7 +112,7 @@ public class LeaderboardService {
         Integer existingScore = getExistingScore(username);
         if (existingScore != null) {
             jdbcTemplate.update(
-                    "UPDATE leaderboard SET winner_message = ? WHERE username = ?",
+                    "UPDATE leaderboard SET message = ? WHERE username = ?",
                     winnerMessage,
                     username
             );
@@ -135,11 +135,11 @@ public class LeaderboardService {
         }
         Map<String, String> dbLeaderboard = new LinkedHashMap<>();
         jdbcTemplate.query(
-                "SELECT username, score, COALESCE(winner_message,'') AS winner_message FROM leaderboard ORDER BY score DESC",
+                "SELECT username, score, COALESCE(message,'') AS message FROM leaderboard ORDER BY score DESC",
                 rs -> {
                     String username = rs.getString("username");
                     int score = rs.getInt("score");
-                    String winnerMessage = rs.getString("winner_message");
+                    String winnerMessage = rs.getString("message");
                     dbLeaderboard.put(username, score + ":" + winnerMessage);
                 }
         );

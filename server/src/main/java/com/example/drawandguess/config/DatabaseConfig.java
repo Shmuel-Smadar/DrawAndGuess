@@ -51,8 +51,8 @@ public class DatabaseConfig {
     @EventListener(ApplicationReadyEvent.class)
     public void createTablesIfNotExists() {
         if (useDatabase && jdbcTemplate != null) {
-            jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS leaderboard (username VARCHAR(255) PRIMARY KEY, score INT NOT NULL, winner_message VARCHAR(255))");
-            jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS words (english_word VARCHAR(255))");
+            jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS leaderboard (username VARCHAR(255) PRIMARY KEY, score INT NOT NULL, message VARCHAR(255))");
+            jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS words (english_word VARCHAR(255), hebrew_word VARCHAR(255))");
         }
     }
 }

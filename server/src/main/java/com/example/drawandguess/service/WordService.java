@@ -6,14 +6,25 @@ import org.springframework.stereotype.Service;
 import com.example.drawandguess.model.WordOptions;
 import java.util.List;
 import java.util.Random;
+import java.util.ArrayList;
+import java.util.Map;
 
 @Service
 public class WordService {
 
     private final JdbcTemplate jdbcTemplate;
     private final boolean useDatabase;
-    private final List<String> defaultWords = List.of(
-            "Cat", "Computer", "Pizza", "Bicycle", "Tree", "Car", "House", "Sun", "Moon", "Banana"
+    private final List<String> defaultWordPairs = List.of(
+            "Cat : חתול",
+            "Computer : מחשב",
+            "Pizza : פיצה",
+            "Bicycle : אופניים",
+            "Tree : עץ",
+            "Car : מכונית",
+            "House : בית",
+            "Sun : שמש",
+            "Moon : ירח",
+            "Banana : בננה"
     );
 
     public WordService(JdbcTemplate jdbcTemplate, @Value("${USE_DB:false}") boolean useDatabase) {
@@ -23,21 +34,30 @@ public class WordService {
 
     public WordOptions getRandomWords() {
         if (useDatabase) {
-            List<String> words = jdbcTemplate.queryForList(
-                    "SELECT english_word FROM Words ORDER BY RANDOM() LIMIT 3",
-                    String.class
+            List<Map<String, Object>> rows = jdbcTemplate.queryForList(
+                    "SELECT english_word, hebrew_word FROM words ORDER BY RANDOM() LIMIT 3"
             );
-            while (words.size() < 3) {
-                words.add(getRandomDefaultWord());
+            List<String> wordPairs = new ArrayList<>();
+            for (Map<String, Object> row : rows) {
+                String english = (String) row.get("english_word");
+                String hebrew = (String) row.get("hebrew_word");
+                wordPairs.add(english + " : " + hebrew);
             }
-            return new WordOptions(words.get(0), words.get(1), words.get(2));
+            while (wordPairs.size() < 3) {
+                wordPairs.add(getRandomDefaultWordPair());
+            }
+            return new WordOptions(wordPairs.get(0), wordPairs.get(1), wordPairs.get(2));
         } else {
-            return new WordOptions(getRandomDefaultWord(), getRandomDefaultWord(), getRandomDefaultWord());
+            List<String> wordPairs = new ArrayList<>();
+            for (int i = 0; i < 3; i++) {
+                wordPairs.add(getRandomDefaultWordPair());
+            }
+            return new WordOptions(wordPairs.get(0), wordPairs.get(1), wordPairs.get(2));
         }
     }
 
-    private String getRandomDefaultWord() {
+    private String getRandomDefaultWordPair() {
         Random r = new Random();
-        return defaultWords.get(r.nextInt(defaultWords.size()));
+        return defaultWordPairs.get(r.nextInt(defaultWordPairs.size()));
     }
 }
