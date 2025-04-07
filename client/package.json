@@ -25,7 +25,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-     "postbuild": "rm -rf /root/stuff/DrawAndGuess/server/src/main/resources/static/drawandguess/* && cp -r build/* /root/stuff/DrawAndGuess/server/src/main/resources/static/drawandguess/",
+    "postbuild": "rm -rf ../server/src/main/resources/static/drawandguess/* && cp -r build/* ../server/src/main/resources/static/drawandguess/",
     "obfuscate": "javascript-obfuscator build --output build --config obfuscator-config.json",
     "build:o": "npm run build && npm run obfuscate && npm run postbuild",
     "test": "react-scripts test",
