@@ -7,7 +7,7 @@ class DrawMessage {
     private String color;
     private double brushSize;
     private String userID;
-    private String eventType; // // TODO: make it an enum ("START", "DRAW", "STOP")
+    private String eventType;
 
     public DrawMessage() {}
 

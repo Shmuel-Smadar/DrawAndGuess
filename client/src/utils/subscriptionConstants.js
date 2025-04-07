@@ -9,10 +9,7 @@ export const APP_REQUEST_WORDS = (roomId) => `/app/room/${roomId}/requestWords`
 export const APP_CHOOSE_WORD = (roomId) => `/app/room/${roomId}/chooseWord`
 export const APP_CLEAR_CANVAS = (roomId) => `/app/room/${roomId}/clearCanvas`
 export const APP_ROOM_CHAT = (roomId) => `/app/room/${roomId}/chat`
-export const APP_ROOM_FILL = (roomId) =>`/app/room/${roomId}/fill`
-export const APP_ROOM_START_DRAWING = (roomId) => `/app/room/${roomId}/startDrawing`
 export const APP_ROOM_DRAW = (roomId) =>  `/app/room/${roomId}/draw`
-export const APP_ROOM_STOP_DRAWING = (roomId) => `/app/room/${roomId}/stopDrawing`
 
 export const USER_TOPIC_ROOM_CREATED = '/user/topic/roomCreated'
 export const USER_TOPIC_NICKNAME = '/user/topic/nickname'

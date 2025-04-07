@@ -11,19 +11,11 @@ public class DrawingService {
     public DrawingService(SimpMessagingTemplate messagingTemplate) {
         this.messagingTemplate = messagingTemplate;
     }
-    public void startDrawing(String roomId, DrawMessage message) {
-        messagingTemplate.convertAndSend("/topic/room/" + roomId + "/drawing", message);
-    }
+
     public void draw(String roomId, DrawMessage message) {
-        messagingTemplate.convertAndSend("/topic/room/" + roomId + "/drawing", message);
-    }
-    public void stopDrawing(String roomId, DrawMessage message) {
         messagingTemplate.convertAndSend("/topic/room/" + roomId + "/drawing", message);
     }
     public void clearCanvas(String roomId, ClearCanvasMessage message) {
         messagingTemplate.convertAndSend("/topic/room/" + roomId + "/clearCanvas", message);
-    }
-    public void fill(String roomId, DrawMessage message) {
-        messagingTemplate.convertAndSend("/topic/room/" + roomId + "/drawing", message);
     }
 }
