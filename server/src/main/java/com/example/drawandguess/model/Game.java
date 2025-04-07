@@ -1,11 +1,9 @@
 package com.example.drawandguess.model;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import static com.example.drawandguess.config.Constants.TOTAL_ROUNDS;
 
 public class Game {
@@ -13,14 +11,11 @@ public class Game {
     private int currentDrawerIndex = -1;
     private String chosenWordEnglish;
     private String chosenWordHebrew;
-    private StringBuilder currentHintBuilder = new StringBuilder();
-    private boolean isFirstHint;
-    private List<Integer> revealOrder = new ArrayList<>();
+    private final Hint hintManager = new Hint();
     private Map<String, Integer> scores = new HashMap<>();
     private int roundCount = 0;
     private boolean gameOver = false;
     private final int totalRounds = TOTAL_ROUNDS;
-    private int hintsUsed = 0;
 
     public void addParticipant(String sessionId) {
         if (!participantSessionIds.contains(sessionId)) {
@@ -67,7 +62,7 @@ public class Game {
         String[] parts = chosenWordCombined.split(" : ");
         this.chosenWordEnglish = parts[0];
         this.chosenWordHebrew = parts.length > 1 ? parts[1] : "";
-        initializeHint();
+        hintManager.initialize(chosenWordEnglish);
     }
 
     public String getChosenWordEnglish() {
@@ -89,10 +84,7 @@ public class Game {
     public void resetRound() {
         this.chosenWordEnglish = null;
         this.chosenWordHebrew = null;
-        this.isFirstHint = true;
-        this.currentHintBuilder.setLength(0);
-        this.revealOrder.clear();
-        this.hintsUsed = 0;
+        hintManager.reset();
     }
 
     public void resetGame() {
@@ -100,9 +92,7 @@ public class Game {
         gameOver = false;
         chosenWordEnglish = null;
         chosenWordHebrew = null;
-        revealOrder.clear();
-        currentHintBuilder.setLength(0);
-        currentDrawerIndex = 0;
+        moveToNextDrawer();
         scores.clear();
     }
 
@@ -115,35 +105,15 @@ public class Game {
     }
 
     public boolean hasMoreHints() {
-        return !revealOrder.isEmpty();
-    }
-
-    private void initializeHint() {
-        int length = chosenWordEnglish.length();
-        currentHintBuilder.setLength(0);
-        currentHintBuilder.append("_".repeat(length));
-        List<Integer> clues = new ArrayList<>();
-        for (int i = 0; i < length; i++) {
-            clues.add(i);
-        }
-        Collections.shuffle(clues);
-        revealOrder = clues;
-        isFirstHint = true;
+        return hintManager.hasMoreHints();
     }
 
     public String nextHint() {
-        if (isFirstHint || revealOrder.isEmpty()) {
-            isFirstHint = false;
-            return currentHintBuilder.toString();
-        }
-        hintsUsed++;
-        int nextIndex = revealOrder.remove(0);
-        currentHintBuilder.setCharAt(nextIndex, chosenWordEnglish.charAt(nextIndex));
-        return currentHintBuilder.toString();
+        return hintManager.nextHint();
     }
 
     public String getCurrentHint() {
-        return currentHintBuilder.toString();
+        return hintManager.getCurrentHint();
     }
 
     public boolean isGameOver() {
@@ -163,6 +133,6 @@ public class Game {
     }
 
     public int getHintsUsed() {
-        return hintsUsed;
+        return hintManager.getHintsUsed();
     }
 }
