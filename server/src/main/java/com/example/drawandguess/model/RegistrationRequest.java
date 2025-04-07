@@ -1,11 +1,11 @@
 package com.example.drawandguess.model;
 
-public class RegistrationMessage {
+public class RegistrationRequest {
     private String nickname;
 
-    public RegistrationMessage() {}
+    public RegistrationRequest() {}
 
-    public RegistrationMessage(String nickname) {
+    public RegistrationRequest(String nickname) {
         this.nickname = nickname;
     }
 

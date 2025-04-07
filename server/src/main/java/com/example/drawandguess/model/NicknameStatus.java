@@ -5,9 +5,6 @@ public class NicknameStatus {
     private String message;
     private String sessionId;
 
-    public NicknameStatus() {
-    }
-
     public NicknameStatus(boolean success, String message) {
         this.success = success;
         this.message = message;

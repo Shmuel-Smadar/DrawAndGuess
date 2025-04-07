@@ -31,10 +31,10 @@ const NicknamePrompt = ({ client, connected, error }) => {
     const trimmedNickname = nicknameInput.trim()
     if (trimmedNickname !== '' && client && connected) {
       currentNickname.current = trimmedNickname
-      const registrationMessage = { nickname: trimmedNickname }
+      const registrationRequest = { nickname: trimmedNickname }
       client.publish({
         destination: APP_REGISTER_NICKNAME,
-        body: JSON.stringify(registrationMessage)
+        body: JSON.stringify(registrationRequest)
       })
     }
   }
