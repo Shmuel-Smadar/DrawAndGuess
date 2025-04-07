@@ -4,13 +4,16 @@ import { floodFill } from '../utils/floodFill'
 import {
   VIRTUAL_WIDTH,
   VIRTUAL_HEIGHT,
-  TOPIC_ROOM_DRAWING,
-  TOPIC_ROOM_CLEAR_CANVAS,
   EVENT_TYPE_START,
   EVENT_TYPE_DRAW,
   EVENT_TYPE_STOP,
   EVENT_TYPE_FILL
 } from '../utils/constants'
+import {
+  TOPIC_ROOM_DRAWING,
+  TOPIC_ROOM_CLEAR_CANVAS,
+  
+} from '../utils/subscriptionConstants'
 
 export const useCanvasSubscriptions = ({ client, roomId, canvasRef, lastPositions }) => {
   const isDrawer = useSelector((state) => state.game.isDrawer)

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { TOPIC_ROOM_PARTICIPANTS } from '../../utils/constants'
+import { TOPIC_ROOM_PARTICIPANTS, APP_GET_PARTICIPANTS } from '../../utils/subscriptionConstants'
 import { PARTICIPANTS_TITLE, DRAWING_INDICATOR_TEXT } from '../../utils/constants'
 import './ParticipantsList.css'
 
@@ -24,7 +24,7 @@ const ParticipantsList = ({ client, height, roomId, username, onDrawerChange }) 
   useEffect(() => {
     if (!client || !roomId) return
     client.publish({
-      destination: `/app/room/${roomId}/getParticipants`,
+      destination: APP_GET_PARTICIPANTS(roomId),
       body: ''
     })
   }, [client, roomId])

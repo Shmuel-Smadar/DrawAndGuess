@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { WINNER_PROMPT_TITLE, WINNER_PROMPT_LABEL, WINNER_PROMPT_SAVE } from '../../utils/constants'
+import { APP_WINNER_MESSAGE } from '../../utils/subscriptionConstants'
 import './WinnerPrompt.css'
 
 export default function WinnerPrompt({ username, client, connected, onClose }) {
@@ -9,7 +10,7 @@ export default function WinnerPrompt({ username, client, connected, onClose }) {
     e.preventDefault()
     if (!username || !client || !connected) return
     client.publish({
-      destination: '/app/winnerMessage',
+      destination: APP_WINNER_MESSAGE,
       body: JSON.stringify({ user: username, message: winnerMessage })
     })
     onClose()

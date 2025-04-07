@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useDispatch } from 'react-redux'
 import { setUsername, setNicknameError, setSessionId } from '../../store/userSlice'
-import { USER_TOPIC_NICKNAME, MAX_NICKNAME_LENGTH, NICKNAME_PROMPT_TITLE, NICKNAME_PLACEHOLDER, JOIN_BUTTON_TEXT } from '../../utils/constants'
+import { MAX_NICKNAME_LENGTH, NICKNAME_PROMPT_TITLE, NICKNAME_PLACEHOLDER, JOIN_BUTTON_TEXT } from '../../utils/constants'
+import { USER_TOPIC_NICKNAME, APP_REGISTER_NICKNAME } from '../../utils/subscriptionConstants'
 import './NicknamePrompt.css'
 
 const NicknamePrompt = ({ client, connected, error }) => {
@@ -32,7 +33,7 @@ const NicknamePrompt = ({ client, connected, error }) => {
       currentNickname.current = trimmedNickname
       const registrationMessage = { nickname: trimmedNickname }
       client.publish({
-        destination: '/app/registerNickname',
+        destination: APP_REGISTER_NICKNAME,
         body: JSON.stringify(registrationMessage)
       })
     }

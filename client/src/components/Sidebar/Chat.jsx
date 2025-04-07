@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
-import DOMPurify from 'dompurify'
 import { useSelector } from 'react-redux'
-import { TOPIC_ROOM_CHAT, SYSTEM_MESSAGE_COLORS, CHAT_TITLE, SCROLL_BUTTON_LABEL, NEW_MESSAGES_LABEL, CHAT_PLACEHOLDER, SEND_BUTTON_TEXT } from '../../utils/constants'
+import DOMPurify from 'dompurify'
+import { SYSTEM_MESSAGE_COLORS, CHAT_TITLE, SCROLL_BUTTON_LABEL, NEW_MESSAGES_LABEL, CHAT_PLACEHOLDER, SEND_BUTTON_TEXT } from '../../utils/constants'
+import { TOPIC_ROOM_CHAT, APP_ROOM_CHAT } from '../../utils/subscriptionConstants'
 import WinnerPrompt from '../Prompt/WinnerPrompt'
 import './Chat.css'
 
@@ -83,7 +84,7 @@ const Chat = ({ client, roomId, username, canChat, width, height }) => {
       type: 'user'
     }
     client.publish({
-      destination: `/app/room/${roomId}/chat`,
+      destination: APP_ROOM_CHAT(roomId),
       body: JSON.stringify(messageData)
     })
     setNewMessage('')

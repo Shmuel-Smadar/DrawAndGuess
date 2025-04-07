@@ -4,11 +4,6 @@ import LeaderboardOverlay from '../Leaderboard/LeaderboardOverlay'
 import RoomTable from './RoomTable'
 import CreditsOverlay from './CreditsOverlay'
 import {
-  TOPIC_ROOMS,
-  APP_GET_ROOMS,
-  APP_CREATE_ROOM,
-  APP_JOIN_ROOM,
-  USER_TOPIC_ROOM_CREATED,
   MAX_ROOM_NAME_LENGTH,
   LOBBY_TITLE,
   NEW_ROOM_PLACEHOLDER,
@@ -16,6 +11,13 @@ import {
   ROOM_NAME_EMPTY_ERROR,
   SERVER_CONNECTION_ERROR
 } from '../../utils/constants'
+import {
+  TOPIC_ROOMS,
+  APP_GET_ROOMS,
+  APP_CREATE_ROOM,
+  APP_JOIN_ROOM,
+  USER_TOPIC_ROOM_CREATED
+} from '../../utils/subscriptionConstants'
 
 function Lobby({ client, connected, setRoom }) {
   const [newRoomName, setNewRoomName] = useState('')

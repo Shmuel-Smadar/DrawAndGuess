@@ -5,6 +5,7 @@ import ClearIcon from '../../assets/trash-bin.png'
 import BrushIcon from '../../assets/paint-brush.png'
 import BucketIcon from '../../assets/paint-bucket.png'
 import { COLOR_OPTIONS, BRUSH_SIZES } from '../../utils/constants'
+import { APP_CLEAR_CANVAS } from '../../utils/subscriptionConstants'
 import './ColorPicker.css'
 
 function ColorPicker({ client, userID, roomId, isDrawer }) {
@@ -17,7 +18,7 @@ function ColorPicker({ client, userID, roomId, isDrawer }) {
     if (!client || !client.connected || !roomId) return
     const message = { userID }
     client.publish({
-      destination: `/app/room/${roomId}/clearCanvas`,
+      destination: APP_CLEAR_CANVAS(roomId),
       body: JSON.stringify(message)
     })
   }

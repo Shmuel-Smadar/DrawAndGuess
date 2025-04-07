@@ -5,7 +5,9 @@ import RightSidebar from './Sidebar/RightSidebar'
 import WordSelection from './Prompt/WordSelection'
 import useGameSubscriptions from '../hooks/useGameSubscriptions'
 import { setIsDrawer, setShowWordSelection } from '../store/gameSlice'
-import { APP_REQUEST_WORDS, APP_CHOOSE_WORD, CANVAS_WIDTH_RATIO, CANVAS_HEIGHT_RATIO, GAME_TITLE } from '../utils/constants'
+import { CANVAS_WIDTH_RATIO, CANVAS_HEIGHT_RATIO, GAME_TITLE } from '../utils/constants'
+import { APP_REQUEST_WORDS, APP_CHOOSE_WORD } from '../utils/subscriptionConstants'
+
 import './Game.css'
 
 function Game({ client, connected, username, room }) {

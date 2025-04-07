@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 import { setWordOptions, setShowWordSelection } from '../store/gameSlice'
-import { USER_TOPIC_WORD_OPTIONS, TOPIC_ROOM_CHAT } from '../utils/constants'
+import { USER_TOPIC_WORD_OPTIONS, TOPIC_ROOM_CHAT } from '../utils/subscriptionConstants'
 
 const useGameSubscriptions = (client, connected, room, isDrawer, requestWordOptions) => {
   const dispatch = useDispatch()

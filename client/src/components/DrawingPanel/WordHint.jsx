@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { TOPIC_ROOM_WORD_HINT, APP_GET_CURRENT_HINT } from '../../utils/constants'
+import { TOPIC_ROOM_WORD_HINT, APP_GET_CURRENT_HINT } from '../../utils/subscriptionConstants'
 import './WordHint.css'
 
 const WordHint = ({ client, roomId, isDrawer }) => {

@@ -9,6 +9,7 @@ import {
   EVENT_TYPE_STOP,
   EVENT_TYPE_FILL
 } from '../utils/constants'
+import { APP_ROOM_FILL, APP_ROOM_START_DRAWING, APP_ROOM_DRAW, APP_ROOM_STOP_DRAWING } from '../utils/subscriptionConstants'
 
 export const useDrawingHandlers = ({
   client,
@@ -50,7 +51,7 @@ export const useDrawingHandlers = ({
         }
 
         client.publish({
-          destination: `/app/room/${roomId}/fill`,
+          destination: APP_ROOM_FILL(roomId),
           body: JSON.stringify(msg)
         })
 
@@ -76,7 +77,7 @@ export const useDrawingHandlers = ({
         eventType: EVENT_TYPE_START
       }
       client.publish({
-        destination: `/app/room/${roomId}/startDrawing`,
+        destination: APP_ROOM_START_DRAWING(roomId),
         body: JSON.stringify(message)
       })
     },
@@ -113,7 +114,7 @@ export const useDrawingHandlers = ({
       }
 
       client.publish({
-        destination: `/app/room/${roomId}/draw`,
+        destination: APP_ROOM_DRAW(roomId),
         body: JSON.stringify(msg)
       })
     },
@@ -141,7 +142,7 @@ export const useDrawingHandlers = ({
       const msg = { userID: String(userID), eventType: EVENT_TYPE_STOP }
 
       client.publish({
-        destination: `/app/room/${roomId}/stopDrawing`,
+        destination: APP_ROOM_STOP_DRAWING(roomId),
         body: JSON.stringify(msg)
       })
     },
