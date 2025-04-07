@@ -10,13 +10,9 @@ import com.example.drawandguess.model.MessageType;
 import com.example.drawandguess.model.ClearCanvasMessage;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
-import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ScheduledFuture;
-import static com.example.drawandguess.config.Constants.HINT_INTERVAL_SECONDS;
 import static com.example.drawandguess.config.Constants.GAME_ENDED_MSG;
 import static com.example.drawandguess.config.Constants.NO_ONE_GUESSED_MSG;
 
@@ -26,11 +22,11 @@ public class GameService {
     private final ParticipantService participantService;
     private final RoomService roomService;
     private final TaskScheduler taskScheduler;
-    private final ConcurrentHashMap<String, ScheduledFuture<?>> hintTasks = new ConcurrentHashMap<>();
     private final LeaderboardService leaderboardService;
     private final MessageService messageService;
     private final WordService wordService;
     private final DrawingService drawingService;
+    private final HintService hintService;
 
     public GameService(
             ChatService chatService,
@@ -40,7 +36,8 @@ public class GameService {
             LeaderboardService leaderboardService,
             MessageService messageService,
             WordService wordService,
-            DrawingService drawingService
+            DrawingService drawingService,
+            HintService hintService
     ) {
         this.chatService = chatService;
         this.participantService = participantService;
@@ -50,6 +47,7 @@ public class GameService {
         this.messageService = messageService;
         this.wordService = wordService;
         this.drawingService = drawingService;
+        this.hintService = hintService;
     }
 
     public WordOptions requestWords(String roomId, String sessionId) {
@@ -75,7 +73,8 @@ public class GameService {
                     String.valueOf(game.getTotalRounds())
             );
             chatService.sendChatMessage(roomId, msg);
-            startHintProgression(roomId);
+            // Start hint progression using HintService and pass a callback to handle no remaining hints
+            hintService.startHintProgression(roomId, game, () -> handleNoGuess(roomId, game));
         }
     }
 
@@ -101,7 +100,8 @@ public class GameService {
             game.addScore(drawerName, drawerPoints);
         }
         roomService.broadcastParticipants(roomId);
-        stopHintProgression(roomId);
+        // Stop hint progression via HintService
+        hintService.stopHintProgression(roomId);
         drawingService.clearCanvas(roomId, new ClearCanvasMessage("system"));
         game.nextRound();
         if (game.isGameOver()) {
@@ -113,33 +113,9 @@ public class GameService {
         }
     }
 
-    public void startHintProgression(String roomId) {
-        if (hintTasks.containsKey(roomId)) return;
-        Room room = roomService.getRoom(roomId);
-        if (room == null) return;
-        Runnable r = () -> {
-            Game g = room.getGame();
-            synchronized (g) {
-                if (!g.hasMoreHints()) {
-                    handleNoGuess(roomId, g);
-                    return;
-                }
-                String hint = g.nextHint();
-                sendHintToParticipants(roomId, hint);
-                if (!g.hasMoreHints()) handleNoGuess(roomId, g);
-            }
-        };
-        ScheduledFuture<?> future = taskScheduler.scheduleAtFixedRate(r, Duration.ofSeconds(HINT_INTERVAL_SECONDS));
-        hintTasks.put(roomId, future);
-    }
-
-    public void stopHintProgression(String roomId) {
-        ScheduledFuture<?> f = hintTasks.remove(roomId);
-        if (f != null) f.cancel(false);
-    }
-
     private void handleNoGuess(String roomId, Game game) {
-        stopHintProgression(roomId);
+        // Stop hint progression via HintService
+        hintService.stopHintProgression(roomId);
         drawingService.clearCanvas(roomId, new ClearCanvasMessage("system"));
         game.nextRound();
         if (game.isGameOver()) {
@@ -151,20 +127,10 @@ public class GameService {
         }
     }
 
-    private void sendHintToParticipants(String roomId, String currentHint) {
-        Room r = roomService.getRoom(roomId);
-        if (r == null) return;
-        List<String> ids = r.getGame().getParticipantSessionIds();
-        String d = r.getGame().getCurrentDrawer();
-        ids.stream()
-                .filter(s -> !s.equals(d))
-                .forEach(s -> chatService.sendWordHint(s, roomId, currentHint));
-    }
-
-    private void updateDrawerAndBroadcast(String roomId, Game g) {
-        String d = g.getCurrentDrawer();
+    private void updateDrawerAndBroadcast(String roomId, Game game) {
+        String currentDrawer = game.getCurrentDrawer();
         participantService.getAllParticipants().values().forEach(
-                p -> participantService.setDrawer(p.getSessionId(), p.getSessionId().equals(d))
+                p -> participantService.setDrawer(p.getSessionId(), p.getSessionId().equals(currentDrawer))
         );
         roomService.broadcastParticipants(roomId);
     }
@@ -179,7 +145,7 @@ public class GameService {
         game.removeParticipant(sessionId);
         ChatMessage leaveMsg = messageService.systemMessage(MessageType.PARTICIPANT_LEFT, p.getUsername());
         chatService.sendChatMessage(roomId, leaveMsg);
-        if(game.isGameOver()) {
+        if (game.isGameOver()) {
             roomService.broadcastParticipants(roomId);
             if (game.getParticipantSessionIds().isEmpty()) {
                 roomService.deleteRoom(roomId);
@@ -189,7 +155,8 @@ public class GameService {
         }
         if (wasDrawer) {
             game.resetRound();
-            stopHintProgression(roomId);
+            // Stop hint progression if the current drawer left
+            hintService.stopHintProgression(roomId);
             if (!game.getParticipantSessionIds().isEmpty()) {
                 String newDrawerId = game.getCurrentDrawer();
                 if (newDrawerId != null) {
@@ -239,7 +206,8 @@ public class GameService {
         ChatMessage m = messageService.systemMessage(MessageType.GAME_ENDED, sb.toString());
         chatService.sendChatMessage(roomId, m);
         handleWinnerAnnouncement(roomId, game);
-        hintTasks.remove(roomId);
+        // Ensure hint progression is stopped
+        hintService.stopHintProgression(roomId);
         scheduleNewGame(roomId, game);
     }
 
@@ -260,9 +228,8 @@ public class GameService {
         }
         if (singleTopUserSessionId != null && !tie) {
             String winnerName = participantService.findParticipantBySessionId(singleTopUserSessionId).getUsername();
-            int winnerScore = game.getScore(winnerName);
-            Map<String,Integer> singleMap = new HashMap<>();
-            singleMap.put(winnerName, winnerScore);
+            Map<String, Integer> singleMap = new HashMap<>();
+            singleMap.put(winnerName, game.getScore(winnerName));
             leaderboardService.saveScores(singleMap);
             ChatMessage winner = messageService.winnerAnnounce(singleTopUserSessionId, winnerName + " is the winner!");
             chatService.sendChatMessage(roomId, winner);
@@ -275,10 +242,7 @@ public class GameService {
             if (!game.getParticipantSessionIds().isEmpty()) {
                 String firstDrawerId = game.getCurrentDrawer();
                 participantService.getAllParticipants().values().forEach(
-                        p -> participantService.setDrawer(
-                                p.getSessionId(),
-                                p.getSessionId().equals(firstDrawerId)
-                        )
+                        p -> participantService.setDrawer(p.getSessionId(), p.getSessionId().equals(firstDrawerId))
                 );
                 ChatMessage newGameMsg = messageService.systemMessage(
                         MessageType.NEW_GAME_STARTED,
