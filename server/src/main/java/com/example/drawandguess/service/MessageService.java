@@ -17,7 +17,6 @@ public class MessageService {
     public ChatMessage systemMessage(MessageType type, String... args) {
         ChatMessage msg = new ChatMessage();
         msg.setSenderSessionId("system");
-        msg.setType("system");
         msg.setMessageType(type);
         switch (type) {
             case ROUND_STARTED ->
@@ -44,7 +43,6 @@ public class MessageService {
         ChatMessage msg = new ChatMessage();
         msg.setSenderSessionId(sessionId);
         msg.setText(text);
-        msg.setType("user");
         msg.setMessageType(null);
         return msg;
     }
@@ -52,7 +50,6 @@ public class MessageService {
     public ChatMessage winnerAnnounce(String winnerSessionId, String text) {
         ChatMessage msg = new ChatMessage();
         msg.setSenderSessionId("system");
-        msg.setType("system");
         msg.setMessageType(MessageType.WINNER_ANNOUNCED);
         msg.setWinnerSessionId(winnerSessionId);
         msg.setText(text);

@@ -29,7 +29,7 @@ const Chat = ({ client, roomId, username, canChat, width, height }) => {
         setShowScrollButton(true)
         setUnreadCount((prevCount) => prevCount + 1)
       }
-      if (chatMessage.type === 'system' && chatMessage.messageType === 'WINNER_ANNOUNCED') {
+      if (chatMessage.senderSessionId === 'system' && chatMessage.messageType === 'WINNER_ANNOUNCED') {
         if (chatMessage.winnerSessionId === sessionId) {
           setShowWinnerPrompt(true)
         }
@@ -98,7 +98,7 @@ const Chat = ({ client, roomId, username, canChat, width, height }) => {
       <div className="chat-window" ref={chatWindowRef}>
         {messages.map((message, index) => {
           const sanitizedText = DOMPurify.sanitize(message.text)
-          if (message.type === 'system') {
+          if (message.senderSessionId === 'system') {
             return (
               <div
                 key={index}

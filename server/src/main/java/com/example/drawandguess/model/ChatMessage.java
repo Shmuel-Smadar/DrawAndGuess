@@ -4,7 +4,6 @@ public class ChatMessage {
     private String text;
     private String senderSessionId;
     private String senderUsername;
-    private String type;
     private MessageType messageType;
     private String winnerSessionId;
 
@@ -15,7 +14,6 @@ public class ChatMessage {
         this.text = text;
         this.senderSessionId = senderSessionId;
         this.senderUsername = senderUsername;
-        this.type = type;
         this.messageType = messageType;
         this.winnerSessionId = winnerSessionId;
     }
@@ -42,14 +40,6 @@ public class ChatMessage {
 
     public void setSenderUsername(String senderUsername) {
         this.senderUsername = senderUsername;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
     }
 
     public MessageType getMessageType() {

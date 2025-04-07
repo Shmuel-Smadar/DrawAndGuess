@@ -20,7 +20,7 @@ const useGameSubscriptions = (client, connected, room, isDrawer, requestWordOpti
     if (!client || !connected || !room) return
     const chatSub = client.subscribe(TOPIC_ROOM_CHAT(room.roomId), (msg) => {
       const message = JSON.parse(msg.body)
-      if (message.type === 'system' && message.messageType === 'NEW_GAME_STARTED' && isDrawer) {
+      if (message.senderSessionId === 'system' && message.messageType === 'NEW_GAME_STARTED' && isDrawer) {
         requestWordOptions()
       }
     })
