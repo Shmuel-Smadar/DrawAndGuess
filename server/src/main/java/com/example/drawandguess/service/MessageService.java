@@ -43,7 +43,7 @@ public class MessageService {
         ChatMessage msg = new ChatMessage();
         msg.setSenderSessionId(sessionId);
         msg.setText(text);
-        msg.setMessageType(null);
+        msg.setMessageType(MessageType.CHAT_MESSAGE);
         return msg;
     }
 
