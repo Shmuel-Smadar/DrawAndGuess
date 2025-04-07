@@ -43,7 +43,7 @@ public class Hint {
     }
 
     public String getCurrentHint() {
-        return currentHintBuilder.toString();
+        return (currentHintBuilder == null) ? "" : currentHintBuilder.toString();
     }
 
     public int getHintsUsed() {
