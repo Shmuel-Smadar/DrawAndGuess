@@ -68,16 +68,10 @@ public class LeaderboardService {
         }
     }
 
-    public void saveScores(Map<String, Integer> scores) {
+    public void saveScores(String username, int newScore) {
         if (!useDatabase) {
-            for (Map.Entry<String, Integer> e : scores.entrySet()) {
-                updateScoreInMemory(e.getKey(), e.getValue());
-            }
-            return;
+                updateScoreInMemory(username, newScore);
         }
-        for (Map.Entry<String, Integer> entry : scores.entrySet()) {
-            String username = entry.getKey();
-            int newScore = entry.getValue();
             Integer currentScore = getExistingScore(username);
             if (currentScore == null) {
                 jdbcTemplate.update(
@@ -93,7 +87,7 @@ public class LeaderboardService {
                         username
                 );
             }
-        }
+
     }
 
     public void updateWinnerMessage(String username, String message) {
@@ -103,8 +97,8 @@ public class LeaderboardService {
                 inMemoryLeaderboard.put(username, "0:" + message);
             } else {
                 String[] arr = existingValue.split(":", 2);
-                String sscore = arr[0];
-                inMemoryLeaderboard.put(username, sscore + ":" + message);
+                String scoreAsString = arr[0];
+                inMemoryLeaderboard.put(username, scoreAsString + ":" + message);
             }
             return;
         }

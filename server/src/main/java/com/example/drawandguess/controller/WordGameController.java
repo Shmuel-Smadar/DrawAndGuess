@@ -40,7 +40,7 @@ WordGameController {
     @MessageMapping("/room/{roomId}/correctGuess")
     public void handleCorrectGuess(@DestinationVariable String roomId, @Payload String guess, SimpMessageHeaderAccessor headerAccessor) {
         String sessionId = headerAccessor.getSessionId();
-        gameService.correctGuess(roomId, guess, sessionId);
+        gameService.handleGuess(roomId, guess, sessionId);
     }
 
     @MessageMapping("/room/{roomId}/getCurrentHint")

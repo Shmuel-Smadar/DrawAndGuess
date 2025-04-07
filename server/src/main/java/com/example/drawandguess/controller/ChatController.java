@@ -20,6 +20,6 @@ public class ChatController {
     @MessageMapping("/room/{roomId}/chat")
     public void processChatMessage(@DestinationVariable String roomId, @Payload ChatMessage chatMessage) {
         chatService.sendChatMessage(roomId, chatMessage);
-        gameService.correctGuess(roomId, chatMessage.getText(), chatMessage.getSenderSessionId());
+        gameService.handleGuess(roomId, chatMessage.getText(), chatMessage.getSenderSessionId());
     }
 }

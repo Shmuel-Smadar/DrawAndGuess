@@ -1,10 +1,7 @@
 package com.example.drawandguess.service;
 
 import com.example.drawandguess.config.Constants;
-import com.example.drawandguess.model.ChatMessage;
 import com.example.drawandguess.model.Game;
-import com.example.drawandguess.model.ClearCanvasMessage;
-import com.example.drawandguess.model.MessageType;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -27,5 +24,23 @@ public class ScoringService {
             int drawerPoints = Constants.DRAWER_BASE_POINTS * multiplier;
             game.addScore(drawerName, drawerPoints);
         }
+    }
+
+    public String getWinnerSessionId(Game game) {
+        String winnerSessionId = null;
+        int maxScore = -1;
+        boolean tie = false;
+        for (String pid : game.getParticipantSessionIds()) {
+            String username = participantService.findParticipantBySessionId(pid).getUsername();
+            int score = game.getScore(username);
+            if (score > maxScore) {
+                maxScore = score;
+                winnerSessionId = pid;
+                tie = false;
+            } else if (score == maxScore) {
+                tie = true;
+            }
+        }
+        return (winnerSessionId != null && !tie) ? winnerSessionId : null;
     }
 }
