@@ -15,11 +15,7 @@ const useCanvas = ({ client, userID, roomId }) => {
   const lastPositions = useRef({});
   const [isDrawing, setIsDrawing] = useState(false);
 
-  const resizeCanvas = useCanvasResize(canvasRef);
-
-  useEffect(() => {
-    resizeCanvas();
-  }, [resizeCanvas]);
+  useCanvasResize(canvasRef);
 
   useEffect(() => {
     const canvas = canvasRef.current;

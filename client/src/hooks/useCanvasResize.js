@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import { ASPECT_RATIO, CANVAS_WIDTH_RATIO, CANVAS_HEIGHT_RATIO } from '../utils/constants';
 
 export const useCanvasResize = (canvasRef) => {
@@ -27,6 +27,13 @@ export const useCanvasResize = (canvasRef) => {
     ctx.lineWidth = 2;
     ctx.lineCap = 'round';
   }, [canvasRef]);
+
+  useEffect(() => {
+    const handleResize = () => resizeCanvas();
+    window.addEventListener('resize', handleResize);
+    resizeCanvas();
+    return () => window.removeEventListener('resize', handleResize);
+  }, [resizeCanvas]);
 
   return resizeCanvas;
 };

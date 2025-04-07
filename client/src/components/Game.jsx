@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import DrawingArea from './Drawing/DrawingArea'
 import RightSidebar from './Sidebar/RightSidebar'
@@ -15,6 +15,21 @@ function Game({ client, connected, username, room }) {
   const isDrawer = useSelector(state => state.game.isDrawer)
   const showWordSelection = useSelector(state => state.game.showWordSelection)
   const wordOptions = useSelector(state => state.game.wordOptions)
+  const [windowSize, setWindowSize] = useState({
+    width: window.innerWidth,
+    height: window.innerHeight
+  })
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowSize({
+        width: window.innerWidth,
+        height: window.innerHeight
+      });
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [])
 
   const requestWordOptions = useCallback(() => {
     if (!client || !connected || !room) return
@@ -60,8 +75,8 @@ function Game({ client, connected, username, room }) {
           roomId={room.roomId}
           username={username}
           canChat={!isDrawer}
-          width={window.innerWidth * CANVAS_WIDTH_RATIO}
-          height={window.innerHeight * CANVAS_HEIGHT_RATIO}
+          width={windowSize.width * CANVAS_WIDTH_RATIO}
+          height={windowSize.height * CANVAS_HEIGHT_RATIO}
           onDrawerChange={handleDrawerChange}
         />
       </div>
