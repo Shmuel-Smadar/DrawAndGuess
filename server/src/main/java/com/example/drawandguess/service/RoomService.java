@@ -60,7 +60,7 @@ public class RoomService {
     public void joinRoom(String sessionId, String roomId) {
         Room room = rooms.get(roomId);
         if (room == null) return;
-        
+
         Game game = room.getGame();
         game.addParticipant(sessionId);
         if(game.isGameOver()) {
@@ -73,8 +73,15 @@ public class RoomService {
             participantService.setDrawer(newDrawerId, true);
         }
         String nickname = participantService.findParticipantBySessionId(sessionId).getUsername();
-        ChatMessage msg = messageService.systemMessage(MessageType.PARTICIPANT_JOINED, nickname);
-        chatService.sendChatMessage(roomId, msg);
+
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                ChatMessage msg = messageService.systemMessage(MessageType.PARTICIPANT_JOINED, nickname);
+                chatService.sendChatMessage(roomId, msg);
+            }
+        }, TIMER_DELAY_MS);
+
         broadcastParticipants(roomId);
         broadcastRooms();
     }
