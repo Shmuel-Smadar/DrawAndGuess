@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.LinkedHashMap;
 import static com.example.drawandguess.config.Constants.LEADERBOARD_QUEUE;
+import static com.example.drawandguess.config.Constants.SCORE_SEPARATOR;
 
 @Service
 public class LeaderboardService {
@@ -26,7 +27,7 @@ public class LeaderboardService {
 
     @JmsListener(destination = LEADERBOARD_QUEUE)
     public void receiveScoreUpdate(String message) {
-        String[] messageParts = message.split(":");
+        String[] messageParts = message.split(SCORE_SEPARATOR);
         if (messageParts.length != 2) {
             return;
         }
@@ -36,19 +37,19 @@ public class LeaderboardService {
     }
 
     public void updateScore(String username, int score) {
-        jmsTemplate.convertAndSend(LEADERBOARD_QUEUE, username + ":" + score);
+        jmsTemplate.convertAndSend(LEADERBOARD_QUEUE, username + SCORE_SEPARATOR + score);
     }
 
     private void updateScoreInMemory(String username, int newScore) {
         String existingValue = inMemoryLeaderboard.get(username);
         if (existingValue == null) {
-            inMemoryLeaderboard.put(username, newScore + ":");
+            inMemoryLeaderboard.put(username, newScore + SCORE_SEPARATOR);
         } else {
-            String[] scoreParts = existingValue.split(":", 2);
+            String[] scoreParts = existingValue.split(SCORE_SEPARATOR, 2);
             int oldScore = Integer.parseInt(scoreParts[0]);
             String oldMessage = scoreParts.length > 1 ? scoreParts[1] : "";
             int maxScore = Math.max(oldScore, newScore);
-            inMemoryLeaderboard.put(username, maxScore + ":" + oldMessage);
+            inMemoryLeaderboard.put(username, maxScore + SCORE_SEPARATOR + oldMessage);
         }
     }
 
@@ -76,7 +77,10 @@ public class LeaderboardService {
 
     public void updateWinnerMessage(String username, String message) {
         if (useDatabase) {
-            String winnerMessage = message == null ? "" : message;
+            String winnerMessage = message;
+            if(winnerMessage == null)
+                winnerMessage = "";
+
             Integer existingScore = getExistingScore(username);
             if (existingScore != null) {
                 jdbcTemplate.update("UPDATE leaderboard SET message = ? WHERE username = ?", winnerMessage, username);
@@ -84,11 +88,11 @@ public class LeaderboardService {
         } else {
             String existingValue = inMemoryLeaderboard.get(username);
             if (existingValue == null) {
-                inMemoryLeaderboard.put(username, "0:" + message);
+                inMemoryLeaderboard.put(username, "0" + SCORE_SEPARATOR + message);
             } else {
-                String[] scoreParts = existingValue.split(":", 2);
+                String[] scoreParts = existingValue.split(SCORE_SEPARATOR, 2);
                 String scoreString = scoreParts[0];
-                inMemoryLeaderboard.put(username, scoreString + ":" + message);
+                inMemoryLeaderboard.put(username, scoreString + SCORE_SEPARATOR + message);
             }
         }
     }
@@ -103,19 +107,31 @@ public class LeaderboardService {
                 if (winnerMessage == null) {
                     winnerMessage = "";
                 }
-                databaseLeaderboard.put(username, score + ":" + winnerMessage);
+                databaseLeaderboard.put(username, score + SCORE_SEPARATOR + winnerMessage);
             });
             return databaseLeaderboard;
         } else {
-            LinkedHashMap<String, String> sortedLeaderboard = new LinkedHashMap<>();
-            inMemoryLeaderboard.entrySet().stream()
-                    .sorted((record1, record2) -> {
-                        int firstScore = Integer.parseInt(record1.getValue().split(":", 2)[0]);
-                        int secondScore = Integer.parseInt(record2.getValue().split(":", 2)[0]);
-                        return Integer.compare(secondScore, firstScore);
-                    })
-                    .forEachOrdered(record -> sortedLeaderboard.put(record.getKey(), record.getValue()));
-            return sortedLeaderboard;
+            return inMemoryLeaderboard;
         }
+    }
+
+    public java.util.List<String> getSortedLeaderboard() {
+        java.util.Map<String, String> board = getLeaderboard();
+        java.util.List<String> data = new java.util.ArrayList<>();
+        for (java.util.Map.Entry<String, String> e : board.entrySet()) {
+            String username = e.getKey();
+            String[] parts = e.getValue().split(SCORE_SEPARATOR, 2);
+            String score = parts[0];
+            String msg = parts.length > 1 ? parts[1] : "";
+            data.add(username + SCORE_SEPARATOR + score + SCORE_SEPARATOR + msg);
+        }
+        data.sort((a, b) -> {
+            String[] aa = a.split(SCORE_SEPARATOR, 3);
+            String[] bb = b.split(SCORE_SEPARATOR, 3);
+            int scoreA = Integer.parseInt(aa[1]);
+            int scoreB = Integer.parseInt(bb[1]);
+            return Integer.compare(scoreB, scoreA);
+        });
+        return data;
     }
 }

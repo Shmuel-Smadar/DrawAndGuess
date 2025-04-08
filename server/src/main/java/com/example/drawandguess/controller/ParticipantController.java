@@ -1,5 +1,6 @@
 package com.example.drawandguess.controller;
 
+import com.example.drawandguess.config.Constants;
 import com.example.drawandguess.model.NicknameStatus;
 import com.example.drawandguess.model.RegistrationRequest;
 import com.example.drawandguess.service.ParticipantService;
@@ -17,11 +18,15 @@ public class ParticipantController {
         this.participantService = participantService;
     }
 
-    @MessageMapping("/registerNickname")
-    @SendToUser("/topic/nickname")
+    @MessageMapping(Constants.REGISTER_NICKNAME)
+    @SendToUser(Constants.NICKNAME_TOPIC)
     public NicknameStatus registerNickname(@Payload RegistrationRequest request, SimpMessageHeaderAccessor headerAccessor) {
         String sessionId = headerAccessor.getSessionId();
-        NicknameStatus status = participantService.registerParticipant(sessionId, request.getNickname());
+        String nickname = request.getNickname().trim();
+        if (!nickname.matches(Constants.NICKNAME_REGEX)) {
+            return new NicknameStatus(false, Constants.INVALID_NICKNAME_MSG);
+        }
+        NicknameStatus status = participantService.registerParticipant(sessionId, nickname);
         status.setSessionId(sessionId);
         return status;
     }

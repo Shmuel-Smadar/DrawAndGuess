@@ -1,8 +1,8 @@
 package com.example.drawandguess.controller;
 
+import com.example.drawandguess.config.Constants;
 import com.example.drawandguess.model.Participant;
 import com.example.drawandguess.model.Room;
-import com.example.drawandguess.service.ParticipantService;
 import com.example.drawandguess.service.RoomService;
 import com.example.drawandguess.service.GameService;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -22,58 +22,54 @@ import java.util.stream.Collectors;
 @Controller
 public class RoomController {
     private final RoomService roomService;
-    private final ParticipantService participantService;
     private final SimpMessagingTemplate messagingTemplate;
     private final GameService gameService;
 
-    public RoomController(
-            RoomService roomService,
-            ParticipantService participantService,
-            SimpMessagingTemplate messagingTemplate,
-            GameService gameService
-    ) {
+    public RoomController(RoomService roomService, SimpMessagingTemplate messagingTemplate, GameService gameService) {
         this.roomService = roomService;
-        this.participantService = participantService;
         this.messagingTemplate = messagingTemplate;
         this.gameService = gameService;
     }
 
-    @MessageMapping("/createRoom")
-    @SendToUser("/topic/roomCreated")
+    @MessageMapping(Constants.CREATE_ROOM)
+    @SendToUser(Constants.ROOM_CREATED_TOPIC)
     public Room createRoom(@Payload String roomName, SimpMessageHeaderAccessor headerAccessor) {
+        if (roomName == null || roomName.length() > Constants.MAX_ROOM_NAME_LENGTH) {
+            return null;
+        }
         Room room = roomService.createRoom(roomName);
         String sessionId = headerAccessor.getSessionId();
         roomService.joinRoom(sessionId, room.getRoomId());
         return room;
     }
 
-    @MessageMapping("/joinRoom")
+    @MessageMapping(Constants.JOIN_ROOM)
     public void joinRoom(@Payload String roomId, SimpMessageHeaderAccessor headerAccessor) {
         String sessionId = headerAccessor.getSessionId();
         roomService.joinRoom(sessionId, roomId);
     }
 
-    @MessageMapping("/leaveRoom")
+    @MessageMapping(Constants.LEAVE_ROOM)
     public void leaveRoom(@Payload String roomId, SimpMessageHeaderAccessor headerAccessor) {
         String sessionId = headerAccessor.getSessionId();
         gameService.userLeftRoom(roomId, sessionId);
     }
 
-    @MessageMapping("/getRooms")
-    @SendTo("/topic/rooms")
+    @MessageMapping(Constants.GET_ROOMS)
+    @SendTo(Constants.TOPIC_ROOMS)
     public Collection<?> getRooms() {
         return roomService.getAllRooms().stream().map(room -> {
             Map<String, Object> roomInfo = new HashMap<>();
-            roomInfo.put("roomName", room.getRoomName());
-            roomInfo.put("roomId", room.getRoomId());
-            roomInfo.put("numberOfParticipants", room.getGame().getParticipantSessionIds().size());
+            roomInfo.put(Constants.ROOM_NAME_KEY, room.getRoomName());
+            roomInfo.put(Constants.ROOM_ID_KEY, room.getRoomId());
+            roomInfo.put(Constants.NUMBER_OF_PARTICIPANTS_KEY, room.getGame().getParticipantSessionIds().size());
             return roomInfo;
         }).collect(Collectors.toList());
     }
 
-    @MessageMapping("/room/{roomId}/getParticipants")
+    @MessageMapping(Constants.PARTICIPANTS_MAPPING)
     public void handleParticipantsRequest(@DestinationVariable String roomId) {
         List<Participant> participants = roomService.getParticipants(roomId);
-        messagingTemplate.convertAndSend("/topic/room/" + roomId + "/participants", participants);
+        messagingTemplate.convertAndSend(Constants.TOPIC_ROOM_PREFIX + roomId + Constants.PARTICIPANTS_ENDPOINT, participants);
     }
 }

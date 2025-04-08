@@ -1,5 +1,6 @@
 package com.example.drawandguess.controller;
 
+import com.example.drawandguess.config.Constants;
 import com.example.drawandguess.model.ChatMessage;
 import com.example.drawandguess.service.ChatService;
 import com.example.drawandguess.service.GameService;
@@ -17,8 +18,12 @@ public class ChatController {
         this.gameService = gameService;
         this.chatService = chatService;
     }
-    @MessageMapping("/room/{roomId}/chat")
+
+    @MessageMapping(Constants.CHAT_MAPPING)
     public void processChatMessage(@DestinationVariable String roomId, @Payload ChatMessage chatMessage) {
+        if (chatMessage.getText() == null || chatMessage.getText().length() > Constants.MAX_CHAT_MESSAGE_LENGTH) {
+            return;
+        }
         chatService.sendChatMessage(roomId, chatMessage);
         gameService.handleGuess(roomId, chatMessage.getText(), chatMessage.getSenderSessionId());
     }

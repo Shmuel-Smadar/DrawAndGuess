@@ -1,5 +1,6 @@
 package com.example.drawandguess.controller;
 
+import com.example.drawandguess.config.Constants;
 import com.example.drawandguess.model.WordOptions;
 import com.example.drawandguess.service.GameService;
 import com.example.drawandguess.service.RoomService;
@@ -12,41 +13,39 @@ import org.springframework.stereotype.Controller;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 
 @Controller
-public class
-WordGameController {
+public class GameLogicController {
     private final GameService gameService;
     private final RoomService roomService;
     private final SimpMessagingTemplate messagingTemplate;
 
-    public WordGameController(GameService gameService, RoomService roomService, SimpMessagingTemplate messagingTemplate) {
+    public GameLogicController(GameService gameService, RoomService roomService, SimpMessagingTemplate messagingTemplate) {
         this.gameService = gameService;
         this.roomService = roomService;
         this.messagingTemplate = messagingTemplate;
     }
 
-    @MessageMapping("/room/{roomId}/requestWords")
-    @SendToUser("/topic/wordOptions")
+    @MessageMapping(Constants.REQUEST_WORDS_MAPPING)
+    @SendToUser(Constants.WORD_OPTIONS_TOPIC)
     public WordOptions handleWordRequest(@DestinationVariable String roomId, SimpMessageHeaderAccessor headerAccessor) {
         String sessionId = headerAccessor.getSessionId();
         return gameService.requestWords(roomId, sessionId);
     }
 
-    @MessageMapping("/room/{roomId}/chooseWord")
+    @MessageMapping(Constants.CHOOSE_WORD_MAPPING)
     public void handleWordChosen(@DestinationVariable String roomId, @Payload String chosenWord, SimpMessageHeaderAccessor headerAccessor) {
         String sessionId = headerAccessor.getSessionId();
         gameService.chooseWord(roomId, sessionId, chosenWord);
     }
 
-    @MessageMapping("/room/{roomId}/correctGuess")
+    @MessageMapping(Constants.CORRECT_GUESS_MAPPING)
     public void handleCorrectGuess(@DestinationVariable String roomId, @Payload String guess, SimpMessageHeaderAccessor headerAccessor) {
         String sessionId = headerAccessor.getSessionId();
         gameService.handleGuess(roomId, guess, sessionId);
     }
 
-    @MessageMapping("/room/{roomId}/getCurrentHint")
+    @MessageMapping(Constants.CURRENT_HINT_MAPPING)
     public void retrieveCurrentHint(@DestinationVariable String roomId) {
         String currentHint = roomService.getRoom(roomId).getGame().getCurrentHint();
-        messagingTemplate.convertAndSend("/topic/room/" + roomId + "/wordHint", currentHint);
+        messagingTemplate.convertAndSend(Constants.TOPIC_ROOM_PREFIX + roomId + Constants.WORD_HINT_ENDPOINT, currentHint);
     }
-
 }
