@@ -11,7 +11,8 @@ import {
   NEW_ROOM_PLACEHOLDER,
   CREATE_ROOM_BUTTON_TEXT,
   ROOM_NAME_EMPTY_ERROR,
-  SERVER_CONNECTION_ERROR
+  SERVER_CONNECTION_ERROR,
+  ROOM_NAME_MAX_ERROR
 } from '../../utils/constants'
 import {
   TOPIC_ROOMS,
@@ -64,15 +65,19 @@ function Lobby({client, connected}) {
       client.publish({
         destination: APP_JOIN_ROOM,
         body: room.roomId,
-      })
-      dispatch(setRoom(room))
+      });
+      dispatch(setRoom(room));
     }
   }
 
   function handleCreateRoom(e) {
     e.preventDefault()
-    if (newRoomName.trim() === '') {
+    if (newRoomName === '') {
       setError(ROOM_NAME_EMPTY_ERROR)
+      return
+    }
+    if (newRoomName.length > MAX_ROOM_NAME_LENGTH) {
+      setError(ROOM_NAME_MAX_ERROR)
       return
     }
     if (client && connected) {

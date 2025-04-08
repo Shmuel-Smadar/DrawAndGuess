@@ -1,7 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useDispatch } from 'react-redux'
 import { setUsername, setNicknameError, setSessionId } from '../../store/userSlice'
-import { MAX_NICKNAME_LENGTH, NICKNAME_PROMPT_TITLE, NICKNAME_PLACEHOLDER, JOIN_BUTTON_TEXT } from '../../utils/constants'
+import { 
+  MAX_NICKNAME_LENGTH, 
+  NICKNAME_PROMPT_TITLE, 
+  NICKNAME_PLACEHOLDER, 
+  JOIN_BUTTON_TEXT, 
+  NICKNAME_INVALID_ERROR 
+} from '../../utils/constants'
 import { USER_TOPIC_NICKNAME, APP_REGISTER_NICKNAME } from '../../utils/subscriptionConstants'
 import './NicknamePrompt.css'
 
@@ -9,7 +15,7 @@ const NicknamePrompt = ({ client, connected, error }) => {
   const [nicknameInput, setNicknameInput] = useState('')
   const dispatch = useDispatch()
   const currentNickname = useRef('')
-
+  
   useEffect(() => {
     if (client && connected) {
       const subscription = client.subscribe(USER_TOPIC_NICKNAME, (message) => {
@@ -24,14 +30,17 @@ const NicknamePrompt = ({ client, connected, error }) => {
       })
       return () => subscription.unsubscribe()
     }
-  }, [client, connected, dispatch])
+  }, [client, connected, dispatch]);
 
   const handleSubmit = (e) => {
-    e.preventDefault()
-    const trimmedNickname = nicknameInput.trim()
-    if (trimmedNickname !== '' && client && connected) {
-      currentNickname.current = trimmedNickname
-      const registrationRequest = { nickname: trimmedNickname }
+    e.preventDefault();
+    if (nicknameInput !== '' && client && connected) {
+      if (!nicknameInput.match(/^[A-Za-z0-9\u0590-\u05FF]+$/)) {
+        dispatch(setNicknameError(NICKNAME_INVALID_ERROR));
+        return;
+      }
+      currentNickname.current = nicknameInput;
+      const registrationRequest = { nickname: nicknameInput }
       client.publish({
         destination: APP_REGISTER_NICKNAME,
         body: JSON.stringify(registrationRequest)

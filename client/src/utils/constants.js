@@ -4,8 +4,6 @@ export const ASPECT_RATIO = VIRTUAL_WIDTH / VIRTUAL_HEIGHT
 export const DEFAULT_SOCKET_URL = "http://localhost:8080/draw-and-guess"
 export const DEFAULT_LEADERBOARD_URL = "http://localhost:8080/leaderboard"
 export const LEADERBOARD_REFRESH_INTERVAL = 100
-export const MAX_NICKNAME_LENGTH = 20
-export const MAX_ROOM_NAME_LENGTH = 20
 export const MAX_WINNER_MESSAGE_LENGTH = 50
 export const CANVAS_WIDTH_RATIO = 0.9
 export const CANVAS_HEIGHT_RATIO = 0.8
@@ -41,6 +39,14 @@ export const SEND_BUTTON_TEXT = "Send"
 export const PARTICIPANTS_TITLE = "Participants"
 export const DRAWING_INDICATOR_TEXT = " (Drawing)"
 export const CREDITS_TITLE = "Credits"
+
+
+
+export const MAX_CHAT_MESSAGE_LENGTH = 50;
+export const MAX_NICKNAME_LENGTH = 20
+export const MAX_ROOM_NAME_LENGTH = 20
+export const NICKNAME_INVALID_ERROR = "Invalid nickname"
+export const ROOM_NAME_MAX_ERROR = `Room name must not be longer than ${MAX_ROOM_NAME_LENGTH} characters.`
 
 export const EVENT_TYPE_START = 'START'
 export const EVENT_TYPE_DRAW = 'DRAW'

@@ -1,12 +1,20 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { useSelector } from 'react-redux'
-import DOMPurify from 'dompurify'
-import { SYSTEM_MESSAGE_COLORS, CHAT_TITLE, SCROLL_BUTTON_LABEL, NEW_MESSAGES_LABEL, CHAT_PLACEHOLDER, SEND_BUTTON_TEXT } from '../../utils/constants'
+
+import { 
+  SYSTEM_MESSAGE_COLORS, 
+  CHAT_TITLE, 
+  SCROLL_BUTTON_LABEL, 
+  NEW_MESSAGES_LABEL, 
+  CHAT_PLACEHOLDER, 
+  SEND_BUTTON_TEXT, 
+  MAX_CHAT_MESSAGE_LENGTH 
+} from '../../utils/constants'
 import { TOPIC_ROOM_CHAT, APP_ROOM_CHAT } from '../../utils/subscriptionConstants'
 import WinnerPrompt from '../Prompt/WinnerPrompt'
 import './Chat.css'
 
-const Chat = ({client, height }) => {
+const Chat = ({ client, height }) => {
   const [messages, setMessages] = useState([])
   const [newMessage, setNewMessage] = useState('')
   const [isAtBottom, setIsAtBottom] = useState(true)
@@ -18,28 +26,28 @@ const Chat = ({client, height }) => {
   const roomId = useSelector(state => state.room.room?.roomId)
   const username = useSelector(state => state.user.username)
   const isDrawer = useSelector(state => state.game.isDrawer)
+
   function getSystemMessageColor(messageType) {
     return SYSTEM_MESSAGE_COLORS[messageType] || 'gray'
   }
-  
+
   useEffect(() => {
     if (!client || !client.connected || !roomId) return
     const subscription = client.subscribe(TOPIC_ROOM_CHAT(roomId), (message) => {
       const chatMessage = JSON.parse(message.body)
       setMessages((prev) => [...prev, chatMessage])
       if (!isAtBottom) {
-        setShowScrollButton(true)
+        setShowScrollButton(true);
         setUnreadCount((prevCount) => prevCount + 1)
       }
       if (chatMessage.senderSessionId === 'system' && chatMessage.messageType === 'WINNER_ANNOUNCED') {
         if (chatMessage.winnerSessionId === sessionId) {
-          setShowWinnerPrompt(true)
+          setShowWinnerPrompt(true);
         }
       }
     })
-    return () => {
-      subscription.unsubscribe()
-    }
+
+    return () => subscription.unsubscribe()
   }, [client, roomId, isAtBottom, sessionId])
 
   useEffect(() => {
@@ -79,12 +87,15 @@ const Chat = ({client, height }) => {
 
   const handleSendMessage = () => {
     if (!client || !roomId || newMessage.trim() === '' || !sessionId) return
+    if (newMessage.length > MAX_CHAT_MESSAGE_LENGTH) return
+
     const messageData = {
       text: newMessage,
       senderSessionId: sessionId,
       senderUsername: username,
       type: 'user'
     }
+
     client.publish({
       destination: APP_ROOM_CHAT(roomId),
       body: JSON.stringify(messageData)
@@ -98,32 +109,23 @@ const Chat = ({client, height }) => {
         <h2>{CHAT_TITLE}</h2>
       </div>
       <div className="chat-window" ref={chatWindowRef}>
-        {messages.map((message, index) => {
-          const sanitizedText = DOMPurify.sanitize(message.text)
-          if (message.senderSessionId === 'system') {
-            return (
-              <div
-                key={index}
-                className="chat-message system-message"
+        {messages.map((message, index) => (
+          message.senderSessionId === 'system' ? (
+            <div key={index} className="chat-message system-message">
+              <span
+                className="chat-text system-text"
+                style={{ color: getSystemMessageColor(message.messageType) }}
               >
-                <span
-                  className="chat-text system-text"
-                  style={{ color: getSystemMessageColor(message.messageType) }}
-                  dangerouslySetInnerHTML={{ __html: sanitizedText }}
-                />
-              </div>
-            )
-          }
-          return (
-            <div
-              key={index}
-              className="chat-message user-message"
-            >
+                {message.text}
+              </span>
+            </div>
+          ) : (
+            <div key={index} className="chat-message user-message">
               <span className="chat-sender">{message.senderUsername}: </span>
-              <span className="chat-text" dangerouslySetInnerHTML={{ __html: sanitizedText }} />
+              <span className="chat-text">{message.text}</span>
             </div>
           )
-        })}
+        ))}
       </div>
       {showScrollButton && (
         <button
@@ -143,6 +145,7 @@ const Chat = ({client, height }) => {
           onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
           disabled={isDrawer}
           aria-label="Type your message"
+          maxLength={MAX_CHAT_MESSAGE_LENGTH}
         />
         <button onClick={handleSendMessage} disabled={isDrawer}>
           {SEND_BUTTON_TEXT}
