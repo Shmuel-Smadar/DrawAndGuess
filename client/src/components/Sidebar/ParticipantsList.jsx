@@ -1,11 +1,14 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, {useState, useEffect, useRef } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
 import { TOPIC_ROOM_PARTICIPANTS, APP_GET_PARTICIPANTS } from '../../utils/subscriptionConstants'
 import { PARTICIPANTS_TITLE, DRAWING_INDICATOR_TEXT } from '../../utils/constants'
 import './ParticipantsList.css'
 
-const ParticipantsList = ({ client, height, roomId, username, onDrawerChange }) => {
+const ParticipantsList = ({client, height, onDrawerChange }) => {
   const [userList, setUserList] = useState([])
   const participantsWindowRef = useRef(null)
+  const roomId = useSelector(state => state.room.room?.roomId)
+  const username = useSelector(state => state.user.username)
 
   useEffect(() => {
     if (!client || !roomId) return

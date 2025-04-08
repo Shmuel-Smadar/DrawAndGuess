@@ -6,12 +6,7 @@ import { TOPIC_ROOM_CHAT, APP_ROOM_CHAT } from '../../utils/subscriptionConstant
 import WinnerPrompt from '../Prompt/WinnerPrompt'
 import './Chat.css'
 
-function getSystemMessageColor(messageType) {
-  return SYSTEM_MESSAGE_COLORS[messageType] || 'gray'
-}
-
-const Chat = ({ client, roomId, username, canChat, width, height }) => {
-  const sessionId = useSelector((state) => state.user.sessionId)
+const Chat = ({client, height }) => {
   const [messages, setMessages] = useState([])
   const [newMessage, setNewMessage] = useState('')
   const [isAtBottom, setIsAtBottom] = useState(true)
@@ -19,7 +14,14 @@ const Chat = ({ client, roomId, username, canChat, width, height }) => {
   const [unreadCount, setUnreadCount] = useState(0)
   const [showWinnerPrompt, setShowWinnerPrompt] = useState(false)
   const chatWindowRef = useRef(null)
-
+  const sessionId = useSelector(state => state.user.sessionId)
+  const roomId = useSelector(state => state.room.room?.roomId)
+  const username = useSelector(state => state.user.username)
+  const isDrawer = useSelector(state => state.game.isDrawer)
+  function getSystemMessageColor(messageType) {
+    return SYSTEM_MESSAGE_COLORS[messageType] || 'gray'
+  }
+  
   useEffect(() => {
     if (!client || !client.connected || !roomId) return
     const subscription = client.subscribe(TOPIC_ROOM_CHAT(roomId), (message) => {
@@ -139,10 +141,10 @@ const Chat = ({ client, roomId, username, canChat, width, height }) => {
           onChange={(e) => setNewMessage(e.target.value)}
           placeholder={CHAT_PLACEHOLDER}
           onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-          disabled={!canChat}
+          disabled={isDrawer}
           aria-label="Type your message"
         />
-        <button onClick={handleSendMessage} disabled={!canChat}>
+        <button onClick={handleSendMessage} disabled={isDrawer}>
           {SEND_BUTTON_TEXT}
         </button>
       </div>

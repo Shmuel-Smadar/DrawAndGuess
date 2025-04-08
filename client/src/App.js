@@ -14,7 +14,6 @@ function App() {
   const nicknameError = useSelector(state => state.user.nicknameError)
   const room = useSelector(state => state.room.room)
   const { client, connected } = useStompClient(process.env.REACT_APP_SOCKET_URL || DEFAULT_SOCKET_URL)
-
   if (!username) {
     return (
       <NicknamePrompt
@@ -38,7 +37,10 @@ function App() {
   }
 
   return (
-    <Game client={client} connected={connected} username={username} room={room} />
+    <Game
+     client={client}
+     connected={connected}
+    />
   )
 }
 

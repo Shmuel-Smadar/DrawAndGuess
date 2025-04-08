@@ -3,29 +3,23 @@ import { useSelector } from 'react-redux'
 import Canvas from './Canvas'
 import ColorPicker from '../DrawingPanel/ColorPicker'
 import WordHint from '../DrawingPanel/WordHint'
+import './DrawingArea.css'
 
-function DrawingArea({ client, userID, roomId }) {
+function DrawingArea({ client}) {
   const isDrawer = useSelector(state => state.game.isDrawer)
 
   return (
     <div className="drawing-area">
       <Canvas
         client={client}
-        userID={userID}
-        roomId={roomId}
       />
       {isDrawer ? (
         <ColorPicker
           client={client}
-          userID={userID}
-          roomId={roomId}
-          isDrawer={isDrawer}
         />
       ) : (
         <WordHint
           client={client}
-          roomId={roomId}
-          isDrawer={isDrawer}
         />
       )}
     </div>

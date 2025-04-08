@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react'
+import { useSelector } from 'react-redux'
 import { TOPIC_ROOM_WORD_HINT, APP_GET_CURRENT_HINT } from '../../utils/subscriptionConstants'
 import './WordHint.css'
 
-const WordHint = ({ client, roomId, isDrawer }) => {
+const WordHint = ({ client }) => {
   const [currentHint, setCurrentHint] = useState('')
+  const roomId = useSelector(state => state.room.room?.roomId)
+  const isDrawer = useSelector(state => state.game.isDrawer)
 
   useEffect(() => {
     if (!client || !client.connected || isDrawer) return

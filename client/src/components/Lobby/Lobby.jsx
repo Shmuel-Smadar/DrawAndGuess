@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import { useDispatch } from 'react-redux'
 import './Lobby.css'
 import LeaderboardOverlay from '../Leaderboard/LeaderboardOverlay'
 import RoomTable from './RoomTable'
 import CreditsOverlay from './CreditsOverlay'
+import { setRoom } from '../../store/roomSlice'
 import {
   MAX_ROOM_NAME_LENGTH,
   LOBBY_TITLE,
@@ -19,12 +21,13 @@ import {
   USER_TOPIC_ROOM_CREATED
 } from '../../utils/subscriptionConstants'
 
-function Lobby({ client, connected, setRoom }) {
+function Lobby({client, connected}) {
   const [newRoomName, setNewRoomName] = useState('')
   const [error, setError] = useState('')
   const [rooms, setRooms] = useState([])
   const [showLeaderboard, setShowLeaderboard] = useState(false)
   const [showCredits, setShowCredits] = useState(false)
+  const dispatch = useDispatch()
 
   useEffect(() => {
     if (!client || !connected) return
@@ -51,10 +54,10 @@ function Lobby({ client, connected, setRoom }) {
     if (!client || !connected) return
     const sub = client.subscribe(USER_TOPIC_ROOM_CREATED, (message) => {
       const room = JSON.parse(message.body)
-      setRoom(room)
+      dispatch(setRoom(room))
     })
     return () => sub.unsubscribe()
-  }, [client, connected, setRoom])
+  }, [client, connected, dispatch])
 
   function handleJoinRoom(room) {
     if (client && connected) {
@@ -62,7 +65,7 @@ function Lobby({ client, connected, setRoom }) {
         destination: APP_JOIN_ROOM,
         body: room.roomId,
       })
-      setRoom(room)
+      dispatch(setRoom(room))
     }
   }
 

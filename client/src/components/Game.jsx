@@ -5,13 +5,13 @@ import RightSidebar from './Sidebar/RightSidebar'
 import WordSelection from './Prompt/WordSelection'
 import useGameSubscriptions from '../hooks/useGameSubscriptions'
 import { setIsDrawer, setShowWordSelection } from '../store/gameSlice'
-import { CANVAS_WIDTH_RATIO, CANVAS_HEIGHT_RATIO, GAME_TITLE } from '../utils/constants'
+import {  CANVAS_HEIGHT_RATIO, GAME_TITLE } from '../utils/constants'
 import { APP_REQUEST_WORDS, APP_CHOOSE_WORD } from '../utils/subscriptionConstants'
-
 import './Game.css'
 
-function Game({ client, connected, username, room }) {
+function Game({ client, connected}) {
   const dispatch = useDispatch()
+  const room = useSelector(state => state.room.room)
   const isDrawer = useSelector(state => state.game.isDrawer)
   const showWordSelection = useSelector(state => state.game.showWordSelection)
   const wordOptions = useSelector(state => state.game.wordOptions)
@@ -63,19 +63,13 @@ function Game({ client, connected, username, room }) {
     <div className="game">
       <h1>{GAME_TITLE}</h1>
       <div className="game-area">
-        {connected && client && (
+      {connected && client && (
           <DrawingArea
             client={client}
-            userID={username}
-            roomId={room.roomId}
           />
         )}
         <RightSidebar
           client={client}
-          roomId={room.roomId}
-          username={username}
-          canChat={!isDrawer}
-          width={windowSize.width * CANVAS_WIDTH_RATIO}
           height={windowSize.height * CANVAS_HEIGHT_RATIO}
           onDrawerChange={handleDrawerChange}
         />

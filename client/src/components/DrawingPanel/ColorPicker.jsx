@@ -8,8 +8,11 @@ import { COLOR_OPTIONS, BRUSH_SIZES } from '../../utils/constants'
 import { APP_CLEAR_CANVAS } from '../../utils/subscriptionConstants'
 import './ColorPicker.css'
 
-function ColorPicker({ client, userID, roomId, isDrawer }) {
+function ColorPicker({client}) {
   const dispatch = useDispatch()
+  const roomId = useSelector(state => state.room.room?.roomId)
+  const userID = useSelector(state => state.user.sessionId)
+  const isDrawer = useSelector(state => state.game.isDrawer)
   const [showSizeList, setShowSizeList] = useState(false)
   const color = useSelector(state => state.draw.color)
   const isFillMode = useSelector(state => state.draw.isFillMode)
