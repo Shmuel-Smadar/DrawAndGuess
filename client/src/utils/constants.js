@@ -41,7 +41,7 @@ export const DRAWING_INDICATOR_TEXT = " (Drawing)"
 export const CREDITS_TITLE = "Credits"
 
 
-
+export const WINNER_MESSAGE_MAX_LENGTH = 50;
 export const MAX_CHAT_MESSAGE_LENGTH = 50;
 export const MAX_NICKNAME_LENGTH = 20
 export const MAX_ROOM_NAME_LENGTH = 20

@@ -83,7 +83,7 @@ function Lobby({client, connected}) {
     if (client && connected) {
       client.publish({
         destination: APP_CREATE_ROOM,
-        body: newRoomName.trim(),
+        body: newRoomName,
       })
       client.publish({
         destination: APP_GET_ROOMS,

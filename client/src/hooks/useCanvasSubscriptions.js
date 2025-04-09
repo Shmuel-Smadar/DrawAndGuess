@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useSelector } from 'react-redux'
-import { floodFill } from '../utils/floodFill'
+import { floodFill } from '../utils/helpers'
 import {
   VIRTUAL_WIDTH,
   VIRTUAL_HEIGHT,
