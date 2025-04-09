@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useSelector } from 'react-redux'
-import { floodFill } from '../utils/helpers'
+import { floodFill } from '../../utils/helpers'
 import {
   VIRTUAL_WIDTH,
   VIRTUAL_HEIGHT,
@@ -8,12 +8,12 @@ import {
   EVENT_TYPE_DRAW,
   EVENT_TYPE_STOP,
   EVENT_TYPE_FILL
-} from '../utils/constants'
+} from '../../utils/constants'
 import {
   TOPIC_ROOM_DRAWING,
   TOPIC_ROOM_CLEAR_CANVAS,
   
-} from '../utils/subscriptionConstants'
+} from '../../utils/subscriptionConstants'
 
 export const useCanvasSubscriptions = ({ client, roomId, canvasRef, lastPositions }) => {
   const isDrawer = useSelector((state) => state.game.isDrawer)

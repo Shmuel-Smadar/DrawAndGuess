@@ -1,8 +1,10 @@
 import React, { useCallback, useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import DrawingArea from './Drawing/DrawingArea'
 import RightSidebar from './Sidebar/RightSidebar'
 import WordSelection from './Prompt/WordSelection'
+import Canvas from './Drawing/Canvas'
+import ColorPicker from './DrawingPanel/ColorPicker'
+import WordHint from './DrawingPanel/WordHint'
 import useGameSubscriptions from '../hooks/useGameSubscriptions'
 import { setIsDrawer, setShowWordSelection } from '../store/gameSlice'
 import {  CANVAS_HEIGHT_RATIO, GAME_TITLE } from '../utils/constants'
@@ -64,9 +66,20 @@ function Game({ client, connected}) {
       <h1>{GAME_TITLE}</h1>
       <div className="game-area">
       {connected && client && (
-          <DrawingArea
+          <div className="drawing-area">
+          <Canvas
             client={client}
           />
+          {isDrawer ? (
+            <ColorPicker
+              client={client}
+            />
+          ) : (
+            <WordHint
+              client={client}
+            />
+          )}
+        </div>
         )}
         <RightSidebar
           client={client}

@@ -1,6 +1,6 @@
 import { useCallback } from 'react'
-import { setIsFillMode } from '../store/drawSlice'
-import { getEventCoordinates } from '../utils/helpers'
+import { setIsFillMode } from '../../store/drawSlice'
+import { getEventCoordinates } from '../../utils/helpers'
 import {
   VIRTUAL_WIDTH,
   VIRTUAL_HEIGHT,
@@ -8,8 +8,8 @@ import {
   EVENT_TYPE_DRAW,
   EVENT_TYPE_STOP,
   EVENT_TYPE_FILL
-} from '../utils/constants'
-import { APP_ROOM_DRAW } from '../utils/subscriptionConstants'
+} from '../../utils/constants'
+import { APP_ROOM_DRAW } from '../../utils/subscriptionConstants'
 
 export const useDrawingHandlers = ({
   client,

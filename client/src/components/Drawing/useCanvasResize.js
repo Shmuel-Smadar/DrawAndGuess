@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { ASPECT_RATIO, CANVAS_WIDTH_RATIO, CANVAS_HEIGHT_RATIO } from '../utils/constants';
+import { ASPECT_RATIO, CANVAS_WIDTH_RATIO, CANVAS_HEIGHT_RATIO } from '../../utils/constants';
 
 export const useCanvasResize = (canvasRef) => {
   useEffect(() => {

@@ -1,6 +1,6 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
-import useCanvas from '../../hooks/useCanvas'
+import useCanvas from './useCanvas'
 import BucketIcon from '../../assets/paint-bucket.png'
 import { BUCKET_ICON_CURSOR_OFFSET, DEFAULT_CURSOR } from '../../utils/constants'
 import './Canvas.css'
