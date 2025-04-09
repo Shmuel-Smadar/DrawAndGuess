@@ -8,14 +8,10 @@ public class RoundService {
     private final ParticipantService participantService;
     private final RoomService roomService;
 
-    public RoundService(ChatService chatService,
-                        ParticipantService participantService,
-                        RoomService roomService) {
+    public RoundService(ParticipantService participantService, RoomService roomService) {
         this.participantService = participantService;
         this.roomService = roomService;
     }
-
-
 
     public void updateDrawerAndBroadcast(String roomId, Game game) {
         String currentDrawer = game.getCurrentDrawer();

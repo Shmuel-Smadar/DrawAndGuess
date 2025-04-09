@@ -8,8 +8,9 @@ import com.example.drawandguess.model.Room;
 import com.example.drawandguess.model.WordOptions;
 import com.example.drawandguess.model.MessageType;
 import com.example.drawandguess.model.ClearCanvasMessage;
-import org.springframework.stereotype.Service;
 import org.springframework.scheduling.TaskScheduler;
+import org.springframework.stereotype.Service;
+import java.time.Instant;
 
 @Service
 public class GameService {
@@ -51,7 +52,6 @@ public class GameService {
 
     public WordOptions requestWords(String roomId, String sessionId) {
         Room room = roomService.getRoom(roomId);
-        if (room == null) return new WordOptions();
         Game game = room.getGame();
         if (game.isDrawer(sessionId)) {
             return wordService.getRandomWords();
@@ -61,7 +61,6 @@ public class GameService {
 
     public void chooseWord(String roomId, String sessionId, String chosenWord) {
         Room room = roomService.getRoom(roomId);
-        if (room == null) return;
         Game game = room.getGame();
         if (game.isDrawer(sessionId)) {
             game.setChosenWord(chosenWord);
@@ -75,6 +74,7 @@ public class GameService {
             hintService.startHintProgression(roomId, game, () -> handleNoGuess(roomId, game));
         }
     }
+
     public void handleNoGuess(String roomId, Game game) {
         hintService.stopHintProgression(roomId);
         drawingService.clearCanvas(roomId, new ClearCanvasMessage("system"));
@@ -87,9 +87,9 @@ public class GameService {
             roundService.updateDrawerAndBroadcast(roomId, game);
         }
     }
+
     public void handleGuess(String roomId, String guess, String sessionId) {
         Room room = roomService.getRoom(roomId);
-        if (room == null) return;
         Game game = room.getGame();
         if (game.isCorrectGuess(guess)) {
             scoringService.handleScoring(roomId, game, guess, sessionId);
@@ -109,7 +109,6 @@ public class GameService {
 
     public void userLeftRoom(String roomId, String sessionId) {
         Room room = roomService.getRoom(roomId);
-        if (room == null) return;
         Game game = room.getGame();
         Participant p = participantService.findParticipantBySessionId(sessionId);
         if (p == null) return;
@@ -195,6 +194,6 @@ public class GameService {
                 roomService.broadcastParticipants(roomId);
                 roundService.updateDrawerAndBroadcast(roomId, game);
             }
-        }, java.util.Date.from(java.time.Instant.now().plusSeconds(10)));
+        }, Instant.now().plusSeconds(Constants.NEW_GAME_DELAY_SECONDS));
     }
 }

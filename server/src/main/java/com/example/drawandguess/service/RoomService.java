@@ -1,23 +1,20 @@
 package com.example.drawandguess.service;
 
+import com.example.drawandguess.config.Constants;
 import com.example.drawandguess.model.Game;
 import com.example.drawandguess.model.Room;
 import com.example.drawandguess.model.Participant;
 import com.example.drawandguess.model.ChatMessage;
 import com.example.drawandguess.model.MessageType;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
+import java.time.Instant;
 import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.stream.Collectors;
-
-import static com.example.drawandguess.config.Constants.TOPIC_ROOMS;
-import static com.example.drawandguess.config.Constants.TOPIC_ROOM_PREFIX;
-import static com.example.drawandguess.config.Constants.TIMER_DELAY_MS;
 
 @Service
 public class RoomService {
@@ -26,12 +23,14 @@ public class RoomService {
     private final ChatService chatService;
     private final SimpMessagingTemplate messagingTemplate;
     private final MessageService messageService;
+    private final TaskScheduler taskScheduler;
 
-    public RoomService(ParticipantService participantService, ChatService chatService, SimpMessagingTemplate messagingTemplate, MessageService messageService) {
+    public RoomService(ParticipantService participantService, ChatService chatService, SimpMessagingTemplate messagingTemplate, MessageService messageService, TaskScheduler taskScheduler) {
         this.participantService = participantService;
         this.chatService = chatService;
         this.messagingTemplate = messagingTemplate;
         this.messageService = messageService;
+        this.taskScheduler = taskScheduler;
     }
 
     public Room createRoom(String roomName) {
@@ -58,48 +57,42 @@ public class RoomService {
     }
 
     public void joinRoom(String sessionId, String roomId) {
-        Room room = rooms.get(roomId);
-        if (room == null) return;
-
+        Room room = getRoom(roomId);
         Game game = room.getGame();
         game.addParticipant(sessionId);
-        if(game.isGameOver()) {
+        if (game.isGameOver()) {
             broadcastParticipants(roomId);
             broadcastRooms();
             return;
         }
-        String newDrawerId = room.getGame().getCurrentDrawer();
+        String newDrawerId = game.getCurrentDrawer();
         if (newDrawerId != null) {
             participantService.setDrawer(newDrawerId, true);
         }
         String nickname = participantService.findParticipantBySessionId(sessionId).getUsername();
-
-        new Timer().schedule(new TimerTask() {
-            @Override
-            public void run() {
-                ChatMessage msg = messageService.systemMessage(MessageType.PARTICIPANT_JOINED, nickname);
-                chatService.sendChatMessage(roomId, msg);
-            }
-        }, TIMER_DELAY_MS);
-
+        scheduleParticipantJoinedMessage(roomId, nickname);
         broadcastParticipants(roomId);
         broadcastRooms();
     }
 
+    private void scheduleParticipantJoinedMessage(String roomId, String nickname) {
+        taskScheduler.schedule(() -> {
+            ChatMessage msg = messageService.systemMessage(MessageType.PARTICIPANT_JOINED, nickname);
+            chatService.sendChatMessage(roomId, msg);
+        }, Instant.now().plusMillis(Constants.TIMER_DELAY_MS));
+    }
+
     public void broadcastParticipants(String roomId) {
-        new Timer().schedule(new TimerTask() {
-            @Override
-            public void run() {
-                Room room = rooms.get(roomId);
-                if (room == null) return;
-                List<String> ids = room.getGame().getParticipantSessionIds();
-                List<Participant> list = participantService.getParticipantsBySessionIds(ids);
-                for (Participant p : list) {
-                    p.setScore(room.getGame().getScore(p.getUsername()));
-                }
-                messagingTemplate.convertAndSend(TOPIC_ROOM_PREFIX + roomId + "/participants", list);
+        taskScheduler.schedule(() -> {
+            Room room = rooms.get(roomId);
+            if (room == null) return;
+            List<String> ids = room.getGame().getParticipantSessionIds();
+            List<Participant> list = participantService.getParticipantsBySessionIds(ids);
+            for (Participant p : list) {
+                p.setScore(room.getGame().getScore(p.getUsername()));
             }
-        }, TIMER_DELAY_MS);
+            messagingTemplate.convertAndSend(Constants.topicRoomParticipants(roomId), list);
+        }, Instant.now().plusMillis(Constants.TIMER_DELAY_MS));
     }
 
     public void broadcastRooms() {
@@ -110,7 +103,7 @@ public class RoomService {
             map.put("numberOfParticipants", room.getGame().getParticipantSessionIds().size());
             return map;
         }).collect(Collectors.toList());
-        messagingTemplate.convertAndSend(TOPIC_ROOMS, data);
+        messagingTemplate.convertAndSend(Constants.TOPIC_ROOMS, data);
     }
 
     public List<Participant> getParticipants(String roomId) {

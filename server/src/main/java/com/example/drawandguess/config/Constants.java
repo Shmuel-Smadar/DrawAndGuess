@@ -33,7 +33,7 @@ public final class Constants {
     public static final String SCHEDULER_THREAD_PREFIX = "HintScheduler-";
     public static final int HINT_INTERVAL_SECONDS = 10;
     public static final int TIMER_DELAY_MS = 100;
-
+    public static final int NEW_GAME_DELAY_SECONDS = 10;
     public static final int TOTAL_ROUNDS = 2;
 
     public static final int GUESSER_BASE_POINTS = 10;
@@ -75,4 +75,20 @@ public final class Constants {
     public static final String ROOM_ID_KEY = "roomId";
     public static final String NUMBER_OF_PARTICIPANTS_KEY = "numberOfParticipants";
     public static final String PARTICIPANTS_ENDPOINT = "/participants";
+
+    public static String topicRoomChat(String roomId) {
+        return TOPIC_ROOM_PREFIX + roomId + "/chat";
+    }
+    public static String topicRoomParticipants(String roomId) {
+        return TOPIC_ROOM_PREFIX + roomId + "/participants";
+    }
+    public static String topicRoomDrawing(String roomId) {
+        return TOPIC_ROOM_PREFIX + roomId + "/drawing";
+    }
+    public static String topicRoomClearCanvas(String roomId) {
+        return TOPIC_ROOM_PREFIX + roomId + "/clearCanvas";
+    }
+    public static String topicRoomWordHint(String roomId) {
+        return TOPIC_ROOM_PREFIX + roomId + "/wordHint";
+    }
 }

@@ -48,14 +48,8 @@ public class HintService {
 
     private void sendHintToParticipants(String roomId, String currentHint, Game game) {
         Room room = roomService.getRoom(roomId);
-        if (room == null) {
-            return;
-        }
-
-        Game roomGame = room.getGame();
-        List<String> participantSessions = roomGame.getParticipantSessionIds();
-        String currentDrawer = roomGame.getCurrentDrawer();
-
+        List<String> participantSessions = room.getGame().getParticipantSessionIds();
+        String currentDrawer = room.getGame().getCurrentDrawer();
         participantSessions.stream()
                 .filter(session -> !session.equals(currentDrawer))
                 .forEach(session -> chatService.sendWordHint(session, roomId, currentHint));
