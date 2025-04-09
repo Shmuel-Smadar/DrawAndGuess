@@ -1,6 +1,16 @@
 package com.example.drawandguess.controller;
 
-import com.example.drawandguess.config.Constants;
+import static com.example.drawandguess.config.PathConstants.CREATE_ROOM;
+import static com.example.drawandguess.config.PathConstants.ROOM_CREATED_TOPIC;
+import static com.example.drawandguess.config.PathConstants.JOIN_ROOM;
+import static com.example.drawandguess.config.PathConstants.LEAVE_ROOM;
+import static com.example.drawandguess.config.PathConstants.GET_ROOMS;
+import static com.example.drawandguess.config.PathConstants.TOPIC_ROOMS;
+import static com.example.drawandguess.config.PathConstants.PARTICIPANTS_MAPPING;
+import static com.example.drawandguess.config.GameConstants.ROOM_NAME_KEY;
+import static com.example.drawandguess.config.GameConstants.ROOM_ID_KEY;
+import static com.example.drawandguess.config.GameConstants.NUMBER_OF_PARTICIPANTS_KEY;
+
 import com.example.drawandguess.model.Participant;
 import com.example.drawandguess.model.Room;
 import com.example.drawandguess.service.RoomService;
@@ -31,10 +41,10 @@ public class RoomController {
         this.gameService = gameService;
     }
 
-    @MessageMapping(Constants.CREATE_ROOM)
-    @SendToUser(Constants.ROOM_CREATED_TOPIC)
+    @MessageMapping(CREATE_ROOM)
+    @SendToUser(ROOM_CREATED_TOPIC)
     public Room createRoom(@Payload String roomName, SimpMessageHeaderAccessor headerAccessor) {
-        if (roomName == null || roomName.length() > Constants.MAX_ROOM_NAME_LENGTH) {
+        if (roomName == null || roomName.length() > com.example.drawandguess.config.GameConstants.MAX_ROOM_NAME_LENGTH) {
             return null;
         }
         Room room = roomService.createRoom(roomName);
@@ -43,33 +53,36 @@ public class RoomController {
         return room;
     }
 
-    @MessageMapping(Constants.JOIN_ROOM)
+    @MessageMapping(JOIN_ROOM)
     public void joinRoom(@Payload String roomId, SimpMessageHeaderAccessor headerAccessor) {
         String sessionId = headerAccessor.getSessionId();
         roomService.joinRoom(sessionId, roomId);
     }
 
-    @MessageMapping(Constants.LEAVE_ROOM)
+    @MessageMapping(LEAVE_ROOM)
     public void leaveRoom(@Payload String roomId, SimpMessageHeaderAccessor headerAccessor) {
         String sessionId = headerAccessor.getSessionId();
         gameService.userLeftRoom(roomId, sessionId);
     }
 
-    @MessageMapping(Constants.GET_ROOMS)
-    @SendTo(Constants.TOPIC_ROOMS)
+    @MessageMapping(GET_ROOMS)
+    @SendTo(TOPIC_ROOMS)
     public Collection<?> getRooms() {
         return roomService.getAllRooms().stream().map(room -> {
             Map<String, Object> roomInfo = new HashMap<>();
-            roomInfo.put(Constants.ROOM_NAME_KEY, room.getRoomName());
-            roomInfo.put(Constants.ROOM_ID_KEY, room.getRoomId());
-            roomInfo.put(Constants.NUMBER_OF_PARTICIPANTS_KEY, room.getGame().getParticipantSessionIds().size());
+            roomInfo.put(ROOM_NAME_KEY, room.getRoomName());
+            roomInfo.put(ROOM_ID_KEY, room.getRoomId());
+            roomInfo.put(NUMBER_OF_PARTICIPANTS_KEY, room.getGame().getParticipantSessionIds().size());
             return roomInfo;
         }).collect(Collectors.toList());
     }
 
-    @MessageMapping(Constants.PARTICIPANTS_MAPPING)
+    @MessageMapping(PARTICIPANTS_MAPPING)
     public void handleParticipantsRequest(@DestinationVariable String roomId) {
         List<Participant> participants = roomService.getParticipants(roomId);
-        messagingTemplate.convertAndSend(Constants.TOPIC_ROOM_PREFIX + roomId + Constants.PARTICIPANTS_ENDPOINT, participants);
+        messagingTemplate.convertAndSend(
+                com.example.drawandguess.config.PathConstants.TOPIC_ROOM_PREFIX + roomId + com.example.drawandguess.config.PathConstants.PARTICIPANTS_ENDPOINT,
+                participants
+        );
     }
 }

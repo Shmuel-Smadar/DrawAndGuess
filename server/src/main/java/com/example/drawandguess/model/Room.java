@@ -1,8 +1,6 @@
 package com.example.drawandguess.model;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 
+import java.util.UUID;
 
 public class Room {
     private String roomId;

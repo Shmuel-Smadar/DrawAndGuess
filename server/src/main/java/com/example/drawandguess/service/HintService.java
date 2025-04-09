@@ -1,5 +1,7 @@
 package com.example.drawandguess.service;
 
+import static com.example.drawandguess.config.GameConstants.HINT_INTERVAL_SECONDS;
+
 import com.example.drawandguess.model.Game;
 import com.example.drawandguess.model.Room;
 import org.springframework.scheduling.TaskScheduler;
@@ -37,7 +39,7 @@ public class HintService {
                 }
             }
         };
-        ScheduledFuture<?> future = taskScheduler.scheduleAtFixedRate(runnable, Duration.ofSeconds(com.example.drawandguess.config.Constants.HINT_INTERVAL_SECONDS));
+        ScheduledFuture<?> future = taskScheduler.scheduleAtFixedRate(runnable, Duration.ofSeconds(HINT_INTERVAL_SECONDS));
         hintTasks.put(roomId, future);
     }
 

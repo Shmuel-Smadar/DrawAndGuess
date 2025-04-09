@@ -1,9 +1,12 @@
 package com.example.drawandguess.service;
 
-import com.example.drawandguess.config.Constants;
-import com.example.drawandguess.model.ChatMessage;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+
+import static com.example.drawandguess.config.PathConstants.topicRoomChat;
+import static com.example.drawandguess.config.PathConstants.topicRoomWordHint;
+
+import com.example.drawandguess.model.ChatMessage;
 
 @Service
 public class ChatService {
@@ -14,10 +17,10 @@ public class ChatService {
     }
 
     public void sendChatMessage(String roomId, ChatMessage msg) {
-        messagingTemplate.convertAndSend(Constants.topicRoomChat(roomId), msg);
+        messagingTemplate.convertAndSend(topicRoomChat(roomId), msg);
     }
 
     public void sendWordHint(String sessionId, String roomId, String hint) {
-        messagingTemplate.convertAndSend(Constants.topicRoomWordHint(roomId), hint);
+        messagingTemplate.convertAndSend(topicRoomWordHint(roomId), hint);
     }
 }

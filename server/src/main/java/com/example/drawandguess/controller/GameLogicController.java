@@ -1,6 +1,13 @@
 package com.example.drawandguess.controller;
 
-import com.example.drawandguess.config.Constants;
+import static com.example.drawandguess.config.PathConstants.REQUEST_WORDS_MAPPING;
+import static com.example.drawandguess.config.PathConstants.WORD_OPTIONS_TOPIC;
+import static com.example.drawandguess.config.PathConstants.CHOOSE_WORD_MAPPING;
+import static com.example.drawandguess.config.PathConstants.CORRECT_GUESS_MAPPING;
+import static com.example.drawandguess.config.PathConstants.CURRENT_HINT_MAPPING;
+import static com.example.drawandguess.config.PathConstants.TOPIC_ROOM_PREFIX;
+import static com.example.drawandguess.config.PathConstants.WORD_HINT_ENDPOINT;
+
 import com.example.drawandguess.model.WordOptions;
 import com.example.drawandguess.service.GameService;
 import com.example.drawandguess.service.RoomService;
@@ -24,28 +31,28 @@ public class GameLogicController {
         this.messagingTemplate = messagingTemplate;
     }
 
-    @MessageMapping(Constants.REQUEST_WORDS_MAPPING)
-    @SendToUser(Constants.WORD_OPTIONS_TOPIC)
+    @MessageMapping(REQUEST_WORDS_MAPPING)
+    @SendToUser(WORD_OPTIONS_TOPIC)
     public WordOptions handleWordRequest(@DestinationVariable String roomId, SimpMessageHeaderAccessor headerAccessor) {
         String sessionId = headerAccessor.getSessionId();
         return gameService.requestWords(roomId, sessionId);
     }
 
-    @MessageMapping(Constants.CHOOSE_WORD_MAPPING)
+    @MessageMapping(CHOOSE_WORD_MAPPING)
     public void handleWordChosen(@DestinationVariable String roomId, @Payload String chosenWord, SimpMessageHeaderAccessor headerAccessor) {
         String sessionId = headerAccessor.getSessionId();
         gameService.chooseWord(roomId, sessionId, chosenWord);
     }
 
-    @MessageMapping(Constants.CORRECT_GUESS_MAPPING)
+    @MessageMapping(CORRECT_GUESS_MAPPING)
     public void handleCorrectGuess(@DestinationVariable String roomId, @Payload String guess, SimpMessageHeaderAccessor headerAccessor) {
         String sessionId = headerAccessor.getSessionId();
         gameService.handleGuess(roomId, guess, sessionId);
     }
 
-    @MessageMapping(Constants.CURRENT_HINT_MAPPING)
+    @MessageMapping(CURRENT_HINT_MAPPING)
     public void retrieveCurrentHint(@DestinationVariable String roomId) {
         String currentHint = roomService.getRoom(roomId).getGame().getCurrentHint();
-        messagingTemplate.convertAndSend(Constants.TOPIC_ROOM_PREFIX + roomId + Constants.WORD_HINT_ENDPOINT, currentHint);
+        messagingTemplate.convertAndSend(TOPIC_ROOM_PREFIX + roomId + WORD_HINT_ENDPOINT, currentHint);
     }
 }

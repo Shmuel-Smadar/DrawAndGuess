@@ -1,14 +1,17 @@
 package com.example.drawandguess.controller;
 
-import com.example.drawandguess.config.Constants;
+import static com.example.drawandguess.config.PathConstants.DRAW_AND_GUESS_PATH;
+import static com.example.drawandguess.config.PathConstants.DRAW_AND_GUESS_SLASH_PATH;
+import static com.example.drawandguess.config.PathConstants.HOME_PATH;
+import static com.example.drawandguess.config.PathConstants.MAIN_INDEX_FILE;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 public class DrawAndGuessController {
-
-    @RequestMapping({Constants.DRAW_AND_GUESS_PATH, Constants.DRAW_AND_GUESS_SLASH_PATH, Constants.HOME_PATH})
+    @RequestMapping({DRAW_AND_GUESS_PATH, DRAW_AND_GUESS_SLASH_PATH, HOME_PATH})
     public String forwardToIndex() {
-        return Constants.MAIN_INDEX_FILE;
+        return MAIN_INDEX_FILE;
     }
 }

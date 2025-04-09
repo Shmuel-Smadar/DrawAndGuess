@@ -1,5 +1,8 @@
 package com.example.drawandguess.service;
 
+import static com.example.drawandguess.config.GameConstants.LEADERBOARD_QUEUE;
+import static com.example.drawandguess.config.GameConstants.SCORE_SEPARATOR;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jms.annotation.JmsListener;
@@ -9,8 +12,6 @@ import org.springframework.stereotype.Service;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.LinkedHashMap;
-import static com.example.drawandguess.config.Constants.LEADERBOARD_QUEUE;
-import static com.example.drawandguess.config.Constants.SCORE_SEPARATOR;
 
 @Service
 public class LeaderboardService {

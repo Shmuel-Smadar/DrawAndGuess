@@ -1,10 +1,11 @@
 package com.example.drawandguess.service;
 
-import com.example.drawandguess.config.Constants;
-import com.example.drawandguess.model.DrawMessage;
-import com.example.drawandguess.model.ClearCanvasMessage;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import com.example.drawandguess.model.DrawMessage;
+import com.example.drawandguess.model.ClearCanvasMessage;
+import static com.example.drawandguess.config.PathConstants.topicRoomDrawing;
+import static com.example.drawandguess.config.PathConstants.topicRoomClearCanvas;
 
 @Service
 public class DrawingService {
@@ -15,10 +16,10 @@ public class DrawingService {
     }
 
     public void draw(String roomId, DrawMessage message) {
-        messagingTemplate.convertAndSend(Constants.topicRoomDrawing(roomId), message);
+        messagingTemplate.convertAndSend(topicRoomDrawing(roomId), message);
     }
 
     public void clearCanvas(String roomId, ClearCanvasMessage message) {
-        messagingTemplate.convertAndSend(Constants.topicRoomClearCanvas(roomId), message);
+        messagingTemplate.convertAndSend(topicRoomClearCanvas(roomId), message);
     }
 }

@@ -1,5 +1,9 @@
 package com.example.drawandguess.service;
 
+import static com.example.drawandguess.config.GameConstants.NICKNAME_TAKEN_MSG;
+import static com.example.drawandguess.config.GameConstants.NICKNAME_REGISTERED_MSG;
+import static com.example.drawandguess.config.GameConstants.REMOVED_PARTICIPANT_MSG_PREFIX;
+
 import org.springframework.stereotype.Service;
 import com.example.drawandguess.model.NicknameStatus;
 import com.example.drawandguess.model.Participant;
@@ -7,10 +11,6 @@ import com.example.drawandguess.model.Participant;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.concurrent.ConcurrentHashMap;
-
-import static com.example.drawandguess.config.Constants.NICKNAME_TAKEN_MSG;
-import static com.example.drawandguess.config.Constants.NICKNAME_REGISTERED_MSG;
-import static com.example.drawandguess.config.Constants.REMOVED_PARTICIPANT_MSG_PREFIX;
 
 @Service
 public class ParticipantService {

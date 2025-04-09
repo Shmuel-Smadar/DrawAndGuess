@@ -1,6 +1,8 @@
 package com.example.drawandguess.service;
 
-import com.example.drawandguess.config.Constants;
+import static com.example.drawandguess.config.GameConstants.GAME_ENDED_MSG;
+import static com.example.drawandguess.config.GameConstants.NEW_GAME_DELAY_SECONDS;
+
 import com.example.drawandguess.model.ChatMessage;
 import com.example.drawandguess.model.Game;
 import com.example.drawandguess.model.Participant;
@@ -160,7 +162,7 @@ public class GameService {
 
     private void endGame(String roomId, Game game) {
         drawingService.clearCanvas(roomId, new ClearCanvasMessage("system"));
-        StringBuilder sb = new StringBuilder(Constants.GAME_ENDED_MSG).append(" after ")
+        StringBuilder sb = new StringBuilder(GAME_ENDED_MSG).append(" after ")
                 .append(game.getTotalRounds()).append(" rounds. Final scores: ");
         for (String pid : game.getParticipantSessionIds()) {
             String username = participantService.findParticipantBySessionId(pid).getUsername();
@@ -194,6 +196,6 @@ public class GameService {
                 roomService.broadcastParticipants(roomId);
                 roundService.updateDrawerAndBroadcast(roomId, game);
             }
-        }, Instant.now().plusSeconds(Constants.NEW_GAME_DELAY_SECONDS));
+        }, Instant.now().plusSeconds(NEW_GAME_DELAY_SECONDS));
     }
 }

@@ -5,12 +5,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
-import static com.example.drawandguess.config.Constants.SCHEDULER_POOL_SIZE;
-import static com.example.drawandguess.config.Constants.SCHEDULER_THREAD_PREFIX;
+import static com.example.drawandguess.config.GameConstants.SCHEDULER_POOL_SIZE;
+import static com.example.drawandguess.config.GameConstants.SCHEDULER_THREAD_PREFIX;
 
 @Configuration
 public class SchedulerConfig {
-
+    
     @Bean
     @Primary
     public ThreadPoolTaskScheduler taskScheduler() {

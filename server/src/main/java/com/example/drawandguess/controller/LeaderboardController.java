@@ -1,6 +1,7 @@
 package com.example.drawandguess.controller;
 
-import com.example.drawandguess.config.Constants;
+import static com.example.drawandguess.config.PathConstants.LEADERBOARD_MAPPING;
+
 import com.example.drawandguess.service.LeaderboardService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -17,7 +18,7 @@ public class LeaderboardController {
         this.leaderboardService = leaderboardService;
     }
 
-    @GetMapping(Constants.LEADERBOARD_MAPPING)
+    @GetMapping(LEADERBOARD_MAPPING)
     public List<String> getLeaderboard() {
         return leaderboardService.getSortedLeaderboard();
     }

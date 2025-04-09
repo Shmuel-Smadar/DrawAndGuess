@@ -1,6 +1,8 @@
 package com.example.drawandguess.controller;
 
-import com.example.drawandguess.config.Constants;
+import static com.example.drawandguess.config.PathConstants.DRAW_MAPPING;
+import static com.example.drawandguess.config.PathConstants.CLEAR_CANVAS_MAPPING;
+
 import com.example.drawandguess.model.DrawMessage;
 import com.example.drawandguess.model.ClearCanvasMessage;
 import com.example.drawandguess.service.DrawingService;
@@ -14,11 +16,11 @@ public class DrawController {
     public DrawController(DrawingService drawingService) {
         this.drawingService = drawingService;
     }
-    @MessageMapping(Constants.DRAW_MAPPING)
+    @MessageMapping(DRAW_MAPPING)
     public void draw(@DestinationVariable String roomId, DrawMessage message) {
         drawingService.draw(roomId, message);
     }
-    @MessageMapping(Constants.CLEAR_CANVAS_MAPPING)
+    @MessageMapping(CLEAR_CANVAS_MAPPING)
     public void clearCanvas(@DestinationVariable String roomId, ClearCanvasMessage message) {
         drawingService.clearCanvas(roomId, message);
     }

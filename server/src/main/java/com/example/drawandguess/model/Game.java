@@ -1,10 +1,11 @@
 package com.example.drawandguess.model;
 
+import static com.example.drawandguess.config.GameConstants.TOTAL_ROUNDS;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import static com.example.drawandguess.config.Constants.TOTAL_ROUNDS;
 
 public class Game {
     private final List<String> participantSessionIds = new ArrayList<>();

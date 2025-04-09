@@ -1,16 +1,15 @@
 package com.example.drawandguess.service;
 
+import static com.example.drawandguess.config.GameConstants.ROUND_STARTED_MSG_PREFIX;
+import static com.example.drawandguess.config.GameConstants.NO_GUESS_MSG;
+import static com.example.drawandguess.config.GameConstants.PARTICIPANT_JOINED_MSG;
+import static com.example.drawandguess.config.GameConstants.PARTICIPANT_LEFT_MSG;
+import static com.example.drawandguess.config.GameConstants.PREVIOUS_DRAWER_QUIT_MSG;
+import static com.example.drawandguess.config.GameConstants.NEW_GAME_STARTED_MSG_PREFIX;
+
 import com.example.drawandguess.model.ChatMessage;
 import com.example.drawandguess.model.MessageType;
 import org.springframework.stereotype.Service;
-
-import static com.example.drawandguess.config.Constants.ROUND_STARTED_MSG_PREFIX;
-import static com.example.drawandguess.config.Constants.NO_GUESS_MSG;
-import static com.example.drawandguess.config.Constants.GAME_ENDED_MSG;
-import static com.example.drawandguess.config.Constants.PARTICIPANT_JOINED_MSG;
-import static com.example.drawandguess.config.Constants.PARTICIPANT_LEFT_MSG;
-import static com.example.drawandguess.config.Constants.PREVIOUS_DRAWER_QUIT_MSG;
-import static com.example.drawandguess.config.Constants.NEW_GAME_STARTED_MSG_PREFIX;
 
 @Service
 public class MessageService {

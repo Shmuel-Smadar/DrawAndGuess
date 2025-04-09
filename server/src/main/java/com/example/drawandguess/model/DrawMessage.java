@@ -1,7 +1,6 @@
 package com.example.drawandguess.model;
 
-public
-class DrawMessage {
+public class DrawMessage {
     private double normX;
     private double normY;
     private String color;

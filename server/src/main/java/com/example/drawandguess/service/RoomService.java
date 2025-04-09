@@ -1,6 +1,9 @@
 package com.example.drawandguess.service;
 
-import com.example.drawandguess.config.Constants;
+import static com.example.drawandguess.config.PathConstants.TOPIC_ROOMS;
+import static com.example.drawandguess.config.PathConstants.topicRoomParticipants;
+import static com.example.drawandguess.config.GameConstants.TIMER_DELAY_MS;
+
 import com.example.drawandguess.model.Game;
 import com.example.drawandguess.model.Room;
 import com.example.drawandguess.model.Participant;
@@ -79,7 +82,7 @@ public class RoomService {
         taskScheduler.schedule(() -> {
             ChatMessage msg = messageService.systemMessage(MessageType.PARTICIPANT_JOINED, nickname);
             chatService.sendChatMessage(roomId, msg);
-        }, Instant.now().plusMillis(Constants.TIMER_DELAY_MS));
+        }, Instant.now().plusMillis(TIMER_DELAY_MS));
     }
 
     public void broadcastParticipants(String roomId) {
@@ -91,8 +94,8 @@ public class RoomService {
             for (Participant p : list) {
                 p.setScore(room.getGame().getScore(p.getUsername()));
             }
-            messagingTemplate.convertAndSend(Constants.topicRoomParticipants(roomId), list);
-        }, Instant.now().plusMillis(Constants.TIMER_DELAY_MS));
+            messagingTemplate.convertAndSend(topicRoomParticipants(roomId), list);
+        }, Instant.now().plusMillis(TIMER_DELAY_MS));
     }
 
     public void broadcastRooms() {
@@ -103,7 +106,7 @@ public class RoomService {
             map.put("numberOfParticipants", room.getGame().getParticipantSessionIds().size());
             return map;
         }).collect(Collectors.toList());
-        messagingTemplate.convertAndSend(Constants.TOPIC_ROOMS, data);
+        messagingTemplate.convertAndSend(TOPIC_ROOMS, data);
     }
 
     public List<Participant> getParticipants(String roomId) {
