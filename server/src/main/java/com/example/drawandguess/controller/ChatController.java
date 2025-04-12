@@ -5,7 +5,7 @@ import static com.example.drawandguess.config.GameConstants.MAX_CHAT_MESSAGE_LEN
 
 import com.example.drawandguess.model.ChatMessage;
 import com.example.drawandguess.service.ChatService;
-import com.example.drawandguess.service.GameService;
+import com.example.drawandguess.service.GameLogicService;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -14,9 +14,9 @@ import org.springframework.stereotype.Controller;
 @Controller
 public class ChatController {
     private final ChatService chatService;
-    private final GameService gameService;
+    private final GameLogicService gameService;
 
-    public ChatController(ChatService chatService, GameService gameService) {
+    public ChatController(ChatService chatService, GameLogicService gameService) {
         this.gameService = gameService;
         this.chatService = chatService;
     }

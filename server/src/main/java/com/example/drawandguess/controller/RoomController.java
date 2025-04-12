@@ -17,7 +17,7 @@ import static com.example.drawandguess.config.APIConstants.TOPIC_ROOM_PREFIX;
 import com.example.drawandguess.model.Participant;
 import com.example.drawandguess.model.Room;
 import com.example.drawandguess.service.RoomService;
-import com.example.drawandguess.service.GameService;
+import com.example.drawandguess.service.GameLogicService;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -36,9 +36,9 @@ import java.util.stream.Collectors;
 public class RoomController {
     private final RoomService roomService;
     private final SimpMessagingTemplate messagingTemplate;
-    private final GameService gameService;
+    private final GameLogicService gameService;
 
-    public RoomController(RoomService roomService, SimpMessagingTemplate messagingTemplate, GameService gameService) {
+    public RoomController(RoomService roomService, SimpMessagingTemplate messagingTemplate, GameLogicService gameService) {
         this.roomService = roomService;
         this.messagingTemplate = messagingTemplate;
         this.gameService = gameService;

@@ -2,7 +2,7 @@ package com.example.drawandguess.service;
 
 import static com.example.drawandguess.config.GameConstants.GAME_ENDED_MSG;
 import static com.example.drawandguess.config.GameConstants.NEW_GAME_DELAY_SECONDS;
-
+import static com.example.drawandguess.config.GameConstants.SERVER_MESSAGE_TYPE;
 import com.example.drawandguess.model.ChatMessage;
 import com.example.drawandguess.model.Game;
 import com.example.drawandguess.model.Participant;
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 
 @Service
-public class GameService {
+public class GameLogicService {
     private final ChatService chatService;
     private final ParticipantService participantService;
     private final RoomService roomService;
@@ -27,16 +27,16 @@ public class GameService {
     private final ScoringService scoringService;
     private final LeaderboardService leaderboardService;
 
-    public GameService(ChatService chatService,
-                       ParticipantService participantService,
-                       RoomService roomService,
-                       MessageService messageService,
-                       WordService wordService,
-                       TaskScheduler taskScheduler,
-                       DrawingService drawingService,
-                       HintService hintService,
-                       LeaderboardService leaderboardService,
-                       ScoringService scoringService) {
+    public GameLogicService(ChatService chatService,
+                            ParticipantService participantService,
+                            RoomService roomService,
+                            MessageService messageService,
+                            WordService wordService,
+                            TaskScheduler taskScheduler,
+                            DrawingService drawingService,
+                            HintService hintService,
+                            LeaderboardService leaderboardService,
+                            ScoringService scoringService) {
         this.chatService = chatService;
         this.participantService = participantService;
         this.roomService = roomService;
@@ -76,7 +76,7 @@ public class GameService {
 
     public void handleNoGuess(String roomId, Game game) {
         hintService.stopHintProgression(roomId);
-        drawingService.clearCanvas(roomId, new ClearCanvasMessage("system"));
+        drawingService.clearCanvas(roomId, new ClearCanvasMessage(SERVER_MESSAGE_TYPE));
         ChatMessage msg = messageService.systemMessage(MessageType.NO_GUESS);
         chatService.sendChatMessage(roomId, msg);
         game.nextRound();
@@ -94,7 +94,7 @@ public class GameService {
             scoringService.handleScoring(roomId, game, guess, sessionId);
             roomService.broadcastParticipants(roomId);
             hintService.stopHintProgression(roomId);
-            drawingService.clearCanvas(roomId, new ClearCanvasMessage("system"));
+            drawingService.clearCanvas(roomId, new ClearCanvasMessage(SERVER_MESSAGE_TYPE));
             game.nextRound();
             String username = participantService.findParticipantBySessionId(sessionId).getUsername();
             chatService.sendChatMessage(roomId, messageService.systemMessage(MessageType.WORD_GUESSED, username));
@@ -158,7 +158,7 @@ public class GameService {
     }
 
     private void endGame(String roomId, Game game) {
-        drawingService.clearCanvas(roomId, new ClearCanvasMessage("system"));
+        drawingService.clearCanvas(roomId, new ClearCanvasMessage(SERVER_MESSAGE_TYPE));
         StringBuilder sb = new StringBuilder(GAME_ENDED_MSG).append(" after ")
                 .append(game.getTotalRounds()).append(" rounds. Final scores: ");
         for (String pid : game.getParticipantSessionIds()) {

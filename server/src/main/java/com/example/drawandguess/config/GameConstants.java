@@ -29,6 +29,7 @@ public final class GameConstants {
     public static final String NICKNAME_REGISTERED_MSG = "Nickname registered successfully";
     public static final String INVALID_NICKNAME_MSG = "Invalid nickname";
     public static final String REMOVED_PARTICIPANT_MSG_PREFIX = "Removed participant: ";
+    public static final String SERVER_MESSAGE_TYPE = "system";
 
     public static final String USER_KEY = "user";
     public static final String MESSAGE_KEY = "message";

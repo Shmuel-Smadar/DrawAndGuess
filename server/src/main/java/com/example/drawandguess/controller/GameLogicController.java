@@ -9,7 +9,7 @@ import static com.example.drawandguess.config.APIConstants.TOPIC_ROOM_PREFIX;
 import static com.example.drawandguess.config.APIConstants.WORD_HINT_ENDPOINT;
 
 import com.example.drawandguess.model.WordOptions;
-import com.example.drawandguess.service.GameService;
+import com.example.drawandguess.service.GameLogicService;
 import com.example.drawandguess.service.RoomService;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -21,12 +21,12 @@ import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 
 @Controller
 public class GameLogicController {
-    private final GameService gameService;
+    private final GameLogicService gameLogicService;
     private final RoomService roomService;
     private final SimpMessagingTemplate messagingTemplate;
 
-    public GameLogicController(GameService gameService, RoomService roomService, SimpMessagingTemplate messagingTemplate) {
-        this.gameService = gameService;
+    public GameLogicController(GameLogicService gameLogicService, RoomService roomService, SimpMessagingTemplate messagingTemplate) {
+        this.gameLogicService = gameLogicService;
         this.roomService = roomService;
         this.messagingTemplate = messagingTemplate;
     }
@@ -35,19 +35,19 @@ public class GameLogicController {
     @SendToUser(WORD_OPTIONS_TOPIC)
     public WordOptions handleWordRequest(@DestinationVariable String roomId, SimpMessageHeaderAccessor headerAccessor) {
         String sessionId = headerAccessor.getSessionId();
-        return gameService.requestWords(roomId, sessionId);
+        return gameLogicService.requestWords(roomId, sessionId);
     }
 
     @MessageMapping(CHOOSE_WORD_MAPPING)
     public void handleWordChosen(@DestinationVariable String roomId, @Payload String chosenWord, SimpMessageHeaderAccessor headerAccessor) {
         String sessionId = headerAccessor.getSessionId();
-        gameService.chooseWord(roomId, sessionId, chosenWord);
+        gameLogicService.chooseWord(roomId, sessionId, chosenWord);
     }
 
     @MessageMapping(CORRECT_GUESS_MAPPING)
     public void handleCorrectGuess(@DestinationVariable String roomId, @Payload String guess, SimpMessageHeaderAccessor headerAccessor) {
         String sessionId = headerAccessor.getSessionId();
-        gameService.handleGuess(roomId, guess, sessionId);
+        gameLogicService.handleGuess(roomId, guess, sessionId);
     }
 
     @MessageMapping(CURRENT_HINT_MAPPING)
