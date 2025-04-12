@@ -1,7 +1,7 @@
 package com.example.drawandguess.controller;
 
-import static com.example.drawandguess.config.PathConstants.DRAW_MAPPING;
-import static com.example.drawandguess.config.PathConstants.CLEAR_CANVAS_MAPPING;
+import static com.example.drawandguess.config.APIConstants.DRAW_MAPPING;
+import static com.example.drawandguess.config.APIConstants.CLEAR_CANVAS_MAPPING;
 
 import com.example.drawandguess.model.DrawMessage;
 import com.example.drawandguess.model.ClearCanvasMessage;

@@ -1,9 +1,9 @@
 package com.example.drawandguess.controller;
 
-import static com.example.drawandguess.config.PathConstants.DRAW_AND_GUESS_PATH;
-import static com.example.drawandguess.config.PathConstants.DRAW_AND_GUESS_SLASH_PATH;
-import static com.example.drawandguess.config.PathConstants.HOME_PATH;
-import static com.example.drawandguess.config.PathConstants.MAIN_INDEX_FILE;
+import static com.example.drawandguess.config.APIConstants.DRAW_AND_GUESS_PATH;
+import static com.example.drawandguess.config.APIConstants.DRAW_AND_GUESS_SLASH_PATH;
+import static com.example.drawandguess.config.APIConstants.HOME_PATH;
+import static com.example.drawandguess.config.APIConstants.MAIN_INDEX_FILE;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;

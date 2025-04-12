@@ -5,7 +5,7 @@ import static com.example.drawandguess.config.GameConstants.NICKNAME_REGISTERED_
 import static com.example.drawandguess.config.GameConstants.REMOVED_PARTICIPANT_MSG_PREFIX;
 
 import org.springframework.stereotype.Service;
-import com.example.drawandguess.model.NicknameStatus;
+import com.example.drawandguess.model.NicknameResgistrationResponse;
 import com.example.drawandguess.model.Participant;
 
 import java.util.*;
@@ -16,13 +16,13 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ParticipantService {
     private final Map<String, Participant> sessionIdToParticipant = new ConcurrentHashMap<>();
 
-    public NicknameStatus registerParticipant(String sessionId, String nickname) {
+    public NicknameResgistrationResponse registerParticipant(String sessionId, String nickname) {
         if (isNicknameTaken(nickname)) {
-            return new NicknameStatus(false, NICKNAME_TAKEN_MSG);
+            return new NicknameResgistrationResponse(false, NICKNAME_TAKEN_MSG);
         }
         Participant participant = new Participant(sessionId, nickname, false);
         sessionIdToParticipant.put(sessionId, participant);
-        return new NicknameStatus(true, NICKNAME_REGISTERED_MSG);
+        return new NicknameResgistrationResponse(true, NICKNAME_REGISTERED_MSG);
     }
 
     public void removeParticipant(String sessionId) {

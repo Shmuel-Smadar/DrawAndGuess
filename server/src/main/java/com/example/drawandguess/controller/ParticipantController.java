@@ -1,11 +1,11 @@
 package com.example.drawandguess.controller;
 
-import static com.example.drawandguess.config.PathConstants.REGISTER_NICKNAME;
-import static com.example.drawandguess.config.PathConstants.NICKNAME_TOPIC;
+import static com.example.drawandguess.config.APIConstants.REGISTER_NICKNAME;
+import static com.example.drawandguess.config.APIConstants.NICKNAME_TOPIC;
 import static com.example.drawandguess.config.GameConstants.NICKNAME_REGEX;
 import static com.example.drawandguess.config.GameConstants.INVALID_NICKNAME_MSG;
 
-import com.example.drawandguess.model.NicknameStatus;
+import com.example.drawandguess.model.NicknameResgistrationResponse;
 import com.example.drawandguess.model.RegistrationRequest;
 import com.example.drawandguess.service.ParticipantService;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -24,14 +24,14 @@ public class ParticipantController {
 
     @MessageMapping(REGISTER_NICKNAME)
     @SendToUser(NICKNAME_TOPIC)
-    public NicknameStatus registerNickname(@Payload RegistrationRequest request, SimpMessageHeaderAccessor headerAccessor) {
+    public NicknameResgistrationResponse registerNickname(@Payload RegistrationRequest request, SimpMessageHeaderAccessor headerAccessor) {
         String sessionId = headerAccessor.getSessionId();
         String nickname = request.getNickname().trim();
         if (!nickname.matches(NICKNAME_REGEX)) {
-            return new NicknameStatus(false, INVALID_NICKNAME_MSG);
+            return new NicknameResgistrationResponse(false, INVALID_NICKNAME_MSG);
         }
-        NicknameStatus status = participantService.registerParticipant(sessionId, nickname);
-        status.setSessionId(sessionId);
-        return status;
+        NicknameResgistrationResponse res = participantService.registerParticipant(sessionId, nickname);
+        res.setSessionId(sessionId);
+        return res;
     }
 }

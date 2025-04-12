@@ -1,15 +1,18 @@
 package com.example.drawandguess.controller;
 
-import static com.example.drawandguess.config.PathConstants.CREATE_ROOM;
-import static com.example.drawandguess.config.PathConstants.ROOM_CREATED_TOPIC;
-import static com.example.drawandguess.config.PathConstants.JOIN_ROOM;
-import static com.example.drawandguess.config.PathConstants.LEAVE_ROOM;
-import static com.example.drawandguess.config.PathConstants.GET_ROOMS;
-import static com.example.drawandguess.config.PathConstants.TOPIC_ROOMS;
-import static com.example.drawandguess.config.PathConstants.PARTICIPANTS_MAPPING;
+import static com.example.drawandguess.config.APIConstants.CREATE_ROOM;
+import static com.example.drawandguess.config.APIConstants.ROOM_CREATED_TOPIC;
+import static com.example.drawandguess.config.APIConstants.JOIN_ROOM;
+import static com.example.drawandguess.config.APIConstants.LEAVE_ROOM;
+import static com.example.drawandguess.config.APIConstants.GET_ROOMS;
+import static com.example.drawandguess.config.APIConstants.TOPIC_ROOMS;
+import static com.example.drawandguess.config.APIConstants.PARTICIPANTS_MAPPING;
 import static com.example.drawandguess.config.GameConstants.ROOM_NAME_KEY;
 import static com.example.drawandguess.config.GameConstants.ROOM_ID_KEY;
 import static com.example.drawandguess.config.GameConstants.NUMBER_OF_PARTICIPANTS_KEY;
+
+import static com.example.drawandguess.config.APIConstants.PARTICIPANTS_ENDPOINT;
+import static com.example.drawandguess.config.APIConstants.TOPIC_ROOM_PREFIX;
 
 import com.example.drawandguess.model.Participant;
 import com.example.drawandguess.model.Room;
@@ -81,7 +84,7 @@ public class RoomController {
     public void handleParticipantsRequest(@DestinationVariable String roomId) {
         List<Participant> participants = roomService.getParticipants(roomId);
         messagingTemplate.convertAndSend(
-                com.example.drawandguess.config.PathConstants.TOPIC_ROOM_PREFIX + roomId + com.example.drawandguess.config.PathConstants.PARTICIPANTS_ENDPOINT,
+                TOPIC_ROOM_PREFIX + roomId + PARTICIPANTS_ENDPOINT,
                 participants
         );
     }

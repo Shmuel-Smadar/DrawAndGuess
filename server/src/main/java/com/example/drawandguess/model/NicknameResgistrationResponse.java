@@ -1,16 +1,16 @@
 package com.example.drawandguess.model;
 
-public class NicknameStatus {
+public class NicknameResgistrationResponse {
     private boolean success;
     private String message;
     private String sessionId;
 
-    public NicknameStatus(boolean success, String message) {
+    public NicknameResgistrationResponse(boolean success, String message) {
         this.success = success;
         this.message = message;
     }
 
-    public NicknameStatus(boolean success, String message, String sessionId) {
+    public NicknameResgistrationResponse(boolean success, String message, String sessionId) {
         this.success = success;
         this.message = message;
         this.sessionId = sessionId;

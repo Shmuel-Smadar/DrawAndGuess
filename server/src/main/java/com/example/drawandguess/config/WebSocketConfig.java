@@ -4,11 +4,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.*;
 
-import static com.example.drawandguess.config.PathConstants.APP_PREFIX;
-import static com.example.drawandguess.config.PathConstants.USER_PREFIX;
-import static com.example.drawandguess.config.PathConstants.TOPIC_PREFIX;
-import static com.example.drawandguess.config.PathConstants.ALLOWED_ORIGINS;
-import static com.example.drawandguess.config.PathConstants.STOMP_ENDPOINT;
+import static com.example.drawandguess.config.APIConstants.APP_PREFIX;
+import static com.example.drawandguess.config.APIConstants.USER_PREFIX;
+import static com.example.drawandguess.config.APIConstants.TOPIC_PREFIX;
+import static com.example.drawandguess.config.APIConstants.ALLOWED_ORIGINS;
+import static com.example.drawandguess.config.APIConstants.STOMP_ENDPOINT;
 
 @Configuration
 @EnableWebSocketMessageBroker

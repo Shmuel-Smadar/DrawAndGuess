@@ -1,12 +1,12 @@
 package com.example.drawandguess.controller;
 
-import static com.example.drawandguess.config.PathConstants.REQUEST_WORDS_MAPPING;
-import static com.example.drawandguess.config.PathConstants.WORD_OPTIONS_TOPIC;
-import static com.example.drawandguess.config.PathConstants.CHOOSE_WORD_MAPPING;
-import static com.example.drawandguess.config.PathConstants.CORRECT_GUESS_MAPPING;
-import static com.example.drawandguess.config.PathConstants.CURRENT_HINT_MAPPING;
-import static com.example.drawandguess.config.PathConstants.TOPIC_ROOM_PREFIX;
-import static com.example.drawandguess.config.PathConstants.WORD_HINT_ENDPOINT;
+import static com.example.drawandguess.config.APIConstants.REQUEST_WORDS_MAPPING;
+import static com.example.drawandguess.config.APIConstants.WORD_OPTIONS_TOPIC;
+import static com.example.drawandguess.config.APIConstants.CHOOSE_WORD_MAPPING;
+import static com.example.drawandguess.config.APIConstants.CORRECT_GUESS_MAPPING;
+import static com.example.drawandguess.config.APIConstants.CURRENT_HINT_MAPPING;
+import static com.example.drawandguess.config.APIConstants.TOPIC_ROOM_PREFIX;
+import static com.example.drawandguess.config.APIConstants.WORD_HINT_ENDPOINT;
 
 import com.example.drawandguess.model.WordOptions;
 import com.example.drawandguess.service.GameService;

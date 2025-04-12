@@ -3,11 +3,9 @@ package com.example.drawandguess.service;
 import static com.example.drawandguess.config.GameConstants.HINT_INTERVAL_SECONDS;
 
 import com.example.drawandguess.model.Game;
-import com.example.drawandguess.model.Room;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 import java.time.Duration;
-import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
 
@@ -15,13 +13,11 @@ import java.util.concurrent.ScheduledFuture;
 public class HintService {
     private final TaskScheduler taskScheduler;
     private final ChatService chatService;
-    private final RoomService roomService;
     private final ConcurrentHashMap<String, ScheduledFuture<?>> hintTasks = new ConcurrentHashMap<>();
 
-    public HintService(TaskScheduler taskScheduler, ChatService chatService, RoomService roomService, DrawingService drawingService) {
+    public HintService(TaskScheduler taskScheduler, ChatService chatService, DrawingService drawingService) {
         this.taskScheduler = taskScheduler;
         this.chatService = chatService;
-        this.roomService = roomService;
     }
 
     public void startHintProgression(String roomId, Game game, Runnable onNoHint) {
@@ -49,11 +45,6 @@ public class HintService {
     }
 
     private void sendHintToParticipants(String roomId, String currentHint, Game game) {
-        Room room = roomService.getRoom(roomId);
-        List<String> participantSessions = room.getGame().getParticipantSessionIds();
-        String currentDrawer = room.getGame().getCurrentDrawer();
-        participantSessions.stream()
-                .filter(session -> !session.equals(currentDrawer))
-                .forEach(session -> chatService.sendWordHint(session, roomId, currentHint));
+        chatService.sendWordHint(roomId, currentHint);
     }
 }

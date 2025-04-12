@@ -1,7 +1,7 @@
 package com.example.drawandguess.service;
 
-import static com.example.drawandguess.config.PathConstants.TOPIC_ROOMS;
-import static com.example.drawandguess.config.PathConstants.topicRoomParticipants;
+import static com.example.drawandguess.config.APIConstants.TOPIC_ROOMS;
+import static com.example.drawandguess.config.APIConstants.topicRoomParticipants;
 import static com.example.drawandguess.config.GameConstants.TIMER_DELAY_MS;
 
 import com.example.drawandguess.model.Game;

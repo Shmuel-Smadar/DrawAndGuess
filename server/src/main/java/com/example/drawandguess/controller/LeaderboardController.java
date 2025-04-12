@@ -1,7 +1,7 @@
 package com.example.drawandguess.controller;
 
-import static com.example.drawandguess.config.PathConstants.LEADERBOARD_MAPPING;
-
+import static com.example.drawandguess.config.APIConstants.LEADERBOARD_MAPPING;
+import static com.example.drawandguess.config.APIConstants.ALLOWED_ORIGINS;
 import com.example.drawandguess.service.LeaderboardService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = ALLOWED_ORIGINS)
 public class LeaderboardController {
 
     private final LeaderboardService leaderboardService;

@@ -29,10 +29,6 @@ public class Participant {
         return username;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
     @JsonProperty("isDrawer")
     public boolean isDrawer() {
         return isDrawer;

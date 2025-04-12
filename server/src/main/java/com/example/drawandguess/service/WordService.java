@@ -3,6 +3,7 @@ package com.example.drawandguess.service;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+import static com.example.drawandguess.config.GameConstants.NUMBER_OF_WORDS_TO_CHOOSE_FROM;
 import com.example.drawandguess.model.WordOptions;
 import java.util.List;
 import java.util.Random;
@@ -49,7 +50,7 @@ public class WordService {
             return new WordOptions(wordPairs.get(0), wordPairs.get(1), wordPairs.get(2));
         } else {
             List<String> wordPairs = new ArrayList<>();
-            for (int i = 0; i < 3; i++) {
+            for (int i = 0; i < NUMBER_OF_WORDS_TO_CHOOSE_FROM; i++) {
                 wordPairs.add(getRandomDefaultWordPair());
             }
             return new WordOptions(wordPairs.get(0), wordPairs.get(1), wordPairs.get(2));

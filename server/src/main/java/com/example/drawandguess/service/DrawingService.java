@@ -4,8 +4,8 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import com.example.drawandguess.model.DrawMessage;
 import com.example.drawandguess.model.ClearCanvasMessage;
-import static com.example.drawandguess.config.PathConstants.topicRoomDrawing;
-import static com.example.drawandguess.config.PathConstants.topicRoomClearCanvas;
+import static com.example.drawandguess.config.APIConstants.topicRoomDrawing;
+import static com.example.drawandguess.config.APIConstants.topicRoomClearCanvas;
 
 @Service
 public class DrawingService {

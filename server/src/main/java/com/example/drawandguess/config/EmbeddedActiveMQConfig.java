@@ -4,7 +4,7 @@ import org.apache.activemq.broker.BrokerService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import static com.example.drawandguess.config.PathConstants.VM_CONNECTOR;
+import static com.example.drawandguess.config.APIConstants.VM_CONNECTOR;
 
 @Configuration
 public class EmbeddedActiveMQConfig {

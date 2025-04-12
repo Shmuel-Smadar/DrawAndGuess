@@ -24,7 +24,6 @@ public class GameService {
     private final TaskScheduler taskScheduler;
     private final DrawingService drawingService;
     private final HintService hintService;
-    private final RoundService roundService;
     private final ScoringService scoringService;
     private final LeaderboardService leaderboardService;
 
@@ -36,7 +35,6 @@ public class GameService {
                        TaskScheduler taskScheduler,
                        DrawingService drawingService,
                        HintService hintService,
-                       RoundService roundService,
                        LeaderboardService leaderboardService,
                        ScoringService scoringService) {
         this.chatService = chatService;
@@ -47,7 +45,6 @@ public class GameService {
         this.drawingService = drawingService;
         this.hintService = hintService;
         this.taskScheduler = taskScheduler;
-        this.roundService = roundService;
         this.leaderboardService = leaderboardService;
         this.scoringService = scoringService;
     }
@@ -86,7 +83,7 @@ public class GameService {
         if (game.isGameOver()) {
             endGame(roomId, game);
         } else {
-            roundService.updateDrawerAndBroadcast(roomId, game);
+            updateDrawerAndBroadcast(roomId, game);
         }
     }
 
@@ -104,7 +101,7 @@ public class GameService {
             if (game.isGameOver()) {
                 endGame(roomId, game);
             } else {
-                roundService.updateDrawerAndBroadcast(roomId, game);
+                updateDrawerAndBroadcast(roomId, game);
             }
         }
     }
@@ -177,7 +174,13 @@ public class GameService {
         }
         scheduleNewGame(roomId, game);
     }
-
+    public void updateDrawerAndBroadcast(String roomId, Game game) {
+        String currentDrawer = game.getCurrentDrawer();
+        participantService.getAllParticipants().values().forEach(
+                p -> participantService.setDrawer(p.getSessionId(), p.getSessionId().equals(currentDrawer))
+        );
+        roomService.broadcastParticipants(roomId);
+    }
     private void scheduleNewGame(String roomId, Game game) {
         taskScheduler.schedule(() -> {
             game.resetGame();
@@ -194,7 +197,7 @@ public class GameService {
                 );
                 chatService.sendChatMessage(roomId, newGameMsg);
                 roomService.broadcastParticipants(roomId);
-                roundService.updateDrawerAndBroadcast(roomId, game);
+                updateDrawerAndBroadcast(roomId, game);
             }
         }, Instant.now().plusSeconds(NEW_GAME_DELAY_SECONDS));
     }

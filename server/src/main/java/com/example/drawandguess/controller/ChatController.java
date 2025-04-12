@@ -1,6 +1,6 @@
 package com.example.drawandguess.controller;
 
-import static com.example.drawandguess.config.PathConstants.CHAT_MAPPING;
+import static com.example.drawandguess.config.APIConstants.CHAT_MAPPING;
 import static com.example.drawandguess.config.GameConstants.MAX_CHAT_MESSAGE_LENGTH;
 
 import com.example.drawandguess.model.ChatMessage;

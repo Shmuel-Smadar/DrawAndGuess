@@ -1,6 +1,6 @@
 package com.example.drawandguess.controller;
 
-import static com.example.drawandguess.config.PathConstants.WINNER_MAPPING;
+import static com.example.drawandguess.config.APIConstants.WINNER_MAPPING;
 import static com.example.drawandguess.config.GameConstants.USER_KEY;
 import static com.example.drawandguess.config.GameConstants.MESSAGE_KEY;
 
