@@ -1,8 +1,10 @@
 package com.example.drawandguess.controller;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import static com.example.drawandguess.config.APIConstants.CHAT_MAPPING;
+import static com.example.drawandguess.config.APIConstants.ERROR_LOG_FILE;
 import static com.example.drawandguess.config.GameConstants.MAX_CHAT_MESSAGE_LENGTH;
-
 import com.example.drawandguess.model.ChatMessage;
 import com.example.drawandguess.service.ChatService;
 import com.example.drawandguess.service.GameLogicService;
@@ -23,10 +25,21 @@ public class ChatController {
 
     @MessageMapping(CHAT_MAPPING)
     public void processChatMessage(@DestinationVariable String roomId, @Payload ChatMessage chatMessage) {
-        if (chatMessage.getText() == null || chatMessage.getText().length() > MAX_CHAT_MESSAGE_LENGTH) {
-            return;
+        try {
+            if (chatMessage.getText() == null || chatMessage.getText().length() > MAX_CHAT_MESSAGE_LENGTH) {
+                try (FileWriter w = new FileWriter(ERROR_LOG_FILE, true)) {
+                    w.write("Invalid chat message from session " + chatMessage.getSenderSessionId() + "\n");
+                } catch (IOException ignored) {
+                }
+                return;
+            }
+            chatService.sendChatMessage(roomId, chatMessage);
+            gameService.handleGuess(roomId, chatMessage.getText(), chatMessage.getSenderSessionId());
+        } catch (Exception e) {
+            try (FileWriter w = new FileWriter(ERROR_LOG_FILE, true)) {
+                w.write("Error processing chat message: " + e.getMessage() + "\n");
+            } catch (IOException ignored) {
+            }
         }
-        chatService.sendChatMessage(roomId, chatMessage);
-        gameService.handleGuess(roomId, chatMessage.getText(), chatMessage.getSenderSessionId());
     }
 }

@@ -165,6 +165,7 @@ public class GameLogicService {
             String username = participantService.findParticipantBySessionId(pid).getUsername();
             sb.append(username).append("=").append(game.getScore(username)).append("  ");
         }
+        sb.append(".\n A new game will start in " + NEW_GAME_DELAY_SECONDS + " seconds.\n");
         chatService.sendChatMessage(roomId, messageService.systemMessage(MessageType.GAME_ENDED, sb.toString()));
         String winnerSessionId = scoringService.getWinnerSessionId(game);
         if (winnerSessionId != null) {

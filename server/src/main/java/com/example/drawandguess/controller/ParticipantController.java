@@ -1,10 +1,12 @@
 package com.example.drawandguess.controller;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import static com.example.drawandguess.config.APIConstants.REGISTER_NICKNAME;
 import static com.example.drawandguess.config.APIConstants.NICKNAME_TOPIC;
 import static com.example.drawandguess.config.GameConstants.NICKNAME_REGEX;
 import static com.example.drawandguess.config.GameConstants.INVALID_NICKNAME_MSG;
-
+import static com.example.drawandguess.config.APIConstants.ERROR_LOG_FILE;
 import com.example.drawandguess.model.NicknameResgistrationResponse;
 import com.example.drawandguess.model.RegistrationRequest;
 import com.example.drawandguess.service.ParticipantService;
@@ -17,21 +19,27 @@ import org.springframework.messaging.handler.annotation.Payload;
 @Controller
 public class ParticipantController {
     private final ParticipantService participantService;
-
     public ParticipantController(ParticipantService participantService) {
         this.participantService = participantService;
     }
-
     @MessageMapping(REGISTER_NICKNAME)
     @SendToUser(NICKNAME_TOPIC)
     public NicknameResgistrationResponse registerNickname(@Payload RegistrationRequest request, SimpMessageHeaderAccessor headerAccessor) {
-        String sessionId = headerAccessor.getSessionId();
-        String nickname = request.getNickname().trim();
-        if (!nickname.matches(NICKNAME_REGEX)) {
-            return new NicknameResgistrationResponse(false, INVALID_NICKNAME_MSG);
+        try {
+            String sessionId = headerAccessor.getSessionId();
+            String nickname = request.getNickname().trim();
+            if (!nickname.matches(NICKNAME_REGEX)) {
+                return new NicknameResgistrationResponse(false, INVALID_NICKNAME_MSG);
+            }
+            NicknameResgistrationResponse res = participantService.registerParticipant(sessionId, nickname);
+            res.setSessionId(sessionId);
+            return res;
+        } catch (Exception e) {
+            try (FileWriter w = new FileWriter(ERROR_LOG_FILE, true)) {
+                w.write("Error in registerNickname: " + e.getMessage() + "\n");
+            } catch (IOException ignored) {
+            }
+            return new NicknameResgistrationResponse(false, "Error");
         }
-        NicknameResgistrationResponse res = participantService.registerParticipant(sessionId, nickname);
-        res.setSessionId(sessionId);
-        return res;
     }
 }

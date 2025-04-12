@@ -1,5 +1,7 @@
 package com.example.drawandguess.controller;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import static com.example.drawandguess.config.APIConstants.CREATE_ROOM;
 import static com.example.drawandguess.config.APIConstants.ROOM_CREATED_TOPIC;
 import static com.example.drawandguess.config.APIConstants.JOIN_ROOM;
@@ -7,13 +9,12 @@ import static com.example.drawandguess.config.APIConstants.LEAVE_ROOM;
 import static com.example.drawandguess.config.APIConstants.GET_ROOMS;
 import static com.example.drawandguess.config.APIConstants.TOPIC_ROOMS;
 import static com.example.drawandguess.config.APIConstants.PARTICIPANTS_MAPPING;
+import static com.example.drawandguess.config.APIConstants.PARTICIPANTS_ENDPOINT;
+import static com.example.drawandguess.config.APIConstants.TOPIC_ROOM_PREFIX;
 import static com.example.drawandguess.config.GameConstants.ROOM_NAME_KEY;
 import static com.example.drawandguess.config.GameConstants.ROOM_ID_KEY;
 import static com.example.drawandguess.config.GameConstants.NUMBER_OF_PARTICIPANTS_KEY;
-
-import static com.example.drawandguess.config.APIConstants.PARTICIPANTS_ENDPOINT;
-import static com.example.drawandguess.config.APIConstants.TOPIC_ROOM_PREFIX;
-
+import static com.example.drawandguess.config.APIConstants.ERROR_LOG_FILE;
 import com.example.drawandguess.model.Participant;
 import com.example.drawandguess.model.Room;
 import com.example.drawandguess.service.RoomService;
@@ -47,45 +48,82 @@ public class RoomController {
     @MessageMapping(CREATE_ROOM)
     @SendToUser(ROOM_CREATED_TOPIC)
     public Room createRoom(@Payload String roomName, SimpMessageHeaderAccessor headerAccessor) {
-        if (roomName == null || roomName.length() > com.example.drawandguess.config.GameConstants.MAX_ROOM_NAME_LENGTH) {
+        try {
+            if (roomName == null || roomName.length() > com.example.drawandguess.config.GameConstants.MAX_ROOM_NAME_LENGTH) {
+                return null;
+            }
+            Room room = roomService.createRoom(roomName);
+            String sessionId = headerAccessor.getSessionId();
+            roomService.joinRoom(sessionId, room.getRoomId());
+            return room;
+        } catch (Exception e) {
+            try (FileWriter w = new FileWriter(ERROR_LOG_FILE, true)) {
+                w.write("Error in createRoom: " + e.getMessage() + "\n");
+            } catch (IOException ignored) {
+            }
             return null;
         }
-        Room room = roomService.createRoom(roomName);
-        String sessionId = headerAccessor.getSessionId();
-        roomService.joinRoom(sessionId, room.getRoomId());
-        return room;
     }
 
     @MessageMapping(JOIN_ROOM)
     public void joinRoom(@Payload String roomId, SimpMessageHeaderAccessor headerAccessor) {
-        String sessionId = headerAccessor.getSessionId();
-        roomService.joinRoom(sessionId, roomId);
+        try {
+            String sessionId = headerAccessor.getSessionId();
+            roomService.joinRoom(sessionId, roomId);
+        } catch (Exception e) {
+            try (FileWriter w = new FileWriter(ERROR_LOG_FILE, true)) {
+                w.write("Error in joinRoom: " + e.getMessage() + "\n");
+            } catch (IOException ignored) {
+            }
+        }
     }
 
     @MessageMapping(LEAVE_ROOM)
     public void leaveRoom(@Payload String roomId, SimpMessageHeaderAccessor headerAccessor) {
-        String sessionId = headerAccessor.getSessionId();
-        gameService.userLeftRoom(roomId, sessionId);
+        try {
+            String sessionId = headerAccessor.getSessionId();
+            gameService.userLeftRoom(roomId, sessionId);
+        } catch (Exception e) {
+            try (FileWriter w = new FileWriter(ERROR_LOG_FILE, true)) {
+                w.write("Error in leaveRoom: " + e.getMessage() + "\n");
+            } catch (IOException ignored) {
+            }
+        }
     }
 
     @MessageMapping(GET_ROOMS)
     @SendTo(TOPIC_ROOMS)
     public Collection<?> getRooms() {
-        return roomService.getAllRooms().stream().map(room -> {
-            Map<String, Object> roomInfo = new HashMap<>();
-            roomInfo.put(ROOM_NAME_KEY, room.getRoomName());
-            roomInfo.put(ROOM_ID_KEY, room.getRoomId());
-            roomInfo.put(NUMBER_OF_PARTICIPANTS_KEY, room.getGame().getParticipantSessionIds().size());
-            return roomInfo;
-        }).collect(Collectors.toList());
+        try {
+            return roomService.getAllRooms().stream().map(room -> {
+                Map<String, Object> roomInfo = new HashMap<>();
+                roomInfo.put(ROOM_NAME_KEY, room.getRoomName());
+                roomInfo.put(ROOM_ID_KEY, room.getRoomId());
+                roomInfo.put(NUMBER_OF_PARTICIPANTS_KEY, room.getGame().getParticipantSessionIds().size());
+                return roomInfo;
+            }).collect(Collectors.toList());
+        } catch (Exception e) {
+            try (FileWriter w = new FileWriter(ERROR_LOG_FILE, true)) {
+                w.write("Error in getRooms: " + e.getMessage() + "\n");
+            } catch (IOException ignored) {
+            }
+            return null;
+        }
     }
 
     @MessageMapping(PARTICIPANTS_MAPPING)
     public void handleParticipantsRequest(@DestinationVariable String roomId) {
-        List<Participant> participants = roomService.getParticipants(roomId);
-        messagingTemplate.convertAndSend(
+        try {
+            List<Participant> participants = roomService.getParticipants(roomId);
+            messagingTemplate.convertAndSend(
                 TOPIC_ROOM_PREFIX + roomId + PARTICIPANTS_ENDPOINT,
                 participants
-        );
+            );
+        } catch (Exception e) {
+            try (FileWriter w = new FileWriter(ERROR_LOG_FILE, true)) {
+                w.write("Error in handleParticipantsRequest: " + e.getMessage() + "\n");
+            } catch (IOException ignored) {
+            }
+        }
     }
 }

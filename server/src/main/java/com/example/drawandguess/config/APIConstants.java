@@ -54,7 +54,7 @@ public final class APIConstants {
     public static final String PARTICIPANTS_ENDPOINT = "/participants";
 
 
-
+    public static final String ERROR_LOG_FILE = "error.log";
     public static final String VM_CONNECTOR = "vm://localhost";
 
     // static helper methods for path construction
