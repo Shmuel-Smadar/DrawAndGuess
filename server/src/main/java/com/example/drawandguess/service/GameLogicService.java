@@ -1,6 +1,5 @@
 package com.example.drawandguess.service;
 
-import static com.example.drawandguess.config.GameConstants.GAME_ENDED_MSG;
 import static com.example.drawandguess.config.GameConstants.NEW_GAME_DELAY_SECONDS;
 import static com.example.drawandguess.config.GameConstants.SERVER_MESSAGE_TYPE;
 import com.example.drawandguess.model.ChatMessage;
@@ -159,14 +158,8 @@ public class GameLogicService {
 
     private void endGame(String roomId, Game game) {
         drawingService.clearCanvas(roomId, new ClearCanvasMessage(SERVER_MESSAGE_TYPE));
-        StringBuilder sb = new StringBuilder(GAME_ENDED_MSG).append(" after ")
-                .append(game.getTotalRounds()).append(" rounds. Final scores: ");
-        for (String pid : game.getParticipantSessionIds()) {
-            String username = participantService.findParticipantBySessionId(pid).getUsername();
-            sb.append(username).append("=").append(game.getScore(username)).append("  ");
-        }
-        sb.append(".\n A new game will start in " + NEW_GAME_DELAY_SECONDS + " seconds.\n");
-        chatService.sendChatMessage(roomId, messageService.systemMessage(MessageType.GAME_ENDED, sb.toString()));
+        String finalScoreMessage = scoringService.buildFinalScoreMessage(game);
+        chatService.sendChatMessage(roomId, messageService.systemMessage(MessageType.GAME_ENDED, finalScoreMessage));
         String winnerSessionId = scoringService.getWinnerSessionId(game);
         if (winnerSessionId != null) {
             String winnerName = participantService.findParticipantBySessionId(winnerSessionId).getUsername();
@@ -175,6 +168,7 @@ public class GameLogicService {
         }
         scheduleNewGame(roomId, game);
     }
+
     public void updateDrawerAndBroadcast(String roomId, Game game) {
         String currentDrawer = game.getCurrentDrawer();
         participantService.getAllParticipants().values().forEach(
@@ -182,6 +176,7 @@ public class GameLogicService {
         );
         roomService.broadcastParticipants(roomId);
     }
+
     private void scheduleNewGame(String roomId, Game game) {
         taskScheduler.schedule(() -> {
             game.resetGame();

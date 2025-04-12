@@ -1,16 +1,16 @@
 package com.example.drawandguess.service;
 
-import static com.example.drawandguess.config.GameConstants.NICKNAME_TAKEN_MSG;
-import static com.example.drawandguess.config.GameConstants.NICKNAME_REGISTERED_MSG;
-import static com.example.drawandguess.config.GameConstants.REMOVED_PARTICIPANT_MSG_PREFIX;
-
-import org.springframework.stereotype.Service;
+import static com.example.drawandguess.config.GameConstants.nicknameTakenMsg;
+import static com.example.drawandguess.config.GameConstants.nicknameRegisteredMsg;
+import static com.example.drawandguess.config.GameConstants.removedParticipantMsg;
 import com.example.drawandguess.model.NicknameResgistrationResponse;
 import com.example.drawandguess.model.Participant;
-
-import java.util.*;
-import java.util.stream.Collectors;
+import org.springframework.stereotype.Service;
+import java.util.Map;
+import java.util.Optional;
+import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.List;
 
 @Service
 public class ParticipantService {
@@ -18,17 +18,17 @@ public class ParticipantService {
 
     public NicknameResgistrationResponse registerParticipant(String sessionId, String nickname) {
         if (isNicknameTaken(nickname)) {
-            return new NicknameResgistrationResponse(false, NICKNAME_TAKEN_MSG);
+            return new NicknameResgistrationResponse(false, nicknameTakenMsg());
         }
         Participant participant = new Participant(sessionId, nickname, false);
         sessionIdToParticipant.put(sessionId, participant);
-        return new NicknameResgistrationResponse(true, NICKNAME_REGISTERED_MSG);
+        return new NicknameResgistrationResponse(true, nicknameRegisteredMsg());
     }
 
     public void removeParticipant(String sessionId) {
         Participant removed = sessionIdToParticipant.remove(sessionId);
         if (removed != null) {
-            System.out.println(REMOVED_PARTICIPANT_MSG_PREFIX + removed.getUsername());
+            System.out.println(removedParticipantMsg(removed.getUsername()));
         }
     }
 
@@ -37,14 +37,11 @@ public class ParticipantService {
     }
 
     public Optional<Participant> findParticipantByNickname(String nickname) {
-        return sessionIdToParticipant.values().stream()
-                .filter(p -> p.getUsername().equals(nickname))
-                .findFirst();
+        return sessionIdToParticipant.values().stream().filter(p -> p.getUsername().equals(nickname)).findFirst();
     }
 
     public boolean isNicknameTaken(String nickname) {
-        return sessionIdToParticipant.values().stream()
-                .anyMatch(p -> p.getUsername().equals(nickname));
+        return sessionIdToParticipant.values().stream().anyMatch(p -> p.getUsername().equals(nickname));
     }
 
     public void setDrawer(String sessionId, boolean isDrawer) {
@@ -55,10 +52,12 @@ public class ParticipantService {
     }
 
     public List<Participant> getParticipantsBySessionIds(List<String> sessionIds) {
-        return sessionIds.stream()
-                .map(sessionIdToParticipant::get)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+        List<Participant> result = new ArrayList<>();
+        for (String sid : sessionIds) {
+            Participant p = sessionIdToParticipant.get(sid);
+            if (p != null) result.add(p);
+        }
+        return result;
     }
 
     public Map<String, Participant> getAllParticipants() {

@@ -3,7 +3,12 @@ package com.example.drawandguess.service;
 import static com.example.drawandguess.config.GameConstants.GUESSER_BASE_POINTS;
 import static com.example.drawandguess.config.GameConstants.DRAWER_BASE_POINTS;
 import static com.example.drawandguess.config.GameConstants.MULTIPLIER_BASE;
-
+import static com.example.drawandguess.config.GameConstants.gameEndedMsg;
+import static com.example.drawandguess.config.GameConstants.finalScoreMsgAfter;
+import static com.example.drawandguess.config.GameConstants.finalScoreMsgRounds;
+import static com.example.drawandguess.config.GameConstants.finalScoreMsgNewGame;
+import static com.example.drawandguess.config.GameConstants.finalScoreMsgSeconds;
+import static com.example.drawandguess.config.GameConstants.NEW_GAME_DELAY_SECONDS;
 import com.example.drawandguess.model.Game;
 import org.springframework.stereotype.Service;
 
@@ -45,5 +50,21 @@ public class ScoringService {
             }
         }
         return (winnerSessionId != null && !tie) ? winnerSessionId : null;
+    }
+
+    public String buildFinalScoreMessage(Game game) {
+        StringBuilder sb = new StringBuilder(gameEndedMsg())
+                .append(finalScoreMsgAfter())
+                .append(game.getTotalRounds())
+                .append(finalScoreMsgRounds());
+        for (String pid : game.getParticipantSessionIds()) {
+            String username = participantService.findParticipantBySessionId(pid).getUsername();
+            sb.append(username).append("=").append(game.getScore(username)).append("  ");
+        }
+        sb.append("./n");
+        sb.append(finalScoreMsgNewGame())
+                .append(NEW_GAME_DELAY_SECONDS)
+                .append(finalScoreMsgSeconds());
+        return sb.toString();
     }
 }

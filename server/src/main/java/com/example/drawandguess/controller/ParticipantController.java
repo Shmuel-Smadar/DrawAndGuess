@@ -5,7 +5,7 @@ import java.io.IOException;
 import static com.example.drawandguess.config.APIConstants.REGISTER_NICKNAME;
 import static com.example.drawandguess.config.APIConstants.NICKNAME_TOPIC;
 import static com.example.drawandguess.config.GameConstants.NICKNAME_REGEX;
-import static com.example.drawandguess.config.GameConstants.INVALID_NICKNAME_MSG;
+import static com.example.drawandguess.config.GameConstants.invalidNicknameMsg;
 import static com.example.drawandguess.config.APIConstants.ERROR_LOG_FILE;
 import com.example.drawandguess.model.NicknameResgistrationResponse;
 import com.example.drawandguess.model.RegistrationRequest;
@@ -22,6 +22,7 @@ public class ParticipantController {
     public ParticipantController(ParticipantService participantService) {
         this.participantService = participantService;
     }
+
     @MessageMapping(REGISTER_NICKNAME)
     @SendToUser(NICKNAME_TOPIC)
     public NicknameResgistrationResponse registerNickname(@Payload RegistrationRequest request, SimpMessageHeaderAccessor headerAccessor) {
@@ -29,7 +30,7 @@ public class ParticipantController {
             String sessionId = headerAccessor.getSessionId();
             String nickname = request.getNickname().trim();
             if (!nickname.matches(NICKNAME_REGEX)) {
-                return new NicknameResgistrationResponse(false, INVALID_NICKNAME_MSG);
+                return new NicknameResgistrationResponse(false, invalidNicknameMsg());
             }
             NicknameResgistrationResponse res = participantService.registerParticipant(sessionId, nickname);
             res.setSessionId(sessionId);

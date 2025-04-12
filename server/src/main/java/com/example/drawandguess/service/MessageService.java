@@ -1,12 +1,13 @@
 package com.example.drawandguess.service;
 
-import static com.example.drawandguess.config.GameConstants.ROUND_STARTED_MSG_PREFIX;
-import static com.example.drawandguess.config.GameConstants.NO_GUESS_MSG;
-import static com.example.drawandguess.config.GameConstants.PARTICIPANT_JOINED_MSG;
-import static com.example.drawandguess.config.GameConstants.PARTICIPANT_LEFT_MSG;
-import static com.example.drawandguess.config.GameConstants.PREVIOUS_DRAWER_QUIT_MSG;
-import static com.example.drawandguess.config.GameConstants.NEW_GAME_STARTED_MSG_PREFIX;
 import static com.example.drawandguess.config.GameConstants.SERVER_MESSAGE_TYPE;
+import static com.example.drawandguess.config.GameConstants.roundStartedMsg;
+import static com.example.drawandguess.config.GameConstants.wordGuessedMsg;
+import static com.example.drawandguess.config.GameConstants.noGuessMsg;
+import static com.example.drawandguess.config.GameConstants.participantJoinedMsg;
+import static com.example.drawandguess.config.GameConstants.participantLeftMsg;
+import static com.example.drawandguess.config.GameConstants.previousDrawerQuitMsg;
+import static com.example.drawandguess.config.GameConstants.newGameStartedMsg;
 import com.example.drawandguess.model.ChatMessage;
 import com.example.drawandguess.model.MessageType;
 import org.springframework.stereotype.Service;
@@ -19,21 +20,21 @@ public class MessageService {
         msg.setMessageType(type);
         switch (type) {
             case ROUND_STARTED ->
-                msg.setText(ROUND_STARTED_MSG_PREFIX + args[0] + ". (Round " + args[1] + "/" + args[2] + ")");
+                    msg.setText(roundStartedMsg(args[0], args[1], args[2]));
             case WORD_GUESSED ->
-                msg.setText(args[0] + " guessed the word!");
+                    msg.setText(wordGuessedMsg(args[0]));
             case NO_GUESS ->
-                msg.setText(NO_GUESS_MSG);
+                    msg.setText(noGuessMsg());
             case GAME_ENDED ->
-                msg.setText(args[0]);
+                    msg.setText(args[0]);
             case PARTICIPANT_JOINED ->
-                msg.setText(args[0] + PARTICIPANT_JOINED_MSG);
+                    msg.setText(participantJoinedMsg(args[0]));
             case PARTICIPANT_LEFT ->
-                msg.setText(args[0] + PARTICIPANT_LEFT_MSG);
+                    msg.setText(participantLeftMsg(args[0]));
             case PREVIOUS_DRAWER_QUIT ->
-                msg.setText(PREVIOUS_DRAWER_QUIT_MSG + args[0]);
+                    msg.setText(previousDrawerQuitMsg(args[0]));
             case NEW_GAME_STARTED ->
-                msg.setText(NEW_GAME_STARTED_MSG_PREFIX + args[0] + "/" + args[1] + ") The drawer is " + args[2] + ".");
+                    msg.setText(newGameStartedMsg(args[0], args[1], args[2]));
         }
         return msg;
     }

@@ -5,7 +5,6 @@ public final class GameConstants {
 
     //names can have english and hebrew characters and numbers
     public static final String NICKNAME_REGEX = "^[A-Za-z0-9\\u0590-\\u05FF]+$";
-
     public static final int HINT_INTERVAL_SECONDS = 10;
     public static final int TIMER_DELAY_MS = 100;
     public static final int NEW_GAME_DELAY_SECONDS = 10;
@@ -17,18 +16,6 @@ public final class GameConstants {
     public static final int MAX_CHAT_MESSAGE_LENGTH = 50;
     public static final int NUMBER_OF_WORDS_TO_CHOOSE_FROM = 3;
     public static final String SCORE_SEPARATOR = ":";
-
-    public static final String ROUND_STARTED_MSG_PREFIX = "A new round has started. The drawer is ";
-    public static final String NO_GUESS_MSG = "No one guessed the word.";
-    public static final String GAME_ENDED_MSG = "The game has ended";
-    public static final String PARTICIPANT_JOINED_MSG = " has joined the room.";
-    public static final String PARTICIPANT_LEFT_MSG = " has left the room.";
-    public static final String PREVIOUS_DRAWER_QUIT_MSG = "The previous drawer quit abruptly. The round has been reset. New drawer is: ";
-    public static final String NEW_GAME_STARTED_MSG_PREFIX = "A new game has started. (Round ";
-    public static final String NICKNAME_TAKEN_MSG = "Nickname is already taken";
-    public static final String NICKNAME_REGISTERED_MSG = "Nickname registered successfully";
-    public static final String INVALID_NICKNAME_MSG = "Invalid nickname";
-    public static final String REMOVED_PARTICIPANT_MSG_PREFIX = "Removed participant: ";
     public static final String SERVER_MESSAGE_TYPE = "system";
 
     public static final String USER_KEY = "user";
@@ -39,4 +26,68 @@ public final class GameConstants {
     public static final String LEADERBOARD_QUEUE = "leaderboardQueue";
     public static final int SCHEDULER_POOL_SIZE = 1;
     public static final String SCHEDULER_THREAD_PREFIX = "HintScheduler-";
+    
+    public static String roundStartedMsg(String drawerName, String round, String totalRounds) {
+        return "A new round has started. The drawer is " + drawerName + ". (Round " + round + "/" + totalRounds + ")";
+    }
+
+    public static String wordGuessedMsg(String guesserName) {
+        return guesserName + " guessed the word!";
+    }
+
+    public static String noGuessMsg() {
+        return "No one guessed the word.";
+    }
+
+    public static String participantJoinedMsg(String username) {
+        return username + " has joined the room.";
+    }
+
+    public static String participantLeftMsg(String username) {
+        return username + " has left the room.";
+    }
+
+    public static String previousDrawerQuitMsg(String newDrawer) {
+        return "The previous drawer quit abruptly. The round has been reset. New drawer is: " + newDrawer;
+    }
+
+    public static String newGameStartedMsg(String round, String totalRounds, String drawerName) {
+        return "A new game has started. (Round " + round + "/" + totalRounds + ") The drawer is " + drawerName + ".";
+    }
+
+    public static String gameEndedMsg() {
+        return "The game has ended";
+    }
+
+    public static String finalScoreMsgAfter() {
+        return " after ";
+    }
+
+    public static String finalScoreMsgRounds() {
+        return " rounds. Final scores: ";
+    }
+
+    public static String finalScoreMsgNewGame() {
+        return "A new game will start in ";
+    }
+
+    public static String finalScoreMsgSeconds() {
+        return " seconds.";
+    }
+
+    public static String nicknameTakenMsg() {
+        return "Nickname is already taken";
+    }
+
+    public static String nicknameRegisteredMsg() {
+        return "Nickname registered successfully";
+    }
+
+    public static String invalidNicknameMsg() {
+        return "Invalid nickname";
+    }
+
+    public static String removedParticipantMsg(String username) {
+        return "Removed participant: " + username;
+    }
 }
