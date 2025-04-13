@@ -59,11 +59,6 @@ public class ScoringService {
             scorePart.append(username).append("=").append(game.getScore(username)).append("  ");
         }
 
-        return buildSystemMessage(
-                MessageType.GAME_ENDED,
-                String.valueOf(game.getTotalRounds()),
-                scorePart.toString().trim(),
-                String.valueOf(NEW_GAME_DELAY_SECONDS)
-        );
+        return scorePart.toString();
     }
 }

@@ -159,7 +159,7 @@ public class GameLogicService {
     private void endGame(String roomId, Game game) {
         drawingService.clearCanvas(roomId, new ClearCanvasMessage(SERVER_MESSAGE_TYPE));
         String finalScoreMessage = scoringService.buildFinalScoreMessage(game);
-        chatService.sendChatMessage(roomId, messageService.systemMessage(MessageType.GAME_ENDED, finalScoreMessage));
+        chatService.sendChatMessage(roomId, messageService.systemMessage(MessageType.GAME_ENDED,  String.valueOf(game.getTotalRounds()), finalScoreMessage,  String.valueOf(NEW_GAME_DELAY_SECONDS)));
         String winnerSessionId = scoringService.getWinnerSessionId(game);
         if (winnerSessionId != null) {
             String winnerName = participantService.findParticipantBySessionId(winnerSessionId).getUsername();
