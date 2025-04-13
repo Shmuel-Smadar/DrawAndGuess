@@ -5,13 +5,12 @@ import WordSelection from './Prompt/WordSelection'
 import Canvas from './Drawing/Canvas'
 import ColorPicker from './DrawingPanel/ColorPicker'
 import WordHint from './DrawingPanel/WordHint'
-import useGameSubscriptions from '../hooks/useGameSubscriptions'
-import { setIsDrawer, setShowWordSelection } from '../store/gameSlice'
-import {  CANVAS_HEIGHT_RATIO, GAME_TITLE } from '../utils/constants'
-import { APP_REQUEST_WORDS, APP_CHOOSE_WORD } from '../utils/subscriptionConstants'
+import { setIsDrawer, setShowWordSelection, setWordOptions } from '../store/gameSlice'
+import { CANVAS_HEIGHT_RATIO, GAME_TITLE } from '../utils/constants'
+import { APP_REQUEST_WORDS, APP_CHOOSE_WORD, USER_TOPIC_WORD_OPTIONS, TOPIC_ROOM_CHAT } from '../utils/subscriptionConstants'
 import './Game.css'
 
-function Game({ client, connected}) {
+function Game({ client, connected }) {
   const dispatch = useDispatch()
   const room = useSelector(state => state.room.room)
   const isDrawer = useSelector(state => state.game.isDrawer)
@@ -27,10 +26,10 @@ function Game({ client, connected}) {
       setWindowSize({
         width: window.innerWidth,
         height: window.innerHeight
-      });
-    };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+      })
+    }
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
   }, [])
 
   const requestWordOptions = useCallback(() => {
@@ -59,27 +58,40 @@ function Game({ client, connected}) {
     dispatch(setShowWordSelection(false))
   }
 
-  useGameSubscriptions(client, connected, room, isDrawer, requestWordOptions)
+  useEffect(() => {
+    if (!client || !connected) return
+    const sub = client.subscribe(USER_TOPIC_WORD_OPTIONS, (msg) => {
+      const data = JSON.parse(msg.body)
+      dispatch(setWordOptions([data.word1, data.word2, data.word3]))
+      dispatch(setShowWordSelection(true))
+    })
+    return () => sub.unsubscribe()
+  }, [client, connected, dispatch])
+
+  useEffect(() => {
+    if (!client || !connected || !room) return
+    const chatSub = client.subscribe(TOPIC_ROOM_CHAT(room.roomId), (msg) => {
+      const message = JSON.parse(msg.body)
+      if (message.senderSessionId === 'system' && message.messageType === 'NEW_GAME_STARTED' && isDrawer) {
+        requestWordOptions()
+      }
+    })
+    return () => chatSub.unsubscribe()
+  }, [client, connected, room, isDrawer, requestWordOptions])
 
   return (
     <div className="game">
       <h1>{GAME_TITLE}</h1>
       <div className="game-area">
-      {connected && client && (
+        {connected && client && (
           <div className="drawing-area">
-          <Canvas
-            client={client}
-          />
-          {isDrawer ? (
-            <ColorPicker
-              client={client}
-            />
-          ) : (
-            <WordHint
-              client={client}
-            />
-          )}
-        </div>
+            <Canvas client={client} />
+            {isDrawer ? (
+              <ColorPicker client={client} />
+            ) : (
+              <WordHint client={client} />
+            )}
+          </div>
         )}
         <RightSidebar
           client={client}
