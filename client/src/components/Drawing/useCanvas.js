@@ -5,9 +5,9 @@ import { useCanvasSubscriptions } from './useCanvasSubscriptions';
 import { useDrawingHandlers } from './useDrawingHandlers';
 
 const useCanvas = ({ client}) => {
-  const color = useSelector((state) => state.draw.color);
-  const brushSize = useSelector((state) => state.draw.brushSize);
-  const isFillMode = useSelector((state) => state.draw.isFillMode);
+  const color = useSelector((state) => state.game.color);
+  const brushSize = useSelector((state) => state.game.brushSize);
+  const isFillMode = useSelector((state) => state.game.isFillMode);
   const isDrawingAllowed = useSelector((state) => state.game.isDrawingAllowed);
   const dispatch = useDispatch();
   const roomId = useSelector(state => state.room.room?.roomId)

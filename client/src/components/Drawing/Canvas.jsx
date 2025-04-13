@@ -19,7 +19,7 @@ function Canvas({ client }) {
     handleTouchEnd
   } = useCanvas({ client, userID, roomId })
 
-  const isFillMode = useSelector(state => state.draw.isFillMode)
+  const isFillMode = useSelector(state => state.game.isFillMode)
 
   return (
     <canvas

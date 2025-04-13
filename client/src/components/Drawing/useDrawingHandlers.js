@@ -1,5 +1,5 @@
 import { useCallback } from 'react'
-import { setIsFillMode } from '../../store/drawSlice'
+import { setIsFillMode } from '../../store/gameSlice'
 import { getEventCoordinates } from '../../utils/helpers'
 import {
   VIRTUAL_WIDTH,

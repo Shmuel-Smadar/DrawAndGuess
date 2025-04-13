@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { setColor, setBrushSize, setIsFillMode } from '../../store/drawSlice'
+import { setColor, setBrushSize, setIsFillMode } from '../../store/gameSlice'
 import ClearIcon from '../../assets/trash-bin.png'
 import BrushIcon from '../../assets/paint-brush.png'
 import BucketIcon from '../../assets/paint-bucket.png'
@@ -14,8 +14,8 @@ function ColorPicker({client}) {
   const userID = useSelector(state => state.user.sessionId)
   const isDrawer = useSelector(state => state.game.isDrawer)
   const [showSizeList, setShowSizeList] = useState(false)
-  const color = useSelector(state => state.draw.color)
-  const isFillMode = useSelector(state => state.draw.isFillMode)
+  const color = useSelector(state => state.game.color)
+  const isFillMode = useSelector(state => state.game.isFillMode)
 
   function handleClearCanvas() {
     if (!client || !client.connected || !roomId) return

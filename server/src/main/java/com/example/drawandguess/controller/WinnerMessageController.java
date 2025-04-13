@@ -1,25 +1,30 @@
 package com.example.drawandguess.controller;
 
-import java.io.FileWriter;
-import java.io.IOException;
-import static com.example.drawandguess.config.APIConstants.WINNER_MAPPING;
-import static com.example.drawandguess.config.GameConstants.USER_KEY;
-import static com.example.drawandguess.config.GameConstants.MESSAGE_KEY;
-import static com.example.drawandguess.config.APIConstants.ERROR_LOG_FILE;
 import com.example.drawandguess.service.LeaderboardService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 
+import java.util.Map;
+
+import static com.example.drawandguess.config.APIConstants.WINNER_MAPPING;
+import static com.example.drawandguess.config.GameConstants.USER_KEY;
+import static com.example.drawandguess.config.GameConstants.MESSAGE_KEY;
+
 @Controller
 public class WinnerMessageController {
+    private static final Logger logger = LoggerFactory.getLogger(WinnerMessageController.class);
     private final LeaderboardService leaderboardService;
+
     public WinnerMessageController(LeaderboardService leaderboardService) {
         this.leaderboardService = leaderboardService;
     }
+
     @MessageMapping(WINNER_MAPPING)
-    public void handleWinnerMessage(@Payload java.util.Map<String, String> body, SimpMessageHeaderAccessor headerAccessor) {
+    public void handleWinnerMessage(@Payload Map<String, String> body, SimpMessageHeaderAccessor headerAccessor) {
         try {
             String user = body.get(USER_KEY);
             String message = body.get(MESSAGE_KEY);
@@ -27,10 +32,7 @@ public class WinnerMessageController {
                 leaderboardService.updateWinnerMessage(user, message);
             }
         } catch (Exception e) {
-            try (FileWriter w = new FileWriter(ERROR_LOG_FILE, true)) {
-                w.write("Error in handleWinnerMessage: " + e.getMessage() + "\n");
-            } catch (IOException ignored) {
-            }
+            logger.error("Error in handleWinnerMessage", e);
         }
     }
 }
