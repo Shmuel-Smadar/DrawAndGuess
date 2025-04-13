@@ -1,5 +1,6 @@
 package com.example.drawandguess.controller;
 
+import com.example.drawandguess.model.LeaderboardEntry;
 import com.example.drawandguess.service.LeaderboardService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,9 +25,9 @@ public class LeaderboardController {
     }
 
     @GetMapping(LEADERBOARD_MAPPING)
-    public List<String> getLeaderboard() {
+    public List<LeaderboardEntry> getLeaderboard() {
         try {
-            return leaderboardService.getSortedLeaderboard();
+            return leaderboardService.getSortedLeaderboardEntries();
         } catch (Exception e) {
             logger.error("Error in getLeaderboard", e);
             return new ArrayList<>();
