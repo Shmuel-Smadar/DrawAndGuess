@@ -1,10 +1,9 @@
 package com.example.drawandguess.service;
 
-import static com.example.drawandguess.config.GameConstants.nicknameTakenMsg;
-import static com.example.drawandguess.config.GameConstants.nicknameRegisteredMsg;
-import static com.example.drawandguess.config.GameConstants.removedParticipantMsg;
+import static com.example.drawandguess.config.GameConstants.buildSystemMessage;
 import com.example.drawandguess.model.NicknameResgistrationResponse;
 import com.example.drawandguess.model.Participant;
+import com.example.drawandguess.model.MessageType;
 import org.springframework.stereotype.Service;
 import java.util.Map;
 import java.util.Optional;
@@ -18,18 +17,15 @@ public class ParticipantService {
 
     public NicknameResgistrationResponse registerParticipant(String sessionId, String nickname) {
         if (isNicknameTaken(nickname)) {
-            return new NicknameResgistrationResponse(false, nicknameTakenMsg());
+            return new NicknameResgistrationResponse(false, buildSystemMessage(MessageType.NICKNAME_TAKEN));
         }
         Participant participant = new Participant(sessionId, nickname, false);
         sessionIdToParticipant.put(sessionId, participant);
-        return new NicknameResgistrationResponse(true, nicknameRegisteredMsg());
+        return new NicknameResgistrationResponse(true, buildSystemMessage(MessageType.NICKNAME_REGISTERED));
     }
 
     public void removeParticipant(String sessionId) {
-        Participant removed = sessionIdToParticipant.remove(sessionId);
-        if (removed != null) {
-            System.out.println(removedParticipantMsg(removed.getUsername()));
-        }
+        sessionIdToParticipant.remove(sessionId);
     }
 
     public Participant findParticipantBySessionId(String sessionId) {
