@@ -18,8 +18,7 @@ import static com.example.drawandguess.config.APIConstants.WORD_OPTIONS_TOPIC;
 import static com.example.drawandguess.config.APIConstants.CHOOSE_WORD_MAPPING;
 import static com.example.drawandguess.config.APIConstants.CORRECT_GUESS_MAPPING;
 import static com.example.drawandguess.config.APIConstants.CURRENT_HINT_MAPPING;
-import static com.example.drawandguess.config.APIConstants.TOPIC_ROOM_PREFIX;
-import static com.example.drawandguess.config.APIConstants.WORD_HINT_ENDPOINT;
+import static com.example.drawandguess.config.APIConstants.topicRoomWordHint;
 
 @Controller
 public class GameLogicController {
@@ -70,7 +69,7 @@ public class GameLogicController {
     public void retrieveCurrentHint(@DestinationVariable String roomId) {
         try {
             String currentHint = roomService.getRoom(roomId).getGame().getCurrentHint();
-            messagingTemplate.convertAndSend(TOPIC_ROOM_PREFIX + roomId + WORD_HINT_ENDPOINT, currentHint);
+            messagingTemplate.convertAndSend(topicRoomWordHint(roomId), currentHint);
         } catch (Exception e) {
             logger.error("Error in retrieveCurrentHint", e);
         }

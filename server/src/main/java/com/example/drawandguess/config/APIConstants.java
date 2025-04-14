@@ -4,14 +4,15 @@ public final class APIConstants {
 
     private APIConstants() {}
 
-    public static final String ALLOWED_ORIGINS = "*"; // Allow all origins for CORS
+    // Allow all origins for CORS
+    public static final String ALLOWED_ORIGINS = "*";
 
     //Endpoint for establishing STOMP connection (the client will use it to contact the server)
     public static final String STOMP_ENDPOINT = "/draw-and-guess";
 
     /* These prefixes manage how messages are routed:
-     * APP_PREFIX: Routes messages destined for application controllers.
-     * TOPIC_PREFIX: For broadcasting messages to multiple subscribers.
+     * APP_PREFIX: For messages sent to the controllers (by the user)
+     * TOPIC_PREFIX: For broadcasting messages to multiple subscribers (users can subscribe).
      * USER_PREFIX: For sending messages to a specific user. */
     public static final String APP_PREFIX = "/app";
     public static final String TOPIC_PREFIX = "/topic";
@@ -40,21 +41,18 @@ public final class APIConstants {
     public static final String CURRENT_HINT_MAPPING = "/room/{roomId}/getCurrentHint";
 
 
+    //These constants are for the server to send to the client
     public static final String ROOM_CREATED_TOPIC = TOPIC_PREFIX + "/roomCreated";
     public static final String NICKNAME_TOPIC = TOPIC_PREFIX + "/nickname";
     public static final String WORD_OPTIONS_TOPIC = TOPIC_PREFIX +  "/wordOptions";
 
-    //routing constants. where the server will serve the static files for the client (frontend)
+    // These are routing constants. where the server will serve the static files for the client (frontend)
     public static final String DRAW_AND_GUESS_PATH = "/drawandguess";
     public static final String DRAW_AND_GUESS_SLASH_PATH = "/drawandguess/";
     public static final String HOME_PATH = "/home";
     public static final String MAIN_INDEX_FILE = "forward:/drawandguess/index.html";
 
-    public static final String WORD_HINT_ENDPOINT = "/wordHint";
-    public static final String PARTICIPANTS_ENDPOINT = "/participants";
-
-
-    public static final String ERROR_LOG_FILE = "error.log";
+    // vm connector for EmbeddedActiveMQ
     public static final String VM_CONNECTOR = "vm://localhost";
 
     // static helper methods for path construction
