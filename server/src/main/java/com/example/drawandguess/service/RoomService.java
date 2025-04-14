@@ -59,10 +59,12 @@ public class RoomService {
         return new ArrayList<>(rooms.values());
     }
 
+    // A method that adds participant to a room
     public void joinRoom(String sessionId, String roomId) {
         Room room = getRoom(roomId);
         Game game = room.getGame();
         game.addParticipant(sessionId);
+        // If a game is over we will only update room and participants lists, without choosing new drawer
         if (game.isGameOver()) {
             broadcastParticipants(roomId);
             broadcastRooms();
@@ -78,6 +80,8 @@ public class RoomService {
         broadcastRooms();
     }
 
+    /* A method that sends a message about user joining a room.
+    * with slight delay so that the joined user will see it as well. */
     private void scheduleParticipantJoinedMessage(String roomId, String nickname) {
         taskScheduler.schedule(() -> {
             ChatMessage msg = messageService.systemMessage(MessageType.PARTICIPANT_JOINED, nickname);
@@ -85,6 +89,7 @@ public class RoomService {
         }, Instant.now().plusMillis(TIMER_DELAY_MS));
     }
 
+    // A method that update the list of participants to a given room
     public void broadcastParticipants(String roomId) {
         taskScheduler.schedule(() -> {
             Room room = rooms.get(roomId);
@@ -98,6 +103,7 @@ public class RoomService {
         }, Instant.now().plusMillis(TIMER_DELAY_MS));
     }
 
+    // A method that update the list of rooms
     public void broadcastRooms() {
         List<Map<String, Object>> data = getAllRooms().stream().map(room -> {
             Map<String, Object> map = new ConcurrentHashMap<>();
@@ -107,12 +113,5 @@ public class RoomService {
             return map;
         }).collect(Collectors.toList());
         messagingTemplate.convertAndSend(TOPIC_ROOMS, data);
-    }
-
-    public List<Participant> getParticipants(String roomId) {
-        Room room = rooms.get(roomId);
-        if (room == null) return new ArrayList<>();
-        List<String> ids = room.getGame().getParticipantSessionIds();
-        return participantService.getParticipantsBySessionIds(ids);
     }
 }

@@ -16,7 +16,7 @@ import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import static com.example.drawandguess.config.APIConstants.REQUEST_WORDS_MAPPING;
 import static com.example.drawandguess.config.APIConstants.WORD_OPTIONS_TOPIC;
 import static com.example.drawandguess.config.APIConstants.CHOOSE_WORD_MAPPING;
-import static com.example.drawandguess.config.APIConstants.CORRECT_GUESS_MAPPING;
+import static com.example.drawandguess.config.APIConstants.GUESS_MAPPING;
 import static com.example.drawandguess.config.APIConstants.CURRENT_HINT_MAPPING;
 import static com.example.drawandguess.config.APIConstants.topicRoomWordHint;
 
@@ -33,6 +33,7 @@ public class GameLogicController {
         this.messagingTemplate = messagingTemplate;
     }
 
+    // A method responsible for getting the drawer the words to choose from
     @MessageMapping(REQUEST_WORDS_MAPPING)
     @SendToUser(WORD_OPTIONS_TOPIC)
     public WordOptions handleWordRequest(@DestinationVariable String roomId, SimpMessageHeaderAccessor headerAccessor) {
@@ -45,6 +46,8 @@ public class GameLogicController {
         }
     }
 
+    /* A method that gets the choice made by the drawer (about which word to draw)
+     and updates the state of the game according to that*/
     @MessageMapping(CHOOSE_WORD_MAPPING)
     public void handleWordChosen(@DestinationVariable String roomId, @Payload String chosenWord, SimpMessageHeaderAccessor headerAccessor) {
         try {
@@ -55,16 +58,8 @@ public class GameLogicController {
         }
     }
 
-    @MessageMapping(CORRECT_GUESS_MAPPING)
-    public void handleCorrectGuess(@DestinationVariable String roomId, @Payload String guess, SimpMessageHeaderAccessor headerAccessor) {
-        try {
-            String sessionId = headerAccessor.getSessionId();
-            gameLogicService.handleGuess(roomId, guess, sessionId);
-        } catch (Exception e) {
-            logger.error("Error in handleCorrectGuess", e);
-        }
-    }
-
+    /* A method that gets a request from a client to get the current hint for the game.
+     it then sends it to all the users in the room */
     @MessageMapping(CURRENT_HINT_MAPPING)
     public void retrieveCurrentHint(@DestinationVariable String roomId) {
         try {

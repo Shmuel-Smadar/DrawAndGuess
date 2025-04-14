@@ -37,7 +37,7 @@ public final class APIConstants {
     public static final String WINNER_MAPPING = "/winnerMessage";
     public static final String REQUEST_WORDS_MAPPING = "/room/{roomId}/requestWords";
     public static final String CHOOSE_WORD_MAPPING = "/room/{roomId}/chooseWord";
-    public static final String CORRECT_GUESS_MAPPING = "/room/{roomId}/correctGuess";
+    public static final String GUESS_MAPPING = "/room/{roomId}/Guess";
     public static final String CURRENT_HINT_MAPPING = "/room/{roomId}/getCurrentHint";
 
 

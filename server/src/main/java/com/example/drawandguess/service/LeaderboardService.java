@@ -1,6 +1,7 @@
 package com.example.drawandguess.service;
 
 import com.example.drawandguess.model.LeaderboardEntry;
+import com.example.drawandguess.model.ScoreUpdate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jms.annotation.JmsListener;
@@ -27,40 +28,12 @@ public class LeaderboardService {
         this.useDatabase = useDatabase;
     }
 
+    // A method that updates the score (wither in memory or in db, according to the configuration
     @JmsListener(destination = "leaderboardQueue")
-    public void receiveScoreUpdate(String message) {
-        String[] messageParts = message.split(":");
-        if (messageParts.length != 2) {
-            return;
-        }
-        String username = messageParts[0];
-        int score = Integer.parseInt(messageParts[1]);
-        updateScoreInMemory(username, score);
-    }
+    public void receiveScoreUpdate(ScoreUpdate update) {
+        String username = update.getUsername();
+        int newScore = update.getNewScore();
 
-    public void updateScore(String username, int score) {
-        jmsTemplate.convertAndSend("leaderboardQueue", username + ":" + score);
-    }
-
-    private void updateScoreInMemory(String username, int newScore) {
-        LeaderboardEntry entry = inMemoryLeaderboard.get(username);
-        if (entry == null) {
-            inMemoryLeaderboard.put(username, new LeaderboardEntry(username, newScore, ""));
-        } else {
-            int oldScore = entry.getScore();
-            entry.setScore(Math.max(oldScore, newScore));
-        }
-    }
-
-    private Integer getExistingScore(String username) {
-        try {
-            return jdbcTemplate.queryForObject("SELECT score FROM leaderboard WHERE username = ?", Integer.class, username);
-        } catch (EmptyResultDataAccessException ex) {
-            return null;
-        }
-    }
-
-    public void saveScores(String username, int newScore) {
         if (useDatabase) {
             Integer currentScore = getExistingScore(username);
             if (currentScore == null) {
@@ -73,6 +46,31 @@ public class LeaderboardService {
         }
     }
 
+    public void saveScores(String username, int score) {
+        jmsTemplate.convertAndSend("leaderboardQueue", new ScoreUpdate(username, score));
+    }
+
+    // A method that updates the score in memory
+    private void updateScoreInMemory(String username, int newScore) {
+        LeaderboardEntry entry = inMemoryLeaderboard.get(username);
+        if (entry == null) {
+            inMemoryLeaderboard.put(username, new LeaderboardEntry(username, newScore, ""));
+        } else {
+            int oldScore = entry.getScore();
+            entry.setScore(Math.max(oldScore, newScore));
+        }
+    }
+
+    // a method that gets existing score for a user
+    private Integer getExistingScore(String username) {
+        try {
+            return jdbcTemplate.queryForObject("SELECT score FROM leaderboard WHERE username = ?", Integer.class, username);
+        } catch (EmptyResultDataAccessException ex) {
+            return null;
+        }
+    }
+
+    // a method that updates the winner message for a user
     public void updateWinnerMessage(String username, String message) {
         if (useDatabase) {
             if (message == null) {
@@ -92,6 +90,7 @@ public class LeaderboardService {
         }
     }
 
+    // a method that returns the leaderboard, either from the memory or from the db
     public Map<String, LeaderboardEntry> getLeaderboard() {
         if (useDatabase) {
             Map<String, LeaderboardEntry> databaseLeaderboard = new LinkedHashMap<>();
@@ -110,6 +109,8 @@ public class LeaderboardService {
         }
     }
 
+    /* A method that sorts the leaderboard and returns it
+    * (highest score above, if two users have the same score, sort by AB descending */
     public List<LeaderboardEntry> getSortedLeaderboardEntries() {
         Map<String, LeaderboardEntry> board = getLeaderboard();
         List<LeaderboardEntry> data = new ArrayList<>(board.values());

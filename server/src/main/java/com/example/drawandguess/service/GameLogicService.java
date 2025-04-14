@@ -2,6 +2,7 @@ package com.example.drawandguess.service;
 
 import static com.example.drawandguess.config.GameConstants.NEW_GAME_DELAY_SECONDS;
 import static com.example.drawandguess.config.GameConstants.SERVER_MESSAGE_TYPE;
+import static com.example.drawandguess.config.GameConstants.TOTAL_ROUNDS;
 import com.example.drawandguess.model.ChatMessage;
 import com.example.drawandguess.model.Game;
 import com.example.drawandguess.model.Participant;
@@ -48,6 +49,7 @@ public class GameLogicService {
         this.scoringService = scoringService;
     }
 
+    // A method which select randomly 3 words for the drawer to choose from and send it
     public WordOptions requestWords(String roomId, String sessionId) {
         Room room = roomService.getRoom(roomId);
         Game game = room.getGame();
@@ -57,6 +59,7 @@ public class GameLogicService {
         return new WordOptions();
     }
 
+    // A method that gets the word the drawer has chosen and update the state of the game accordingly
     public void chooseWord(String roomId, String sessionId, String chosenWord) {
         Room room = roomService.getRoom(roomId);
         Game game = room.getGame();
@@ -67,25 +70,15 @@ public class GameLogicService {
                     MessageType.ROUND_STARTED,
                     drawerUsername,
                     String.valueOf(game.getRoundCount() + 1),
-                    String.valueOf(game.getTotalRounds())
+                    String.valueOf(TOTAL_ROUNDS)
             ));
             hintService.startHintProgression(roomId, game, () -> handleNoGuess(roomId, game));
         }
     }
 
-    public void handleNoGuess(String roomId, Game game) {
-        hintService.stopHintProgression(roomId);
-        drawingService.clearCanvas(roomId, new ClearCanvasMessage(SERVER_MESSAGE_TYPE));
-        ChatMessage msg = messageService.systemMessage(MessageType.NO_GUESS);
-        chatService.sendChatMessage(roomId, msg);
-        game.nextRound();
-        if (game.isGameOver()) {
-            endGame(roomId, game);
-        } else {
-            updateDrawerAndBroadcast(roomId, game);
-        }
-    }
-
+    /* A method that gets a guess made by a non drawer and checks if it's a match,
+     * if so, update the state of the game accordingly and starts the next round.
+     */
     public void handleGuess(String roomId, String guess, String sessionId) {
         Room room = roomService.getRoom(roomId);
         Game game = room.getGame();
@@ -102,6 +95,20 @@ public class GameLogicService {
             } else {
                 updateDrawerAndBroadcast(roomId, game);
             }
+        }
+    }
+
+    // A method that handles the case in which no one was able to guess the correct word. starts the next round.
+    public void handleNoGuess(String roomId, Game game) {
+        hintService.stopHintProgression(roomId);
+        drawingService.clearCanvas(roomId, new ClearCanvasMessage(SERVER_MESSAGE_TYPE));
+        ChatMessage msg = messageService.systemMessage(MessageType.NO_GUESS);
+        chatService.sendChatMessage(roomId, msg);
+        game.nextRound();
+        if (game.isGameOver()) {
+            endGame(roomId, game);
+        } else {
+            updateDrawerAndBroadcast(roomId, game);
         }
     }
 
@@ -132,11 +139,6 @@ public class GameLogicService {
                         participantService.findParticipantBySessionId(newDrawerId).getUsername()
                 ));
             }
-        } else {
-            String currentDrawerId = game.getCurrentDrawer();
-            participantService.getAllParticipants().values().forEach(
-                    p2 -> participantService.setDrawer(p2.getSessionId(), p2.getSessionId().equals(currentDrawerId))
-            );
         }
         roomService.broadcastParticipants(roomId);
         if (game.getParticipantSessionIds().isEmpty()) {
@@ -145,6 +147,8 @@ public class GameLogicService {
         roomService.broadcastRooms();
     }
 
+    /* A method that responsible for handling sudden user disconnection.
+    * goes through all the room and make sure to update the room the user left. */
     public void handleDisconnect(String sessionId) {
         Participant participant = participantService.findParticipantBySessionId(sessionId);
         if (participant == null) return;
@@ -156,19 +160,22 @@ public class GameLogicService {
         participantService.removeParticipant(sessionId);
     }
 
+    /* A method responsible for managing the end of the game.
+    * notifying the room about the winner and the scores, and calling for a new game to start. */
     private void endGame(String roomId, Game game) {
         drawingService.clearCanvas(roomId, new ClearCanvasMessage(SERVER_MESSAGE_TYPE));
         String finalScoreMessage = scoringService.buildFinalScoreMessage(game);
-        chatService.sendChatMessage(roomId, messageService.systemMessage(MessageType.GAME_ENDED,  String.valueOf(game.getTotalRounds()), finalScoreMessage,  String.valueOf(NEW_GAME_DELAY_SECONDS)));
+        chatService.sendChatMessage(roomId, messageService.systemMessage(MessageType.GAME_ENDED,  String.valueOf(TOTAL_ROUNDS), finalScoreMessage,  String.valueOf(NEW_GAME_DELAY_SECONDS)));
         String winnerSessionId = scoringService.getWinnerSessionId(game);
         if (winnerSessionId != null) {
             String winnerName = participantService.findParticipantBySessionId(winnerSessionId).getUsername();
             leaderboardService.saveScores(winnerName, game.getScore(winnerName));
-            chatService.sendChatMessage(roomId, messageService.winnerAnnounce(winnerSessionId, winnerName + " is the winner!"));
+            chatService.sendChatMessage(roomId, messageService.systemMessage(MessageType.WINNER_ANNOUNCED, winnerSessionId, winnerName + " is the winner!"));
         }
         scheduleNewGame(roomId, game);
     }
 
+    // A method that responsible for setting the drawer chosen by the game and updating the room about the current drawer.
     public void updateDrawerAndBroadcast(String roomId, Game game) {
         String currentDrawer = game.getCurrentDrawer();
         participantService.getAllParticipants().values().forEach(
@@ -177,6 +184,7 @@ public class GameLogicService {
         roomService.broadcastParticipants(roomId);
     }
 
+    // A method that responsible for scheduling a new game and notifying the room about it when it starts.
     private void scheduleNewGame(String roomId, Game game) {
         taskScheduler.schedule(() -> {
             game.resetGame();
@@ -188,7 +196,7 @@ public class GameLogicService {
                 ChatMessage newGameMsg = messageService.systemMessage(
                         MessageType.NEW_GAME_STARTED,
                         String.valueOf(game.getRoundCount() + 1),
-                        String.valueOf(game.getTotalRounds()),
+                        String.valueOf(TOTAL_ROUNDS),
                         participantService.findParticipantBySessionId(firstDrawerId).getUsername()
                 );
                 chatService.sendChatMessage(roomId, newGameMsg);

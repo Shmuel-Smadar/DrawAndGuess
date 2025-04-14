@@ -24,6 +24,7 @@ public class LeaderboardController {
         this.leaderboardService = leaderboardService;
     }
 
+    //A method that gets a leaderboard request and returns it
     @GetMapping(LEADERBOARD_MAPPING)
     public List<LeaderboardEntry> getLeaderboard() {
         try {

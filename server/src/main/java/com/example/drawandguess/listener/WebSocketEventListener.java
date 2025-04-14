@@ -9,17 +9,18 @@ import com.example.drawandguess.service.GameLogicService;
 
 @Component
 public class WebSocketEventListener {
-    private final GameLogicService gameService;
+    private final GameLogicService gameLogicService;
 
     @Autowired
-    public WebSocketEventListener(GameLogicService gameService) {
-        this.gameService = gameService;
+    public WebSocketEventListener(GameLogicService gameLogicService) {
+        this.gameLogicService = gameLogicService;
     }
 
+    // A listener which responsible for notifying gameLogicService if a user quit a game abruptly.
     @EventListener
     public void handleSessionDisconnect(SessionDisconnectEvent event) {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
         String sessionId = accessor.getSessionId();
-        gameService.handleDisconnect(sessionId);
+        gameLogicService.handleDisconnect(sessionId);
     }
 }

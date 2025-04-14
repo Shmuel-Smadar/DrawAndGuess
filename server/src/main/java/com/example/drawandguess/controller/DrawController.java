@@ -21,6 +21,7 @@ public class DrawController {
         this.drawingService = drawingService;
     }
 
+    // A method that passes a drawing message from the drawer to draw on the canvas of the users in that room
     @MessageMapping(DRAW_MAPPING)
     public void draw(@DestinationVariable String roomId, DrawMessage message) {
         try {
@@ -29,7 +30,7 @@ public class DrawController {
             logger.error("Error in draw", e);
         }
     }
-
+    // A method that passes a clear canvas message from the drawer to the other users in that room
     @MessageMapping(CLEAR_CANVAS_MAPPING)
     public void clearCanvas(@DestinationVariable String roomId, ClearCanvasMessage message) {
         try {

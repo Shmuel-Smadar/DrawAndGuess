@@ -8,20 +8,18 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class MessageService {
+    /* A method responsible for building a system message
+    * get a type and arguments, and sends to a function dedicated to parse the arguments
+    * to create appropriate message */
     public ChatMessage systemMessage(MessageType type, String... args) {
         ChatMessage msg = new ChatMessage();
         msg.setSenderSessionId(SERVER_MESSAGE_TYPE);
         msg.setMessageType(type);
+        if(type == MessageType.WINNER_ANNOUNCED) {
+            msg.setWinnerSessionId(args[0]);
+            msg.setText(args[1]);
+        }
         msg.setText(buildSystemMessage(type, args));
-        return msg;
-    }
-
-    public ChatMessage winnerAnnounce(String winnerSessionId, String text) {
-        ChatMessage msg = new ChatMessage();
-        msg.setSenderSessionId(SERVER_MESSAGE_TYPE);
-        msg.setMessageType(MessageType.WINNER_ANNOUNCED);
-        msg.setWinnerSessionId(winnerSessionId);
-        msg.setText(text);
         return msg;
     }
 }

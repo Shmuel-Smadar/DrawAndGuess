@@ -48,6 +48,7 @@ public class DatabaseConfig {
         return this.jdbcTemplate;
     }
 
+    /*A function that makes sure the table exist in the database. if not - creates them. */
     @EventListener(ApplicationReadyEvent.class)
     public void createTablesIfNotExists() {
         if (useDatabase && jdbcTemplate != null) {

@@ -24,6 +24,12 @@ public class ChatController {
         this.gameService = gameService;
     }
 
+    /* A method that gets a message from a user in the chat. it then does:
+        1. validates the message
+        2. publishes the message to the other clients in the room
+        3. sends the message to the gameLogicService to check if the message
+         is a correct guess for the word being drawn currently.
+    */
     @MessageMapping(CHAT_MAPPING)
     public void processChatMessage(@DestinationVariable String roomId, @Payload ChatMessage chatMessage) {
         try {

@@ -42,6 +42,7 @@ public class RoomController {
         this.gameService = gameService;
     }
 
+    // A method responsible for creating a room
     @MessageMapping(CREATE_ROOM)
     @SendToUser(ROOM_CREATED_TOPIC)
     public Room createRoom(@Payload String roomName, SimpMessageHeaderAccessor headerAccessor) {
@@ -59,6 +60,7 @@ public class RoomController {
         }
     }
 
+    // A method responsible for handling a user request to join a room
     @MessageMapping(JOIN_ROOM)
     public void joinRoom(@Payload String roomId, SimpMessageHeaderAccessor headerAccessor) {
         try {
@@ -68,7 +70,7 @@ public class RoomController {
             logger.error("Error in joinRoom", e);
         }
     }
-
+    // A method responsible for handling a user request to leave a room
     @MessageMapping(LEAVE_ROOM)
     public void leaveRoom(@Payload String roomId, SimpMessageHeaderAccessor headerAccessor) {
         try {
@@ -79,6 +81,7 @@ public class RoomController {
         }
     }
 
+    // A method responsible for updating the room list in the lobby (and number of players in each room)
     @MessageMapping(GET_ROOMS)
     @SendTo(TOPIC_ROOMS)
     public Collection<?> getRooms() {
@@ -96,6 +99,7 @@ public class RoomController {
         }
     }
 
+    // A method responsible for updating the participant list in a given room
     @MessageMapping(PARTICIPANTS_MAPPING)
     public void handleParticipantsRequest(@DestinationVariable String roomId) {
         try {

@@ -20,6 +20,7 @@ public class HintService {
         this.chatService = chatService;
     }
 
+    // A method responsible for sending hints to a given room, and a function to call when hints are over
     public void startHintProgression(String roomId, Game game, Runnable onNoHint) {
         if (hintTasks.containsKey(roomId)) return;
         Runnable runnable = () -> {

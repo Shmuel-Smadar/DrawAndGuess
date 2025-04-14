@@ -17,6 +17,7 @@ public class ScoringService {
         this.participantService = participantService;
     }
 
+    // A method that handles the scored at the end of the round, for the drawer and the guesser
     public void handleScoring(String roomId, Game game, String guess, String sessionId) {
         String username = participantService.findParticipantBySessionId(sessionId).getUsername();
         int used = game.getHintsUsed();
@@ -34,6 +35,7 @@ public class ScoringService {
 
     
 
+    // A method that finds the winner in a game. return null if it's a tie.
     public String getWinnerSessionId(Game game) {
         String winnerSessionId = null;
         int maxScore = -1;
@@ -52,6 +54,7 @@ public class ScoringService {
         return (winnerSessionId != null && !tie) ? winnerSessionId : null;
     }
 
+    // A method that builds the message notifying about the end of the game and the results.
     public String buildFinalScoreMessage(Game game) {
         StringBuilder scorePart = new StringBuilder();
         for (String pid : game.getParticipantSessionIds()) {

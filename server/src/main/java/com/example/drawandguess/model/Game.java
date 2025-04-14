@@ -16,7 +16,6 @@ public class Game {
     private Map<String, Integer> scores = new HashMap<>();
     private int roundCount = 0;
     private boolean gameOver = false;
-    private final int totalRounds = TOTAL_ROUNDS;
 
     public void addParticipant(String sessionId) {
         if (!participantSessionIds.contains(sessionId)) {
@@ -66,10 +65,6 @@ public class Game {
         hintManager.initialize(chosenWordEnglish);
     }
 
-    public String getChosenWordEnglish() {
-        return chosenWordEnglish;
-    }
-
     public boolean isCorrectGuess(String guess) {
         return (chosenWordEnglish != null && chosenWordEnglish.equalsIgnoreCase(guess)) ||
                 (chosenWordHebrew != null && chosenWordHebrew.equalsIgnoreCase(guess));
@@ -77,7 +72,7 @@ public class Game {
 
     public void nextRound() {
         roundCount++;
-        if (roundCount >= totalRounds) gameOver = true;
+        if (roundCount >= TOTAL_ROUNDS) gameOver = true;
         resetRound();
         moveToNextDrawer();
     }
@@ -99,10 +94,6 @@ public class Game {
 
     public int getRoundCount() {
         return roundCount;
-    }
-
-    public int getTotalRounds() {
-        return totalRounds;
     }
 
     public boolean hasMoreHints() {

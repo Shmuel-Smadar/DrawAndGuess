@@ -27,6 +27,10 @@ public class ParticipantController {
         this.participantService = participantService;
     }
 
+    /* A method that responsible for registration.
+    * gets a RegistrationRequest with a chosen nickname, and returns NicknameResgistrationResponse
+    *  which contains the response if the registration succeeded, and if failed, explains why (e.g "nickname already exists")
+    */
     @MessageMapping(REGISTER_NICKNAME)
     @SendToUser(NICKNAME_TOPIC)
     public NicknameResgistrationResponse registerNickname(@Payload RegistrationRequest request, SimpMessageHeaderAccessor headerAccessor) {

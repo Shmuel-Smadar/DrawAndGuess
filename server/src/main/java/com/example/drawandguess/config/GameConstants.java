@@ -5,6 +5,7 @@ import com.example.drawandguess.model.MessageType;
 public final class GameConstants {
     private GameConstants() {}
 
+    // Constants for game logic, scoring and messages
     public static final String NICKNAME_REGEX = "^[A-Za-z0-9\\u0590-\\u05FF]+$";
     public static final int HINT_INTERVAL_SECONDS = 10;
     public static final int TIMER_DELAY_MS = 100;

@@ -23,6 +23,7 @@ public class WinnerMessageController {
         this.leaderboardService = leaderboardService;
     }
 
+    //A method responsible for getting a message from the winner and updating the leaderboard with it
     @MessageMapping(WINNER_MAPPING)
     public void handleWinnerMessage(@Payload Map<String, String> body, SimpMessageHeaderAccessor headerAccessor) {
         try {
