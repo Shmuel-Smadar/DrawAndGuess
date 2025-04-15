@@ -1,5 +1,9 @@
 package com.example.drawandguess.model;
 
+/*
+ * Represents a chat message, which can be sent by the user or by the server
+ * (in case of a system message).
+ */
 public class ChatMessage {
     private String text;
     private String senderSessionId;
@@ -10,7 +14,8 @@ public class ChatMessage {
     public ChatMessage() {
     }
 
-    public ChatMessage(String text, String senderSessionId, String senderUsername, String type, MessageType messageType, String winnerSessionId) {
+    public ChatMessage(String text, String senderSessionId, String senderUsername,
+                       String type, MessageType messageType, String winnerSessionId) {
         this.text = text;
         this.senderSessionId = senderSessionId;
         this.senderUsername = senderUsername;
@@ -37,7 +42,6 @@ public class ChatMessage {
     public String getSenderUsername() {
         return senderUsername;
     }
-
     public void setSenderUsername(String senderUsername) {
         this.senderUsername = senderUsername;
     }
@@ -53,7 +57,7 @@ public class ChatMessage {
     public String getWinnerSessionId() {
         return winnerSessionId;
     }
-
+    
     public void setWinnerSessionId(String winnerSessionId) {
         this.winnerSessionId = winnerSessionId;
     }

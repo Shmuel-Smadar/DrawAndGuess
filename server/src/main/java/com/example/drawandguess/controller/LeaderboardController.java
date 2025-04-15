@@ -14,6 +14,9 @@ import java.util.ArrayList;
 import static com.example.drawandguess.config.APIConstants.LEADERBOARD_MAPPING;
 import static com.example.drawandguess.config.APIConstants.ALLOWED_ORIGINS;
 
+/*
+ * A controller that exposes a REST endpoint to retrieve the leaderboard entries (sorted by score).
+ */
 @RestController
 @CrossOrigin(origins = ALLOWED_ORIGINS)
 public class LeaderboardController {
@@ -24,7 +27,9 @@ public class LeaderboardController {
         this.leaderboardService = leaderboardService;
     }
 
-    //A method that gets a leaderboard request and returns it
+    /*
+     * Gets the sorted leaderboard as a list of LeaderboardEntry model.
+     */
     @GetMapping(LEADERBOARD_MAPPING)
     public List<LeaderboardEntry> getLeaderboard() {
         try {

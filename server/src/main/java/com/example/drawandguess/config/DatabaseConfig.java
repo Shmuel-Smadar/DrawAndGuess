@@ -9,6 +9,10 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import javax.sql.DataSource;
 
+/*
+ * Manages database connectivity settings and ensures necessary tables exist
+ * if USE_DB (environment variable) is true.
+ */
 @Configuration
 public class DatabaseConfig {
 
@@ -48,7 +52,7 @@ public class DatabaseConfig {
         return this.jdbcTemplate;
     }
 
-    /*A function that makes sure the table exist in the database. if not - creates them. */
+    // A function that ensures the required tables exist in the database, if not - creates them.
     @EventListener(ApplicationReadyEvent.class)
     public void createTablesIfNotExists() {
         if (useDatabase && jdbcTemplate != null) {

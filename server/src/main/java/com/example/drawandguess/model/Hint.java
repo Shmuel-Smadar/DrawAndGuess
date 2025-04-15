@@ -4,6 +4,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/*
+ * Manages the partial reveal of a chosen word, building the current hint string
+ * by revealing characters in random order.
+ */
 public class Hint {
     private String chosenWord;
     private StringBuilder currentHintBuilder;
@@ -31,6 +35,10 @@ public class Hint {
         return !revealOrder.isEmpty();
     }
 
+    /*
+     * Reveals one more character in the word (unless it's the first hint, which just returns
+     * the underscores initially).
+     */
     public String nextHint() {
         if (isFirstHint || revealOrder.isEmpty()) {
             isFirstHint = false;

@@ -1,5 +1,8 @@
 package com.example.drawandguess.model;
 
+/*
+ * An object that holds possible words for the drawer can pick from
+ */
 public class WordOptions {
     private String word1;
     private String word2;

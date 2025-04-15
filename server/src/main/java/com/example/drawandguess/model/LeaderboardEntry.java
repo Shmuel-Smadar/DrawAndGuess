@@ -1,5 +1,7 @@
 package com.example.drawandguess.model;
 
+// Represents an entry in the leaderboard: username, score, and a custom message.
+
 public class LeaderboardEntry {
     private String username;
     private int score;
@@ -33,7 +35,7 @@ public class LeaderboardEntry {
     public String getMessage() {
         return message;
     }
-
+    
     public void setMessage(String message) {
         this.message = message;
     }

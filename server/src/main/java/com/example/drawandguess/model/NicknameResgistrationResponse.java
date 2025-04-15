@@ -1,5 +1,9 @@
 package com.example.drawandguess.model;
 
+/*
+ * Represents the response from registering a nickname:
+ * success/failure, message to explain erros, and sessionId if successful.
+ */
 public class NicknameResgistrationResponse {
     private boolean success;
     private String message;

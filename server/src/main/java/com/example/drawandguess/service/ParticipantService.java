@@ -11,10 +11,18 @@ import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.List;
 
+/*
+ * A service that Manages all participants (mapping sessionId ->to the Participant model)
+ *  and andles registration and drawer updates (whether a participant is a drawer or not).
+ */
 @Service
 public class ParticipantService {
     private final Map<String, Participant> sessionIdToParticipant = new ConcurrentHashMap<>();
 
+    /*
+     * Registers a new participant with the given nickname.
+     * If nickname is taken, returns a failure response wit hapropriate message.
+     */
     public NicknameResgistrationResponse registerParticipant(String sessionId, String nickname) {
         if (isNicknameTaken(nickname)) {
             return new NicknameResgistrationResponse(false, buildSystemMessage(MessageType.NICKNAME_TAKEN));
@@ -33,11 +41,14 @@ public class ParticipantService {
     }
 
     public Optional<Participant> findParticipantByNickname(String nickname) {
-        return sessionIdToParticipant.values().stream().filter(p -> p.getUsername().equals(nickname)).findFirst();
+        return sessionIdToParticipant.values().stream()
+                .filter(p -> p.getUsername().equals(nickname))
+                .findFirst();
     }
 
     public boolean isNicknameTaken(String nickname) {
-        return sessionIdToParticipant.values().stream().anyMatch(p -> p.getUsername().equals(nickname));
+        return sessionIdToParticipant.values().stream()
+                .anyMatch(p -> p.getUsername().equals(nickname));
     }
 
     public void setDrawer(String sessionId, boolean isDrawer) {

@@ -1,5 +1,8 @@
 package com.example.drawandguess.model;
 
+/*
+ * Represents the user’s request to register a nickname.
+ */
 public class RegistrationRequest {
     private String nickname;
 

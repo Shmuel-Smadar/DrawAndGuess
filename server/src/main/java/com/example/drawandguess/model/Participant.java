@@ -2,6 +2,10 @@ package com.example.drawandguess.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/*
+ * Represents a user participant in a room/game, including session ID,
+ * nickname (username), a drawer flag, and the participant's score.
+ */
 public class Participant {
     private String sessionId;
     private String username;

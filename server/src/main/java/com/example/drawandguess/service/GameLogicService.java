@@ -14,6 +14,13 @@ import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 import java.time.Instant;
 
+/*
+ * A service that manages the main flow of game logic:
+ * - Word choosing
+ * - Guess processing
+ * - Round transitions
+ * - Ending the game and scheduling new game
+ */
 @Service
 public class GameLogicService {
     private final ChatService chatService;
@@ -49,7 +56,7 @@ public class GameLogicService {
         this.scoringService = scoringService;
     }
 
-    // A method which select randomly 3 words for the drawer to choose from and send it
+ // A method which select randomly 3 words for the drawer to choose from and send it
     public WordOptions requestWords(String roomId, String sessionId) {
         Room room = roomService.getRoom(roomId);
         Game game = room.getGame();
@@ -112,6 +119,10 @@ public class GameLogicService {
         }
     }
 
+    /*d
+     * A method that is called when a user leaves the room. Checks if they were the drawer,
+     * updates the game accordingly, and remove the room if empty.
+     */
     public void userLeftRoom(String roomId, String sessionId) {
         Room room = roomService.getRoom(roomId);
         Game game = room.getGame();
@@ -165,12 +176,21 @@ public class GameLogicService {
     private void endGame(String roomId, Game game) {
         drawingService.clearCanvas(roomId, new ClearCanvasMessage(SERVER_MESSAGE_TYPE));
         String finalScoreMessage = scoringService.buildFinalScoreMessage(game);
-        chatService.sendChatMessage(roomId, messageService.systemMessage(MessageType.GAME_ENDED,  String.valueOf(TOTAL_ROUNDS), finalScoreMessage,  String.valueOf(NEW_GAME_DELAY_SECONDS)));
+        chatService.sendChatMessage(roomId, messageService.systemMessage(
+                MessageType.GAME_ENDED,
+                String.valueOf(TOTAL_ROUNDS),
+                finalScoreMessage,
+                String.valueOf(NEW_GAME_DELAY_SECONDS)
+        ));
         String winnerSessionId = scoringService.getWinnerSessionId(game);
         if (winnerSessionId != null) {
             String winnerName = participantService.findParticipantBySessionId(winnerSessionId).getUsername();
             leaderboardService.saveScores(winnerName, game.getScore(winnerName));
-            chatService.sendChatMessage(roomId, messageService.systemMessage(MessageType.WINNER_ANNOUNCED, winnerSessionId, winnerName + " is the winner!"));
+            chatService.sendChatMessage(roomId, messageService.systemMessage(
+                    MessageType.WINNER_ANNOUNCED,
+                    winnerSessionId,
+                    winnerName + " is the winner!"
+            ));
         }
         scheduleNewGame(roomId, game);
     }

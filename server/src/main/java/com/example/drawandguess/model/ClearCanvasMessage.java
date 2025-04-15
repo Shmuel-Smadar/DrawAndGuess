@@ -1,5 +1,8 @@
 package com.example.drawandguess.model;
 
+/*
+ * Represents a message indicating that the canvas should be cleared.
+ */
 public class ClearCanvasMessage {
     private String userID;
 

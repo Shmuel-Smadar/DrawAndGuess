@@ -9,6 +9,10 @@ import java.time.Duration;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
 
+/*
+ * A servie that Handles scheduling and sending incremental hints (revealing letters) to participants.
+ * if the word is fully revealed and no one guesses, triggers the "no guess" function.
+ */
 @Service
 public class HintService {
     private final TaskScheduler taskScheduler;
@@ -20,7 +24,8 @@ public class HintService {
         this.chatService = chatService;
     }
 
-    // A method responsible for sending hints to a given room, and a function to call when hints are over
+    /* A method responsible for sending hints to a given room,
+    * and a function to call when hints are over */
     public void startHintProgression(String roomId, Game game, Runnable onNoHint) {
         if (hintTasks.containsKey(roomId)) return;
         Runnable runnable = () -> {

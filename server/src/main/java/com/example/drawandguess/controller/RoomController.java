@@ -1,6 +1,5 @@
 package com.example.drawandguess.controller;
 
-import com.example.drawandguess.model.Participant;
 import com.example.drawandguess.model.Room;
 import com.example.drawandguess.service.RoomService;
 import com.example.drawandguess.service.GameLogicService;
@@ -31,6 +30,9 @@ import static com.example.drawandguess.config.GameConstants.ROOM_ID_KEY;
 import static com.example.drawandguess.config.GameConstants.NUMBER_OF_PARTICIPANTS_KEY;
 import static com.example.drawandguess.config.GameConstants.MAX_ROOM_NAME_LENGTH;
 
+/*
+ * Manages creating rooms, joining/leaving rooms, and fetching the list of rooms.
+ */
 @Controller
 public class RoomController {
     private static final Logger logger = LoggerFactory.getLogger(RoomController.class);
@@ -42,7 +44,10 @@ public class RoomController {
         this.gameService = gameService;
     }
 
-    // A method responsible for creating a room
+    /*
+     * Creates a room with the given name, joins the user who requested it,
+     * and returns the room info to that user.
+     */
     @MessageMapping(CREATE_ROOM)
     @SendToUser(ROOM_CREATED_TOPIC)
     public Room createRoom(@Payload String roomName, SimpMessageHeaderAccessor headerAccessor) {
@@ -60,7 +65,9 @@ public class RoomController {
         }
     }
 
-    // A method responsible for handling a user request to join a room
+    /*
+     * Called when a user wants to join a specified room by ID.
+     */
     @MessageMapping(JOIN_ROOM)
     public void joinRoom(@Payload String roomId, SimpMessageHeaderAccessor headerAccessor) {
         try {
@@ -70,7 +77,10 @@ public class RoomController {
             logger.error("Error in joinRoom", e);
         }
     }
-    // A method responsible for handling a user request to leave a room
+
+    /*
+     * Called when a user wants to leave a specified room by ID.
+     */
     @MessageMapping(LEAVE_ROOM)
     public void leaveRoom(@Payload String roomId, SimpMessageHeaderAccessor headerAccessor) {
         try {
@@ -81,7 +91,10 @@ public class RoomController {
         }
     }
 
-    // A method responsible for updating the room list in the lobby (and number of players in each room)
+    /*
+     * Returns a list of all rooms with their details (name, ID, number of participants),
+     * sent to all subscribers (users in the lobby)
+     */
     @MessageMapping(GET_ROOMS)
     @SendTo(TOPIC_ROOMS)
     public Collection<?> getRooms() {
@@ -99,7 +112,10 @@ public class RoomController {
         }
     }
 
-    // A method responsible for updating the participant list in a given room
+    /*
+     * Handles a request to retrieve the participant list for a room.
+     * broadcasts that list to the entire room.
+     */
     @MessageMapping(PARTICIPANTS_MAPPING)
     public void handleParticipantsRequest(@DestinationVariable String roomId) {
         try {

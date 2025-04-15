@@ -1,5 +1,8 @@
 package com.example.drawandguess.model;
 
+/*
+ * Enumerates possible types of system messages.
+ */
 public enum MessageType {
     ROUND_STARTED,
     WORD_GUESSED,

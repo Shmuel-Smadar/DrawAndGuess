@@ -14,6 +14,10 @@ import static com.example.drawandguess.config.APIConstants.WINNER_MAPPING;
 import static com.example.drawandguess.config.GameConstants.USER_KEY;
 import static com.example.drawandguess.config.GameConstants.MESSAGE_KEY;
 
+/*
+ * Controller that listens for a "winner message" after the game ends,
+ * allowing the winner to set a custom message on the leaderboard.
+ */
 @Controller
 public class WinnerMessageController {
     private static final Logger logger = LoggerFactory.getLogger(WinnerMessageController.class);
@@ -23,7 +27,9 @@ public class WinnerMessageController {
         this.leaderboardService = leaderboardService;
     }
 
-    //A method responsible for getting a message from the winner and updating the leaderboard with it
+    /*
+     * Called when the winner sets a custom message. Updates the leaderboard accordingly.
+     */
     @MessageMapping(WINNER_MAPPING)
     public void handleWinnerMessage(@Payload Map<String, String> body, SimpMessageHeaderAccessor headerAccessor) {
         try {

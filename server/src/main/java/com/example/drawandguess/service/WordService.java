@@ -10,6 +10,10 @@ import java.util.Random;
 import java.util.ArrayList;
 import java.util.Map;
 
+/*
+ * A service that handles retrieving random word pairs for drawing, either from the database
+ * or a default in-memory list (based on the configuration)
+ */
 @Service
 public class WordService {
 
@@ -46,6 +50,7 @@ public class WordService {
                 String hebrew = (String) row.get("hebrew_word");
                 wordPairs.add(english + " : " + hebrew);
             }
+            // if fewer than 3 found in DB, fill the remainder from default list
             while (wordPairs.size() < 3) {
                 wordPairs.add(getRandomDefaultWordPair());
             }
@@ -58,7 +63,7 @@ public class WordService {
             return new WordOptions(wordPairs.get(0), wordPairs.get(1), wordPairs.get(2));
         }
     }
-    
+
     private String getRandomDefaultWordPair() {
         Random r = new Random();
         return defaultWordPairs.get(r.nextInt(defaultWordPairs.size()));

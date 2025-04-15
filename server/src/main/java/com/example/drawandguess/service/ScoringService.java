@@ -3,12 +3,13 @@ package com.example.drawandguess.service;
 import static com.example.drawandguess.config.GameConstants.GUESSER_BASE_POINTS;
 import static com.example.drawandguess.config.GameConstants.DRAWER_BASE_POINTS;
 import static com.example.drawandguess.config.GameConstants.MULTIPLIER_BASE;
-import static com.example.drawandguess.config.GameConstants.buildSystemMessage;
-import static com.example.drawandguess.config.GameConstants.NEW_GAME_DELAY_SECONDS;
 import com.example.drawandguess.model.Game;
-import com.example.drawandguess.model.MessageType;
 import org.springframework.stereotype.Service;
 
+/*
+ * A service that calculates and assigns points to the guesser and drawer at round completion.
+ * Also helps determine the game’s winner.
+ */
 @Service
 public class ScoringService {
     private final ParticipantService participantService;
@@ -17,7 +18,10 @@ public class ScoringService {
         this.participantService = participantService;
     }
 
-    // A method that handles the scored at the end of the round, for the drawer and the guesser
+    /*
+     * A method that add points to the guesser and the current drawer,
+     * factoring in how many hints have been revealed. (more hints = lower score)
+     */
     public void handleScoring(String roomId, Game game, String guess, String sessionId) {
         String username = participantService.findParticipantBySessionId(sessionId).getUsername();
         int used = game.getHintsUsed();
@@ -34,7 +38,6 @@ public class ScoringService {
     }
 
     
-
     // A method that finds the winner in a game. return null if it's a tie.
     public String getWinnerSessionId(Game game) {
         String winnerSessionId = null;

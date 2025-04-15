@@ -19,6 +19,10 @@ import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+/*
+ * A service that manages all created rooms, letting users join, updating participants,
+ * and broadcasting room/participant lists.
+ */
 @Service
 public class RoomService {
     private final Map<String, Room> rooms = new ConcurrentHashMap<>();
@@ -28,7 +32,11 @@ public class RoomService {
     private final MessageService messageService;
     private final TaskScheduler taskScheduler;
 
-    public RoomService(ParticipantService participantService, ChatService chatService, SimpMessagingTemplate messagingTemplate, MessageService messageService, TaskScheduler taskScheduler) {
+    public RoomService(ParticipantService participantService,
+                       ChatService chatService,
+                       SimpMessagingTemplate messagingTemplate,
+                       MessageService messageService,
+                       TaskScheduler taskScheduler) {
         this.participantService = participantService;
         this.chatService = chatService;
         this.messagingTemplate = messagingTemplate;
@@ -59,12 +67,15 @@ public class RoomService {
         return new ArrayList<>(rooms.values());
     }
 
-    // A method that adds participant to a room
+    /*
+     * A method that adds participant to a room updates the drawer if needed,
+     * and broadcasts updated lists. Also schedules a "participant joined" system message.
+     */
     public void joinRoom(String sessionId, String roomId) {
         Room room = getRoom(roomId);
         Game game = room.getGame();
         game.addParticipant(sessionId);
-        // If a game is over we will only update room and participants lists, without choosing new drawer
+        // If the game is over, no new drawer logic is performed
         if (game.isGameOver()) {
             broadcastParticipants(roomId);
             broadcastRooms();
@@ -81,7 +92,8 @@ public class RoomService {
     }
 
     /* A method that sends a message about user joining a room.
-    * with slight delay so that the joined user will see it as well. */
+    * with slight delay so that the joined user will see it as well.
+    */
     private void scheduleParticipantJoinedMessage(String roomId, String nickname) {
         taskScheduler.schedule(() -> {
             ChatMessage msg = messageService.systemMessage(MessageType.PARTICIPANT_JOINED, nickname);
@@ -89,7 +101,7 @@ public class RoomService {
         }, Instant.now().plusMillis(TIMER_DELAY_MS));
     }
 
-    // A method that update the list of participants to a given room
+   // A method that update the list of participants to a given room
     public void broadcastParticipants(String roomId) {
         taskScheduler.schedule(() -> {
             Room room = rooms.get(roomId);

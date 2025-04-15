@@ -1,12 +1,17 @@
 package com.example.drawandguess.model;
 
-import static com.example.drawandguess.config.GameConstants.TOTAL_ROUNDS;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.example.drawandguess.config.GameConstants.TOTAL_ROUNDS;
+
+/*
+ * Represents The state of the ongoing game within a room, including:
+ * participants, drawer, chosen word, hint mangament and scores.
+ */
 public class Game {
     private final List<String> participantSessionIds = new ArrayList<>();
     private int currentDrawerIndex = -1;
@@ -65,9 +70,10 @@ public class Game {
         hintManager.initialize(chosenWordEnglish);
     }
 
+    // Checks whether the guess (in English or Hebrew) matches the chosen word.
     public boolean isCorrectGuess(String guess) {
-        return (chosenWordEnglish != null && chosenWordEnglish.equalsIgnoreCase(guess)) ||
-                (chosenWordHebrew != null && chosenWordHebrew.equalsIgnoreCase(guess));
+        return (chosenWordEnglish != null && chosenWordEnglish.equalsIgnoreCase(guess))
+                || (chosenWordHebrew != null && chosenWordHebrew.equalsIgnoreCase(guess));
     }
 
     public void nextRound() {

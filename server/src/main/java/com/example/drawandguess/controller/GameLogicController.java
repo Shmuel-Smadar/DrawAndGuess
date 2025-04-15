@@ -13,13 +13,12 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Controller;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 
-import static com.example.drawandguess.config.APIConstants.REQUEST_WORDS_MAPPING;
-import static com.example.drawandguess.config.APIConstants.WORD_OPTIONS_TOPIC;
-import static com.example.drawandguess.config.APIConstants.CHOOSE_WORD_MAPPING;
-import static com.example.drawandguess.config.APIConstants.GUESS_MAPPING;
-import static com.example.drawandguess.config.APIConstants.CURRENT_HINT_MAPPING;
-import static com.example.drawandguess.config.APIConstants.topicRoomWordHint;
+import static com.example.drawandguess.config.APIConstants.*;
 
+/*
+ * Controller that manages the game flow requests:
+ * requesting word options, choosing a word, retrieving the current hint, etc.
+ */
 @Controller
 public class GameLogicController {
     private static final Logger logger = LoggerFactory.getLogger(GameLogicController.class);
@@ -27,13 +26,18 @@ public class GameLogicController {
     private final RoomService roomService;
     private final SimpMessagingTemplate messagingTemplate;
 
-    public GameLogicController(GameLogicService gameLogicService, RoomService roomService, SimpMessagingTemplate messagingTemplate) {
+    public GameLogicController(GameLogicService gameLogicService,
+                               RoomService roomService,
+                               SimpMessagingTemplate messagingTemplate) {
         this.gameLogicService = gameLogicService;
         this.roomService = roomService;
         this.messagingTemplate = messagingTemplate;
     }
 
-    // A method responsible for getting the drawer the words to choose from
+    /*
+     * Gets a request from the drawer to get words to choose from
+     * uses the GameLogicService to obtain them and return to the drawer.
+     */
     @MessageMapping(REQUEST_WORDS_MAPPING)
     @SendToUser(WORD_OPTIONS_TOPIC)
     public WordOptions handleWordRequest(@DestinationVariable String roomId, SimpMessageHeaderAccessor headerAccessor) {
@@ -46,10 +50,14 @@ public class GameLogicController {
         }
     }
 
-    /* A method that gets the choice made by the drawer (about which word to draw)
-     and updates the state of the game according to that*/
+    /*
+     * Receives word the drawer chosen to draw.
+     * Tells the GameLogicService to set that word and updatethe  game state accordingly.
+     */
     @MessageMapping(CHOOSE_WORD_MAPPING)
-    public void handleWordChosen(@DestinationVariable String roomId, @Payload String chosenWord, SimpMessageHeaderAccessor headerAccessor) {
+    public void handleWordChosen(@DestinationVariable String roomId,
+                                 @Payload String chosenWord,
+                                 SimpMessageHeaderAccessor headerAccessor) {
         try {
             String sessionId = headerAccessor.getSessionId();
             gameLogicService.chooseWord(roomId, sessionId, chosenWord);
@@ -58,8 +66,10 @@ public class GameLogicController {
         }
     }
 
-    /* A method that gets a request from a client to get the current hint for the game.
-     it then sends it to all the users in the room */
+    /*
+     * Receives a client hint request,
+     * it then sends it to all the users in the room
+     */
     @MessageMapping(CURRENT_HINT_MAPPING)
     public void retrieveCurrentHint(@DestinationVariable String roomId) {
         try {

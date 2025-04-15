@@ -1,5 +1,10 @@
 package com.example.drawandguess.config;
 
+/*
+ * Defines a set of constants for STOMP endpoints, prefixes,
+ * routes, and some server paths. This class also includes helper methods
+ * to build dynamic topic paths (for specific room IDs).
+ */
 public final class APIConstants {
 
     private APIConstants() {}
@@ -7,7 +12,7 @@ public final class APIConstants {
     // Allow all origins for CORS
     public static final String ALLOWED_ORIGINS = "*";
 
-    //Endpoint for establishing STOMP connection (the client will use it to contact the server)
+    // Endpoint for establishing STOMP connection
     public static final String STOMP_ENDPOINT = "/draw-and-guess";
 
     /* These prefixes manage how messages are routed:
@@ -17,7 +22,6 @@ public final class APIConstants {
     public static final String APP_PREFIX = "/app";
     public static final String TOPIC_PREFIX = "/topic";
     public static final String USER_PREFIX = "/user";
-
 
     // These constants define topic the server broadcasts to all the client who subscribed
     public static final String TOPIC_ROOMS = "/topic/rooms";
@@ -40,19 +44,18 @@ public final class APIConstants {
     public static final String GUESS_MAPPING = "/room/{roomId}/Guess";
     public static final String CURRENT_HINT_MAPPING = "/room/{roomId}/getCurrentHint";
 
-
     //These constants are for the server to send to the client
     public static final String ROOM_CREATED_TOPIC = TOPIC_PREFIX + "/roomCreated";
     public static final String NICKNAME_TOPIC = TOPIC_PREFIX + "/nickname";
     public static final String WORD_OPTIONS_TOPIC = TOPIC_PREFIX +  "/wordOptions";
 
-    // These are routing constants. where the server will serve the static files for the client (frontend)
+// These are routing constants. where the server will serve the static files for the client (frontend)
     public static final String DRAW_AND_GUESS_PATH = "/drawandguess";
     public static final String DRAW_AND_GUESS_SLASH_PATH = "/drawandguess/";
     public static final String HOME_PATH = "/home";
     public static final String MAIN_INDEX_FILE = "forward:/drawandguess/index.html";
 
-    // vm connector for EmbeddedActiveMQ
+    // VM connector for EmbeddedActiveMQ
     public static final String VM_CONNECTOR = "vm://localhost";
 
     // static helper methods for path construction

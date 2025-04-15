@@ -2,7 +2,6 @@ package com.example.drawandguess.controller;
 
 import com.example.drawandguess.model.NicknameResgistrationResponse;
 import com.example.drawandguess.model.RegistrationRequest;
-import com.example.drawandguess.model.MessageType;
 import com.example.drawandguess.service.ParticipantService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +17,9 @@ import static com.example.drawandguess.config.GameConstants.NICKNAME_REGEX;
 import static com.example.drawandguess.config.GameConstants.buildSystemMessage;
 import static com.example.drawandguess.model.MessageType.INVALID_NICKNAME;
 
+/*
+ * A controller that handles user registration requests.
+ */
 @Controller
 public class ParticipantController {
     private static final Logger logger = LoggerFactory.getLogger(ParticipantController.class);
@@ -27,13 +29,14 @@ public class ParticipantController {
         this.participantService = participantService;
     }
 
-    /* A method that responsible for registration.
-    * gets a RegistrationRequest with a chosen nickname, and returns NicknameResgistrationResponse
-    *  which contains the response if the registration succeeded, and if failed, explains why (e.g "nickname already exists")
-    */
+    /*
+     * Gets a registration request, make basic vallidation and then sends it to participantService to make sure
+     * its unique. returns the response (includes an error message in case of failure).
+     */
     @MessageMapping(REGISTER_NICKNAME)
     @SendToUser(NICKNAME_TOPIC)
-    public NicknameResgistrationResponse registerNickname(@Payload RegistrationRequest request, SimpMessageHeaderAccessor headerAccessor) {
+    public NicknameResgistrationResponse registerNickname(@Payload RegistrationRequest request,
+                                                          SimpMessageHeaderAccessor headerAccessor) {
         try {
             String sessionId = headerAccessor.getSessionId();
             String nickname = request.getNickname().trim();

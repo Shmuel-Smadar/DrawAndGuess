@@ -1,5 +1,9 @@
 package com.example.drawandguess.model;
 
+/*
+ * Represents a drawing event, including coordinates,
+ * color, brush size, user ID, and event type.
+ */
 public class DrawMessage {
     private double normX;
     private double normY;

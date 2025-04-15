@@ -6,6 +6,9 @@ import com.example.drawandguess.model.ChatMessage;
 import com.example.drawandguess.model.MessageType;
 import org.springframework.stereotype.Service;
 
+/*
+ * A service that creates system messages according to the ENUM sent.
+ */
 @Service
 public class MessageService {
     /* A method responsible for building a system message

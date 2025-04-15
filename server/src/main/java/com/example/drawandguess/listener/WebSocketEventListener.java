@@ -16,7 +16,10 @@ public class WebSocketEventListener {
         this.gameLogicService = gameLogicService;
     }
 
-    // A listener which responsible for notifying gameLogicService if a user quit a game abruptly.
+    /*
+     * A method that is called whenever a session disconnect event occurs.
+     * notifies gameLogicService to update the game state accordingly.
+     */
     @EventListener
     public void handleSessionDisconnect(SessionDisconnectEvent event) {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());

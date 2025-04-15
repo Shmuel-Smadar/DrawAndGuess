@@ -13,6 +13,9 @@ import org.springframework.stereotype.Controller;
 import static com.example.drawandguess.config.APIConstants.CHAT_MAPPING;
 import static com.example.drawandguess.config.GameConstants.MAX_CHAT_MESSAGE_LENGTH;
 
+/*
+ * A controller that handles chat messages sent by users.
+ */
 @Controller
 public class ChatController {
     private static final Logger logger = LoggerFactory.getLogger(ChatController.class);
@@ -24,7 +27,7 @@ public class ChatController {
         this.gameService = gameService;
     }
 
-    /* A method that gets a message from a user in the chat. it then does:
+    /* Recieves message from a user in the chat. it then does:
         1. validates the message
         2. publishes the message to the other clients in the room
         3. sends the message to the gameLogicService to check if the message

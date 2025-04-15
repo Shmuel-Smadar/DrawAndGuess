@@ -2,6 +2,10 @@ package com.example.drawandguess.model;
 
 import java.util.UUID;
 
+/*
+ * Represents a game room with a unique ID, a user-defined name,
+ * and an associated Game for tracking gameplay state.
+ */
 public class Room {
     private String roomId;
     private String roomName;
