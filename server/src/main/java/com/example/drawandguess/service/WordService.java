@@ -5,10 +5,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import static com.example.drawandguess.config.GameConstants.NUMBER_OF_WORDS_TO_CHOOSE_FROM;
 import com.example.drawandguess.model.WordOptions;
-import java.util.List;
-import java.util.Random;
-import java.util.ArrayList;
-import java.util.Map;
+import java.util.*;
 
 /*
  * A service that handles retrieving random word pairs for drawing, either from the database
@@ -51,16 +48,19 @@ public class WordService {
                 wordPairs.add(english + " : " + hebrew);
             }
             // if fewer than 3 found in DB, fill the remainder from default list
-            while (wordPairs.size() < 3) {
+            while (wordPairs.size() < NUMBER_OF_WORDS_TO_CHOOSE_FROM) {
                 wordPairs.add(getRandomDefaultWordPair());
             }
             return new WordOptions(wordPairs.get(0), wordPairs.get(1), wordPairs.get(2));
         } else {
-            List<String> wordPairs = new ArrayList<>();
-            for (int i = 0; i < NUMBER_OF_WORDS_TO_CHOOSE_FROM; i++) {
-                wordPairs.add(getRandomDefaultWordPair());
-            }
-            return new WordOptions(wordPairs.get(0), wordPairs.get(1), wordPairs.get(2));
+                // Create a copy of the default list and shuffle it.
+                List<String> defaultWordsShuffled = new ArrayList<>(defaultWordPairs);
+                Collections.shuffle(defaultWordsShuffled);
+                return new WordOptions(
+                        defaultWordsShuffled.get(0),
+                        defaultWordsShuffled.get(1),
+                        defaultWordsShuffled.get(2)
+                );
         }
     }
 
