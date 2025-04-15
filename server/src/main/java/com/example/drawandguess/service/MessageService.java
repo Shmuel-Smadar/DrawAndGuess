@@ -21,6 +21,7 @@ public class MessageService {
         if(type == MessageType.WINNER_ANNOUNCED) {
             msg.setWinnerSessionId(args[0]);
             msg.setText(args[1]);
+            return msg;
         }
         msg.setText(buildSystemMessage(type, args));
         return msg;
