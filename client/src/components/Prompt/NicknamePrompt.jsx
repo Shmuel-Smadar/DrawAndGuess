@@ -11,11 +11,17 @@ import {
 import { USER_TOPIC_NICKNAME, APP_REGISTER_NICKNAME } from '../../utils/subscriptionConstants'
 import './NicknamePrompt.css'
 
+ /*
+ * Prompts the user for a nickname on first load.
+ * validates the input (with regex) and sends it to the server to ensure
+ * the nickname is unique. display an error in case the server returns one.
+ */
 const NicknamePrompt = ({ client, connected, error }) => {
   const [nicknameInput, setNicknameInput] = useState('')
   const dispatch = useDispatch()
   const currentNickname = useRef('')
   
+  // A hook that subscribe to get an answer from the server regarding registration
   useEffect(() => {
     if (client && connected) {
       const subscription = client.subscribe(USER_TOPIC_NICKNAME, (message) => {
@@ -32,6 +38,8 @@ const NicknamePrompt = ({ client, connected, error }) => {
     }
   }, [client, connected, dispatch]);
 
+    /* A function which gets called after the user chose a nickname.
+    * the nickname then being verified internally. and if valid it is send to the server */
   const handleSubmit = (e) => {
     e.preventDefault();
     if (nicknameInput !== '' && client && connected) {

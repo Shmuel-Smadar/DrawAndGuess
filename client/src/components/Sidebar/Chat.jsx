@@ -14,6 +14,12 @@ import { TOPIC_ROOM_CHAT, APP_ROOM_CHAT } from '../../utils/subscriptionConstant
 import WinnerPrompt from '../Prompt/WinnerPrompt'
 import './Chat.css'
 
+
+/*
+ * Chat component that shows messages from all participants (and system messages from the server),
+ * and allows the user to send text if they are not the drawer.
+ */
+
 const Chat = ({ client, height }) => {
   const [messages, setMessages] = useState([])
   const [newMessage, setNewMessage] = useState('')
@@ -27,10 +33,13 @@ const Chat = ({ client, height }) => {
   const username = useSelector(state => state.user.username)
   const isDrawer = useSelector(state => state.game.isDrawer)
 
+  //Assigns special color for various type of system messages
   function getSystemMessageColor(messageType) {
     return SYSTEM_MESSAGE_COLORS[messageType] || 'gray'
   }
 
+  /* Subscribes to chat messages, also parse the message to see if it notifies that the
+  * current user won the game. if so, displays winner prompt */
   useEffect(() => {
     if (!client || !client.connected || !roomId) return
     const subscription = client.subscribe(TOPIC_ROOM_CHAT(roomId), (message) => {
@@ -50,6 +59,12 @@ const Chat = ({ client, height }) => {
     return () => subscription.unsubscribe()
   }, [client, roomId, isAtBottom, sessionId])
 
+
+  /*
+  * Determains scrolling behavior. if the user is at the bottom, a new message will cause auto scrolling by default.
+  * if the user is not a the bottom, there won't be auto scrolling,
+  * but a small notification about new messages will be displayed
+  */
   useEffect(() => {
     if (isAtBottom && chatWindowRef.current) {
       chatWindowRef.current.scrollTop = chatWindowRef.current.scrollHeight

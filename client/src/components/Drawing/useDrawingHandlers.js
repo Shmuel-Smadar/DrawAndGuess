@@ -1,6 +1,6 @@
 import { useCallback } from 'react'
 import { setIsFillMode } from '../../store/gameSlice'
-import { getEventCoordinates } from '../../utils/helpers'
+import { getEventCoordinates } from './helpers'
 import {
   VIRTUAL_WIDTH,
   VIRTUAL_HEIGHT,
@@ -11,6 +11,10 @@ import {
 } from '../../utils/constants'
 import { APP_ROOM_DRAW } from '../../utils/subscriptionConstants'
 
+
+/* A hook that publishes local drawing actions (start, draw, stop, fill)
+* to the STOMP conenction, so that other participants see them. It also applies
+* immediate local updates on the canvas for real-time feedback. */
 export const useDrawingHandlers = ({
   client,
   userID,

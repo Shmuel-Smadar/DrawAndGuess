@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux'
 import { TOPIC_ROOM_WORD_HINT, APP_GET_CURRENT_HINT } from '../../utils/subscriptionConstants'
 import './WordHint.css'
 
+// Shows a hint of the current word to the guessers.
 const WordHint = ({ client }) => {
   const [currentHint, setCurrentHint] = useState('')
   const roomId = useSelector(state => state.room.room?.roomId)

@@ -1,3 +1,8 @@
+/*
+ * Defines all the STOMP destinations for publishing
+ * and subscribing endpoints.
+ */
+
 export const APP_GET_ROOMS = '/app/getRooms'
 export const APP_CREATE_ROOM = '/app/createRoom'
 export const APP_JOIN_ROOM = '/app/joinRoom'

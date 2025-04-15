@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useSelector } from 'react-redux'
-import { floodFill } from '../../utils/helpers'
+import { floodFill } from './helpers'
 import {
   VIRTUAL_WIDTH,
   VIRTUAL_HEIGHT,
@@ -15,6 +15,9 @@ import {
   
 } from '../../utils/subscriptionConstants'
 
+/* A hook that subscribes to canvas events and perform the
+*  actions that are being sent from other users on the canvas.
+*/
 export const useCanvasSubscriptions = ({ client, roomId, canvasRef, lastPositions }) => {
   const isDrawer = useSelector((state) => state.game.isDrawer)
 

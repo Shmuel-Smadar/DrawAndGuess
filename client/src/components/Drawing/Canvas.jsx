@@ -6,8 +6,9 @@ import { BUCKET_ICON_CURSOR_OFFSET, DEFAULT_CURSOR } from '../../utils/constants
 import './Canvas.css'
 
 function Canvas({ client }) {
-    const roomId = useSelector(state => state.room.room?.roomId)
-    const userID = useSelector(state => state.user.sessionId)
+  const roomId = useSelector(state => state.room.room?.roomId)
+  const userID = useSelector(state => state.user.sessionId)
+  //handle user actions on the canvas
   const {
     canvasRef,
     handleMouseDown,

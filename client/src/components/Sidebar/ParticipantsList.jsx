@@ -4,6 +4,11 @@ import { TOPIC_ROOM_PARTICIPANTS, APP_GET_PARTICIPANTS } from '../../utils/subsc
 import { PARTICIPANTS_TITLE, DRAWING_INDICATOR_TEXT } from '../../utils/constants'
 import './ParticipantsList.css'
 
+
+/*
+ * Shows a list of participants in the current room, 
+ * with scores and an indicator of the current drawer.
+ */
 const ParticipantsList = ({client, height, onDrawerChange }) => {
   const [userList, setUserList] = useState([])
   const participantsWindowRef = useRef(null)

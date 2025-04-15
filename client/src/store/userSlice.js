@@ -1,5 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit'
 
+/*
+ * Manages user-related state: nickname, session ID, nicknameError.
+ */
 const userSlice = createSlice({
   name: 'user',
   initialState: {

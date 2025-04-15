@@ -1,5 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit'
 
+/*
+ * Manages game-related state: color, brush size, fill mode, isDrawer,
+ * and showing word selection to the drawer
+ */
+
 const initialState = {
   color: '#000000',
   brushSize: 2,

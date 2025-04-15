@@ -1,3 +1,8 @@
+/**
+ * Helper functions for coordinate handling and flood fill
+ *  (filling a closed area in the canvas with some color)
+ */
+
 export const getEventCoordinates = (event, canvasRef) => {
   if (event.nativeEvent instanceof MouseEvent) {
     return { offsetX: event.nativeEvent.offsetX, offsetY: event.nativeEvent.offsetY }

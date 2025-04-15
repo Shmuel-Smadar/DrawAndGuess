@@ -22,6 +22,13 @@ import {
   USER_TOPIC_ROOM_CREATED
 } from '../../utils/subscriptionConstants'
 
+
+
+/*
+ * The main lobby page that lists all the active rooms,
+ * allows creating a new room, and also provides buttons
+ * to open the leaderboard or credits overlays.
+ * */
 function Lobby({client, connected}) {
   const [newRoomName, setNewRoomName] = useState('')
   const [error, setError] = useState('')
@@ -30,6 +37,7 @@ function Lobby({client, connected}) {
   const [showCredits, setShowCredits] = useState(false)
   const dispatch = useDispatch()
 
+  // A hook that gets a list of rooms and sort them in the room table
   useEffect(() => {
     if (!client || !connected) return
     const subscription = client.subscribe(TOPIC_ROOMS, (message) => {
@@ -51,6 +59,7 @@ function Lobby({client, connected}) {
     return () => subscription.unsubscribe()
   }, [client, connected])
 
+  // A hook that gets called when the current user created a room and the server notified about it
   useEffect(() => {
     if (!client || !connected) return
     const sub = client.subscribe(USER_TOPIC_ROOM_CREATED, (message) => {
@@ -70,6 +79,7 @@ function Lobby({client, connected}) {
     }
   }
 
+  // A function that handles room creation
   function handleCreateRoom(e) {
     e.preventDefault()
     if (newRoomName === '') {

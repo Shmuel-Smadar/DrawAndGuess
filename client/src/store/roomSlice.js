@@ -1,5 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit'
 
+
+/*
+ * Manages the currently joined room state.
+ */
 const roomSlice = createSlice({
   name: 'room',
   initialState: {

@@ -3,9 +3,11 @@ import { WINNER_PROMPT_TITLE, WINNER_PROMPT_LABEL, WINNER_PROMPT_SAVE, WINNER_ME
 import { APP_WINNER_MESSAGE } from '../../utils/subscriptionConstants'
 import './WinnerPrompt.css'
 
+// A component that lets the winner create a message and send to the server
 export default function WinnerPrompt({ username, client, connected, onClose }) {
   const [winnerMessage, setWinnerMessage] = useState('')
 
+  // A function that sends the message of the winner to the server.
   const handleSubmit = (e) => {
     e.preventDefault()
     if (!client || !connected) return

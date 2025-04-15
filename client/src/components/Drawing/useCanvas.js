@@ -4,6 +4,15 @@ import { useCanvasResize } from './useCanvasResize';
 import { useCanvasSubscriptions } from './useCanvasSubscriptions';
 import { useDrawingHandlers } from './useDrawingHandlers';
 
+
+
+/*
+ * custom hook that covers all the logic related to the canvas:
+ * - setting up canvas dimensions (with `useCanvasResize`)
+ * - subscribing to drawing events by other users (with `useCanvasSubscriptions`)
+ * - handling local user drawing (with `useDrawingHandlers`)
+ *
+ */
 const useCanvas = ({ client}) => {
   const color = useSelector((state) => state.game.color);
   const brushSize = useSelector((state) => state.game.brushSize);

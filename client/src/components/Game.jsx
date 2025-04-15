@@ -10,6 +10,14 @@ import { CANVAS_HEIGHT_RATIO, GAME_TITLE } from '../utils/constants'
 import { APP_REQUEST_WORDS, APP_CHOOSE_WORD, USER_TOPIC_WORD_OPTIONS, TOPIC_ROOM_CHAT } from '../utils/subscriptionConstants'
 import './Game.css'
 
+
+/*
+* The main component inisde a room that displayes
+* - The canvas
+* - The drawing panel for the drawer and the hint for non drawers
+* - Tha chat in which non drawers can guess the word being drawn
+* - The list of participants in the current room
+*/
 function Game({ client, connected }) {
   const dispatch = useDispatch()
   const room = useSelector(state => state.room.room)

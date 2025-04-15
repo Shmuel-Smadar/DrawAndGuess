@@ -1,3 +1,8 @@
+/**
+ * Various constants used throughout the application for sizing, text,
+ * colors, and so forth.
+ */
+
 export const VIRTUAL_WIDTH = 10
 export const VIRTUAL_HEIGHT = 16
 export const ASPECT_RATIO = VIRTUAL_WIDTH / VIRTUAL_HEIGHT

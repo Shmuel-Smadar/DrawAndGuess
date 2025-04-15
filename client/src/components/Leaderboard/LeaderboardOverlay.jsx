@@ -8,6 +8,9 @@ import {
   THIRD_PLACE_ICON
 } from '../../utils/constants';
 
+
+
+/* component that displayes the message of the winner */
 function MessageModal({ record, onClose }) {
   return (
     <div className="message-overlay">
@@ -20,6 +23,8 @@ function MessageModal({ record, onClose }) {
   );
 }
 
+/* A function that fetches the updated leaderboard data from the server,
+ and set the data on the leaderboard */
 function LeaderboardOverlay({ onClose }) {
   const [scores, setScores] = useState([]);
   const [selectedRecord, setSelectedRecord] = useState(null);
@@ -39,6 +44,7 @@ function LeaderboardOverlay({ onClose }) {
     return () => clearInterval(interval);
   }, []);
 
+  // adds icons for the first 3 places.
   const getRankIcon = (index) => {
     if (index === 0) return FIRST_PLACE_ICON;
     if (index === 1) return SECOND_PLACE_ICON;

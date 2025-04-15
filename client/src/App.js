@@ -8,6 +8,12 @@ import { setUsername, setNicknameError } from './store/userSlice'
 import { setRoom } from './store/roomSlice'
 import { DEFAULT_SOCKET_URL } from './utils/constants'
 
+
+/*
+* The main function of the client.
+* sets up the STOMP connection to the server, shows the nickname prompt for the user to choose one.
+* it then displays the lobby for the user, and after the user joined a room, it starts the game
+*/
 function App() {
   const dispatch = useDispatch()
   const username = useSelector(state => state.user.username)

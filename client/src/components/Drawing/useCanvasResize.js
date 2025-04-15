@@ -1,6 +1,10 @@
 import { useEffect } from 'react';
 import { ASPECT_RATIO, CANVAS_WIDTH_RATIO, CANVAS_HEIGHT_RATIO } from '../../utils/constants';
 
+/*
+* A hook that calculates the canvas size according to the window width and height.
+* it also listens to window size changes and update the canvas dimensions accordingly.
+*/
 export const useCanvasResize = (canvasRef) => {
   useEffect(() => {
     const resizeCanvas = () => {

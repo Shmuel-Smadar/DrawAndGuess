@@ -3,7 +3,9 @@ import './RoomTable.css'
 import EmptyIcon from '../../assets/empty-pockets.png'
 import { EMPTY_ROOM_HEADING, EMPTY_ROOM_TEXT, JOIN_ROOM_BUTTON_TEXT } from '../../utils/constants'
 
-function EmptyRoomState({ onCreateRoom }) {
+
+// Shows an icon and a message stating that there are no rooms available
+function EmptyRoomState() {
   return (
     <div className="empty-room-container">
       <img
@@ -19,11 +21,12 @@ function EmptyRoomState({ onCreateRoom }) {
   )
 }
 
-function RoomTable({ rooms, onJoinRoom, onCreateRoom }) {
+// Displays a scrollable list of rooms and calls EmptyRoomState in case of no rooms
+function RoomTable({ rooms, onJoinRoom }) {
   return (
     <div className="scrollable-rooms">
       {rooms.length === 0 ? (
-        <EmptyRoomState onCreateRoom={onCreateRoom} />
+        <EmptyRoomState />
       ) : (
         <div className="room-list">
           {rooms.map((room) => (

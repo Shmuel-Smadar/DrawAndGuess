@@ -2,6 +2,7 @@ import React from 'react'
 import { CLOSE_BUTTON_TEXT, CREDITS_TITLE } from '../../utils/constants'
 import './CreditsOverlay.css'
 
+/*A simple overlay that shows credits for the icon creators  */
 function CreditsOverlay({ onClose }) {
   return (
     <div className="credits-overlay">
