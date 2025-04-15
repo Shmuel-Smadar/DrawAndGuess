@@ -1,4 +1,4 @@
-/**
+/*
  * Various constants used throughout the application for sizing, text,
  * colors, and so forth.
  */

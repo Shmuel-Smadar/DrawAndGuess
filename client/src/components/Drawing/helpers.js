@@ -1,4 +1,4 @@
-/**
+/*
  * Helper functions for coordinate handling and flood fill
  *  (filling a closed area in the canvas with some color)
  */
