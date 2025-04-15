@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useRef } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { TOPIC_ROOM_PARTICIPANTS, APP_GET_PARTICIPANTS } from '../../utils/subscriptionConstants'
 import { PARTICIPANTS_TITLE, DRAWING_INDICATOR_TEXT } from '../../utils/constants'
 import './ParticipantsList.css'
