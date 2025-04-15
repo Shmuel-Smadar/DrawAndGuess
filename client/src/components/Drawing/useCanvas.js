@@ -17,7 +17,7 @@ const useCanvas = ({ client}) => {
   const color = useSelector((state) => state.game.color);
   const brushSize = useSelector((state) => state.game.brushSize);
   const isFillMode = useSelector((state) => state.game.isFillMode);
-  const isDrawingAllowed = useSelector((state) => state.game.isDrawingAllowed);
+  const isDrawer = useSelector((state) => state.game.isDrawer);
   const dispatch = useDispatch();
   const roomId = useSelector(state => state.room.room?.roomId)
   const userID = useSelector(state => state.user.sessionId)
@@ -42,7 +42,7 @@ const useCanvas = ({ client}) => {
     roomId,
     canvasRef,
     isFillMode,
-    isDrawingAllowed,
+    isDrawer,
     color,
     brushSize,
     dispatch,

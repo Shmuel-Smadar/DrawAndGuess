@@ -12,7 +12,6 @@ const initialState = {
   isDrawer: false,
   showWordSelection: false,
   wordOptions: [],
-  isDrawingAllowed: false
 }
 
 const gameSlice = createSlice({
@@ -30,7 +29,6 @@ const gameSlice = createSlice({
     },
     setIsDrawer: (state, action) => {
       state.isDrawer = action.payload
-      state.isDrawingAllowed = action.payload
     },
     setShowWordSelection: (state, action) => {
       state.showWordSelection = action.payload

@@ -21,7 +21,7 @@ export const useDrawingHandlers = ({
   roomId,
   canvasRef,
   isFillMode,
-  isDrawingAllowed,
+  isDrawer,
   color,
   brushSize,
   dispatch,
@@ -42,7 +42,7 @@ export const useDrawingHandlers = ({
 
   const startDrawing = useCallback(
     (event) => {
-      if (!isDrawingAllowed || !client) return
+      if (!isDrawer || !client) return
       const ctx = canvasRef.current.getContext('2d')
       if (isFillMode) {
         const { normX, normY } = computeCoords(event)
@@ -86,7 +86,7 @@ export const useDrawingHandlers = ({
       })
     },
     [
-      isDrawingAllowed,
+      isDrawer,
       client,
       isFillMode,
       color,
@@ -103,7 +103,7 @@ export const useDrawingHandlers = ({
 
   const draw = useCallback(
     (event) => {
-      if (!isDrawing || !isDrawingAllowed || !client || isFillMode) return
+      if (!isDrawing || !isDrawer || !client || isFillMode) return
       const { offsetX, offsetY, normX, normY } = computeCoords(event)
       const ctx = canvasRef.current.getContext('2d')
       ctx.lineTo(offsetX, offsetY)
@@ -124,7 +124,7 @@ export const useDrawingHandlers = ({
     },
     [
       isDrawing,
-      isDrawingAllowed,
+      isDrawer,
       client,
       isFillMode,
       brushSize,
@@ -138,7 +138,7 @@ export const useDrawingHandlers = ({
 
   const stopDrawing = useCallback(
     (event) => {
-      if (!isDrawingAllowed || !client) return
+      if (!isDrawer || !client) return
 
       setIsDrawing(false)
       delete lastPositions.current[userID]
@@ -150,7 +150,7 @@ export const useDrawingHandlers = ({
         body: JSON.stringify(msg)
       })
     },
-    [isDrawingAllowed, client, roomId, userID, setIsDrawing, lastPositions]
+    [isDrawer, client, roomId, userID, setIsDrawing, lastPositions]
   )
 
   return { startDrawing, draw, stopDrawing }
