@@ -12,11 +12,11 @@ public final class GameConstants {
     // Regex for nickname validation
     public static final String NICKNAME_REGEX = "^[A-Za-z0-9\\u0590-\\u05FF]+$";
 
-    // Intervals, delays, and round info
-    public static final int HINT_INTERVAL_SECONDS = 10;
+    // Intervals, delays
+    public static final int HINT_INTERVAL_SECONDS = 15;
     public static final int TIMER_DELAY_MS = 100;
     public static final int NEW_GAME_DELAY_SECONDS = 10;
-    public static final int TOTAL_ROUNDS = 2;
+    public static final int TOTAL_ROUNDS = 6;
 
     // Scoring logic
     public static final int GUESSER_BASE_POINTS = 10;
