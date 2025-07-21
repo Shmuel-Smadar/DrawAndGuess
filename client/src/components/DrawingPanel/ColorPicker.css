@@ -84,4 +84,12 @@
   .color-picker-container {
     overflow: visible;
   }
-  
+  @media screen and (min-width: 1024px) and (max-width: 1440px) {
+  .color-buttons {
+    justify-content: start; /* or center */
+    max-width: calc(7 * 50px);
+    gap: ; /* 7 buttons × (40px + ~10px margin/gap) */
+  }
+
+
+}

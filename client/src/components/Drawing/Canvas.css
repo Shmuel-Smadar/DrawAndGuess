@@ -8,9 +8,18 @@
   overscroll-behavior: none;
   touch-action: none;
   display: block;
+
 }
 @media (max-width: 480px) {
   .myCanvas {
     max-width: 95%;
   }
+}
+
+  @media (min-width: 451px) {
+    .myCanvas {
+  width: 100%;
+  max-width: 100%;
+  flex-shrink: 1;
+    }
 }

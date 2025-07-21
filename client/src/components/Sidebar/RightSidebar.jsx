@@ -10,6 +10,9 @@ import { CHAT_HEIGHT_RATIO, PARTICIPANTS_HEIGHT_RATIO } from '../../utils/consta
  * - A participants list at the bottom portion
  */
 const RightSidebar = ({client, height, onDrawerChange }) => {
+  console.log(height)
+  if(height < 600)
+    height = 560;
   const chatHeight = height * CHAT_HEIGHT_RATIO
   const participantsHeight = height * PARTICIPANTS_HEIGHT_RATIO
 

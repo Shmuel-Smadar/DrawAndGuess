@@ -1,14 +1,16 @@
 .scrollable-rooms {
-  width: 100%;
+  width: 90%;
   max-width: 700px;
-  min-height: 600px;
-  max-height: 600px;
+  max-height: 80%;
   overflow-y: auto;
   margin-bottom: 20px;
   border: 2px solid #444;
   border-radius: 5px;
   padding: 10px;
   box-sizing: border-box;
+  min-height: 60vh;
+  display: flex;
+
 }
 
 .room-list {
@@ -54,11 +56,12 @@
   justify-content: center;
   text-align: center;
   border-radius: 8px;
-  border: 2px #ccc;
   margin: 20px auto;
   padding: 40px;
   max-width: 700px;
   box-sizing: border-box;
+  height: 100%;
+  width: 100%;
 }
 
 .empty-room-image {
@@ -79,8 +82,7 @@
 
 @media screen and (max-width: 768px) {
   .scrollable-rooms {
-    min-height: 400px;
-    max-height: 400px;
+    min-height: 60vh;
     padding: 5px;
   }
   .room-name {
