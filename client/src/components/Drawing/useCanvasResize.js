@@ -25,20 +25,7 @@ export const useCanvasResize = (canvasRef) => {
 
       canvas.width = Math.min(width, maxWidth);
       canvas.height = Math.min(height, maxHeight);
-      console.log(canvas.width)
-      console.log(canvas.height)
-      const windowWidth = window.innerWidth;
-      const windowHeight = window.innerHeight;
-      if(windowWidth < 1300 && windowWidth > 1000)
-      {
-        canvas.width = 350;
-      }
-      if(windowHeight < 730 && windowHeight > 700)
-      {
-        canvas.height = 560;
-      }
-      console.log(windowWidth)
-      console.log(windowHeight)
+
       ctx.lineWidth = 2;
       ctx.lineCap = 'round';
     };
