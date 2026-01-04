@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
+import { motion } from 'framer-motion'
+import { Eye } from 'lucide-react'
 import { TOPIC_ROOM_WORD_HINT, APP_GET_CURRENT_HINT } from '../../utils/subscriptionConstants'
-import './WordHint.css'
 
 // Shows a hint of the current word to the guessers.
 const WordHint = ({ client }) => {
@@ -31,16 +32,47 @@ const WordHint = ({ client }) => {
   if (isDrawer) return null
 
   return (
-    <div className="word-hint-container">
-      <h3>Word Hint:</h3>
-      <div className="word-hint">
-        {currentHint.split('').map((char, index) => (
-          <span key={index} className="word-letter">
-            {(char === ' ' || char === '_') ? '\u00A0' : char}
-          </span>
-        ))}
+    <motion.div
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.3 }}
+      className="card p-4 max-w-sm mx-auto"
+    >
+      <div className="flex items-center gap-2 mb-3">
+        <Eye className="w-5 h-5 text-secondary-500" />
+        <h3 className="font-semibold text-gray-800 dark:text-gray-200">Word Hint</h3>
       </div>
-    </div>
+
+      <motion.div
+        className="flex flex-wrap gap-1 justify-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
+        key={currentHint} // Re-animate when hint changes
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
+      >
+        {currentHint.split('').map((char, index) => (
+          <motion.span
+            key={`${char}-${index}`}
+            className="inline-flex items-center justify-center w-8 h-8 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded font-bold text-lg text-gray-800 dark:text-gray-200"
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: index * 0.05 }}
+          >
+            {(char === ' ' || char === '_') ? '\u00A0' : char}
+          </motion.span>
+        ))}
+      </motion.div>
+
+      {currentHint && (
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="text-center text-sm text-gray-600 dark:text-gray-400 mt-2"
+        >
+          Guess the word being drawn!
+        </motion.p>
+      )}
+    </motion.div>
   )
 }
 

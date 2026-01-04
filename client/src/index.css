@@ -1,15 +1,54 @@
-html, body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-  'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-  sans-serif;
--webkit-font-smoothing: antialiased;
--moz-osx-font-smoothing: grayscale;
-  padding: 0;
-  box-sizing: border-box;
-  overflow-x: hidden;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+
+  body {
+    @apply bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100;
+    @apply transition-colors duration-300;
+  }
+
+  * {
+    @apply box-border;
+  }
 }
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+
+@layer components {
+  .btn-primary {
+    @apply bg-primary-500 hover:bg-primary-600 text-white font-medium py-2 px-4 rounded-lg;
+    @apply transition-all duration-200 transform hover:scale-105 active:scale-95;
+    @apply shadow-md hover:shadow-lg;
+  }
+
+  .btn-secondary {
+    @apply bg-secondary-500 hover:bg-secondary-600 text-white font-medium py-2 px-4 rounded-lg;
+    @apply transition-all duration-200 transform hover:scale-105 active:scale-95;
+    @apply shadow-md hover:shadow-lg;
+  }
+
+  .btn-outline {
+    @apply border border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-white;
+    @apply font-medium py-2 px-4 rounded-lg transition-all duration-200;
+  }
+
+  .card {
+    @apply bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700;
+    @apply transition-all duration-300 hover:shadow-xl;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600;
+    @apply bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100;
+    @apply focus:ring-2 focus:ring-primary-500 focus:border-transparent;
+    @apply transition-all duration-200 placeholder-gray-500 dark:placeholder-gray-400;
+  }
+
+  .game-title {
+    @apply text-4xl font-bold text-center mb-8;
+    @apply bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent;
+  }
 }

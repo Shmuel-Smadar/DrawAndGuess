@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { useDispatch } from 'react-redux'
-import './Lobby.css'
+import { motion } from 'framer-motion'
+import { Plus, Trophy, Info } from 'lucide-react'
+import ThemeToggle from '../common/ThemeToggle'
 import LeaderboardOverlay from '../Leaderboard/LeaderboardOverlay'
 import RoomTable from './RoomTable'
 import CreditsOverlay from './CreditsOverlay'
@@ -107,42 +109,111 @@ function Lobby({client, connected}) {
   }
 
   return (
-    <div className="lobby">
-      <h2>{LOBBY_TITLE}</h2>
-      <RoomTable rooms={rooms} onJoinRoom={handleJoinRoom} />
-      <form onSubmit={handleCreateRoom} className="new-room-form">
-        <input
-          type="text"
-          value={newRoomName}
-          onChange={(e) => setNewRoomName(e.target.value)}
-          placeholder={NEW_ROOM_PLACEHOLDER}
-          maxLength={MAX_ROOM_NAME_LENGTH}
-          required
-        />
-        <button type="submit">{CREATE_ROOM_BUTTON_TEXT}</button>
-        {error && <div className="error">{error}</div>}
-      </form>
-      <div className="button-group">
-        <button
-          className="leaderboard-button"
-          onClick={() => setShowLeaderboard(true)}
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4"
+    >
+      <div className="max-w-4xl mx-auto">
+        {/* Header */}
+        <div className="flex justify-between items-center mb-8">
+          <motion.h1
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.2 }}
+            className="game-title"
+          >
+            {LOBBY_TITLE}
+          </motion.h1>
+          <ThemeToggle />
+        </div>
+
+        {/* Room Table */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="mb-8"
         >
-          Leaderboard
-        </button>
-        <button
-          className="credits-button"
-          onClick={() => setShowCredits(true)}
+          <RoomTable rooms={rooms} onJoinRoom={handleJoinRoom} />
+        </motion.div>
+
+        {/* Create Room Form */}
+        <motion.form
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          onSubmit={handleCreateRoom}
+          className="card p-6 mb-8"
         >
-          Credits
-        </button>
+          <div className="flex flex-col sm:flex-row gap-4">
+            <input
+              type="text"
+              value={newRoomName}
+              onChange={(e) => setNewRoomName(e.target.value)}
+              placeholder={NEW_ROOM_PLACEHOLDER}
+              maxLength={MAX_ROOM_NAME_LENGTH}
+              className="input-field flex-1"
+              required
+            />
+            <motion.button
+              type="submit"
+              className="btn-primary flex items-center gap-2 whitespace-nowrap"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <Plus className="w-4 h-4" />
+              {CREATE_ROOM_BUTTON_TEXT}
+            </motion.button>
+          </div>
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="mt-4 p-3 bg-red-100 dark:bg-red-900/30 border border-red-300 dark:border-red-700 rounded-lg text-red-700 dark:text-red-400 text-sm"
+            >
+              {error}
+            </motion.div>
+          )}
+        </motion.form>
+
+        {/* Action Buttons */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="flex flex-col sm:flex-row gap-4 justify-center"
+        >
+          <motion.button
+            onClick={() => setShowLeaderboard(true)}
+            className="btn-outline flex items-center gap-2"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            <Trophy className="w-4 h-4" />
+            Leaderboard
+          </motion.button>
+          <motion.button
+            onClick={() => setShowCredits(true)}
+            className="btn-outline flex items-center gap-2"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            <Info className="w-4 h-4" />
+            Credits
+          </motion.button>
+        </motion.div>
       </div>
+
+      {/* Overlays */}
       {showLeaderboard && (
         <LeaderboardOverlay onClose={() => setShowLeaderboard(false)} />
       )}
       {showCredits && (
         <CreditsOverlay onClose={() => setShowCredits(false)} />
       )}
-    </div>
+    </motion.div>
   )
 }
 
