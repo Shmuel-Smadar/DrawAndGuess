@@ -1,10 +1,17 @@
+/* src/index.css */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   html {
-    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family:
+      "Inter",
+      system-ui,
+      -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      sans-serif;
   }
 
   body {
@@ -48,7 +55,10 @@
   }
 
   .game-title {
-    @apply text-4xl font-bold text-center mb-8;
+    @apply inline-block text-3xl sm:text-4xl font-bold text-center;
     @apply bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent;
+    line-height: 1.15;
+    padding-bottom: 0.12em;
+    overflow: visible;
   }
 }

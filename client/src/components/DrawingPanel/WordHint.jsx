@@ -38,11 +38,6 @@ const WordHint = ({ client }) => {
       transition={{ duration: 0.3 }}
       className="card p-4 max-w-sm mx-auto"
     >
-      <div className="flex items-center gap-2 mb-3">
-        <Eye className="w-5 h-5 text-secondary-500" />
-        <h3 className="font-semibold text-gray-800 dark:text-gray-200">Word Hint</h3>
-      </div>
-
       <motion.div
         className="flex flex-wrap gap-1 justify-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
         key={currentHint} // Re-animate when hint changes
@@ -62,16 +57,6 @@ const WordHint = ({ client }) => {
           </motion.span>
         ))}
       </motion.div>
-
-      {currentHint && (
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="text-center text-sm text-gray-600 dark:text-gray-400 mt-2"
-        >
-          Guess the word being drawn!
-        </motion.p>
-      )}
     </motion.div>
   )
 }
