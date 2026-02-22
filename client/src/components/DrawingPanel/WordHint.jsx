@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { motion } from "framer-motion";
-import { Eye } from "lucide-react";
 import {
   TOPIC_ROOM_WORD_HINT,
   APP_GET_CURRENT_HINT,
