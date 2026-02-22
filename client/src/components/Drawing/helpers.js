@@ -4,15 +4,33 @@
  */
 
 export const getEventCoordinates = (event, canvasRef) => {
+  const canvas = canvasRef.current;
+  const rect = canvas.getBoundingClientRect();
+
+  let clientX, clientY;
+
   if (event.nativeEvent instanceof MouseEvent) {
-    return { offsetX: event.nativeEvent.offsetX, offsetY: event.nativeEvent.offsetY }
+    clientX = event.nativeEvent.clientX;
+    clientY = event.nativeEvent.clientY;
   } else if (event.nativeEvent instanceof TouchEvent) {
-    const rect = canvasRef.current.getBoundingClientRect()
-    return {
-      offsetX: event.nativeEvent.touches[0].clientX - rect.left,
-      offsetY: event.nativeEvent.touches[0].clientY - rect.top,
-    };
+    const touch = event.nativeEvent.touches[0] || event.nativeEvent.changedTouches[0];
+    clientX = touch.clientX;
+    clientY = touch.clientY;
   }
+
+  // Calculate position relative to canvas bounding rectangle
+  const x = clientX - rect.left;
+  const y = clientY - rect.top;
+
+  // Scale coordinates to match canvas internal resolution
+  // This accounts for any difference between CSS size and canvas resolution
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+
+  return {
+    offsetX: x * scaleX,
+    offsetY: y * scaleY
+  };
 };
 export function floodFill(ctx, x, y, fillHex) {
   const { width, height } = ctx.canvas

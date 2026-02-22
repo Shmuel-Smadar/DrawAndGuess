@@ -1,6 +1,6 @@
-import React from 'react';
-import { WORD_SELECTION_TITLE } from '../../utils/constants'
-import './WordSelection.css';
+import React from "react";
+import { WORD_SELECTION_TITLE } from "../../utils/constants";
+import "./WordSelection.css";
 
 //Component that lets the user choose one of 3 random words to draw
 const WordSelection = ({ words, onWordSelect }) => {

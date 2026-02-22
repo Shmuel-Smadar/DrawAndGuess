@@ -1,5 +1,6 @@
 import React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
+import { ThemeProvider } from './contexts/ThemeContext'
 import useStompClient from './utils/useStompClient'
 import NicknamePrompt from './components/Prompt/NicknamePrompt'
 import Lobby from './components/Lobby/Lobby'
@@ -14,12 +15,13 @@ import { DEFAULT_SOCKET_URL } from './utils/constants'
 * sets up the STOMP connection to the server, shows the nickname prompt for the user to choose one.
 * it then displays the lobby for the user, and after the user joined a room, it starts the game
 */
-function App() {
+function AppContent() {
   const dispatch = useDispatch()
   const username = useSelector(state => state.user.username)
   const nicknameError = useSelector(state => state.user.nicknameError)
   const room = useSelector(state => state.room.room)
   const { client, connected } = useStompClient(process.env.REACT_APP_SOCKET_URL || DEFAULT_SOCKET_URL)
+
   if (!username) {
     return (
       <NicknamePrompt
@@ -47,6 +49,14 @@ function App() {
      client={client}
      connected={connected}
     />
+  )
+}
+
+function App() {
+  return (
+    <ThemeProvider>
+      <AppContent />
+    </ThemeProvider>
   )
 }
 
