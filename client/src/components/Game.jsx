@@ -56,13 +56,15 @@ function Game({ client, connected }) {
           <>
             <ThemeToggle />
             <motion.button
+              type="button"
               onClick={() => window.location.reload()}
-              className="btn-outline flex items-center gap-2"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+              className="btn-outline h-10 w-10 p-0 inline-flex items-center justify-center rounded-xl"
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              aria-label="Back to lobby"
+              title="Back to lobby"
             >
-              <Home className="w-4 h-4" />
-              Leave Game
+              <Home className="w-5 h-5" />
             </motion.button>
           </>
         }
@@ -102,7 +104,7 @@ function Game({ client, connected }) {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.4 }}
-            className="order-3 lg:order-2 w-full lg:w-auto"
+            className="order-3 lg:order-2 w-full lg:w-[400px] lg:shrink-0"
           >
             <RightSidebar
               client={client}

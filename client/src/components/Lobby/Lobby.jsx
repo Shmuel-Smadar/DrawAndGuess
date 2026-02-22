@@ -1,4 +1,3 @@
-// src/components/Lobby/Lobby.jsx
 import React, { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { motion } from "framer-motion";
@@ -110,90 +109,91 @@ function Lobby({ client, connected }) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 px-4 pt-10 pb-6"
+      className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 px-4 pt-1 pb-6"
     >
       <div className="max-w-4xl mx-auto">
         <AppHeader
           title={LOBBY_TITLE}
           right={<ThemeToggle />}
-          className="mb-10cfc"
+          className="mb-2"
         />
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="mb-10"
-        >
-          <RoomTable rooms={rooms} onJoinRoom={handleJoinRoom} />
-        </motion.div>
+        <div className="flex flex-col gap-6 sm:gap-10">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+          >
+            <RoomTable rooms={rooms} onJoinRoom={handleJoinRoom} />
+          </motion.div>
 
-        <motion.form
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          onSubmit={handleCreateRoom}
-          className="card p-6 mb-10"
-        >
-          <div className="flex flex-col sm:flex-row gap-4">
-            <input
-              type="text"
-              value={newRoomName}
-              onChange={(e) => setNewRoomName(e.target.value)}
-              placeholder={NEW_ROOM_PLACEHOLDER}
-              maxLength={MAX_ROOM_NAME_LENGTH}
-              className="input-field flex-1"
-              required
-            />
+          <motion.form
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            onSubmit={handleCreateRoom}
+            className="card p-6"
+          >
+            <div className="flex flex-col sm:flex-row gap-4">
+              <input
+                type="text"
+                value={newRoomName}
+                onChange={(e) => setNewRoomName(e.target.value)}
+                placeholder={NEW_ROOM_PLACEHOLDER}
+                maxLength={MAX_ROOM_NAME_LENGTH}
+                className="input-field flex-1"
+                required
+              />
 
+              <motion.button
+                type="submit"
+                className="btn-primary flex items-center gap-2 whitespace-nowrap"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <Plus className="w-4 h-4" />
+                {CREATE_ROOM_BUTTON_TEXT}
+              </motion.button>
+            </div>
+
+            {error && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="mt-4 p-3 bg-red-100 dark:bg-red-900/30 border border-red-300 dark:border-red-700 rounded-lg text-red-700 dark:text-red-400 text-sm"
+              >
+                {error}
+              </motion.div>
+            )}
+          </motion.form>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            className="flex flex-col sm:flex-row gap-4 justify-center"
+          >
             <motion.button
-              type="submit"
-              className="btn-primary flex items-center gap-2 whitespace-nowrap"
+              onClick={() => setShowLeaderboard(true)}
+              className="btn-outline flex items-center gap-2"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
-              <Plus className="w-4 h-4" />
-              {CREATE_ROOM_BUTTON_TEXT}
+              <Trophy className="w-4 h-4" />
+              Leaderboard
             </motion.button>
-          </div>
 
-          {error && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="mt-4 p-3 bg-red-100 dark:bg-red-900/30 border border-red-300 dark:border-red-700 rounded-lg text-red-700 dark:text-red-400 text-sm"
+            <motion.button
+              onClick={() => setShowCredits(true)}
+              className="btn-outline flex items-center gap-2"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
             >
-              {error}
-            </motion.div>
-          )}
-        </motion.form>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-          className="flex flex-col sm:flex-row gap-4 justify-center"
-        >
-          <motion.button
-            onClick={() => setShowLeaderboard(true)}
-            className="btn-outline flex items-center gap-2"
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-          >
-            <Trophy className="w-4 h-4" />
-            Leaderboard
-          </motion.button>
-
-          <motion.button
-            onClick={() => setShowCredits(true)}
-            className="btn-outline flex items-center gap-2"
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-          >
-            <Info className="w-4 h-4" />
-            Credits
-          </motion.button>
-        </motion.div>
+              <Info className="w-4 h-4" />
+              Credits
+            </motion.button>
+          </motion.div>
+        </div>
       </div>
 
       {showLeaderboard && (
