@@ -68,7 +68,7 @@ function Game({ client, connected }) {
             </motion.button>
           </>
         }
-        className="mb-2"
+        className="-mt-5 mb-1 lg:mb-2"
       />
 
       <motion.div
@@ -85,19 +85,21 @@ function Game({ client, connected }) {
               transition={{ delay: 0.4 }}
               className="drawing-area flex flex-col items-center order-1 w-full lg:w-auto lg:order-1"
             >
-              <Canvas client={client} />
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 }}
-                className="mt-1 lg:mt-4 w-full"
-              >
-                {isDrawer ? (
-                  <ColorPicker client={client} />
-                ) : (
-                  <WordHint client={client} />
-                )}
-              </motion.div>
+              <div className="w-fit max-w-full mx-auto">
+                <Canvas client={client} />
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 }}
+                  className="mt-1 lg:mt-4 w-full"
+                >
+                  {isDrawer ? (
+                    <ColorPicker client={client} />
+                  ) : (
+                    <WordHint client={client} />
+                  )}
+                </motion.div>
+              </div>
             </motion.div>
           )}
           <motion.div

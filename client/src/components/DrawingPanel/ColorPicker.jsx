@@ -39,7 +39,7 @@ function ColorPicker({client}) {
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="card p-2 lg:p-3 max-w-md lg:max-w-3xl mx-auto"
+      className="card p-2 lg:p-3 w-full max-w-full mx-auto"
     >
       {/* First row: Tools + First 6 colors */}
       <div className="flex justify-center gap-1 lg:gap-2 mb-1 lg:mb-2 flex-wrap">
