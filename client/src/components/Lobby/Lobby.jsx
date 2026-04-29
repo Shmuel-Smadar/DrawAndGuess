@@ -118,7 +118,7 @@ function Lobby({ client, connected }) {
           className="mb-2"
         />
 
-        <div className="flex flex-col gap-6 sm:gap-10">
+        <div className="flex flex-col gap-4 sm:gap-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -132,7 +132,7 @@ function Lobby({ client, connected }) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
             onSubmit={handleCreateRoom}
-            className="card p-6"
+            className="card p-4 sm:p-5"
           >
             <div className="flex flex-col sm:flex-row gap-4">
               <input
@@ -171,7 +171,7 @@ function Lobby({ client, connected }) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
-            className="flex flex-col sm:flex-row gap-4 justify-center"
+            className="flex flex-col sm:flex-row gap-3 justify-center"
           >
             <motion.button
               onClick={() => setShowLeaderboard(true)}
