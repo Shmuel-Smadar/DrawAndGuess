@@ -81,7 +81,7 @@ function Game({ client, connected }) {
         transition={{ delay: 0.3 }}
         className="max-w-7xl mx-auto"
       >
-        <div className="game-area flex flex-col lg:grid lg:grid-cols-[auto_400px] gap-3 lg:gap-x-6 lg:gap-y-4 items-start justify-center">
+        <div className="game-area flex flex-col lg:grid lg:grid-cols-[auto_400px] gap-3 lg:gap-x-6 lg:gap-y-2 items-start justify-center">
           {connected && client && (
             <motion.div
               initial={{ opacity: 0, x: -20 }}
@@ -95,7 +95,7 @@ function Game({ client, connected }) {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.5 }}
-                  className="mt-2 lg:mt-4 w-full"
+                  className={isDrawer ? "mt-2 w-full lg:hidden" : "mt-2 lg:mt-4 w-full"}
                 >
                   {isDrawer ? (
                     <div className="lg:hidden">
