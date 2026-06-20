@@ -1,36 +1,66 @@
 # DrawAndGuess
+
 ## Prerequisites
-You need at least **Java 11** or above to run the code.
-You need to use nodejs to compile the code. https://nodejs.org/en
-You need to use maven to compile the code. https://maven.apache.org/ 
-(either add it to the environment variables, or use mvn.cmd to excecute mvn commands on windows)
-## Building Client
+
+To run this project, install:
+
+- **Java 11** or newer
+- **Node.js**: https://nodejs.org/en
+- **Maven**: https://maven.apache.org/
+
+On Windows, either add Maven to your environment variables or use `mvn.cmd` to execute Maven commands.
+
+## Setup
+
+Clone the repository, or download it as a ZIP file:
+
+```bash
+git clone https://github.com/Shmuel-Smadar/DrawAndGuess.git
+cd DrawAndGuess
 ```
-git clone https://github.com/Shmuel-Smadar/DrawAndGuess.git (or use zip file)
-cd DrawAndGuess-main
+
+## Client
+
+Install the client dependencies:
+
+```bash
 cd client
 npm install
 ```
-## Building Server
+
+Run the client in development mode:
+
+```bash
+npm start
 ```
-git clone https://github.com/Shmuel-Smadar/DrawAndGuess.git (or use zip file)
-cd DrawAndGuess-main
+
+## Server
+
+Compile the server:
+
+```bash
 cd server
 mvn clean compile
 ```
 
-To get the client running in development environment, excecute inside the client folder: 
-```
-npm start
-```
-To get the server running, execute inside the server folder 
-```
-mvn spring-boot:run 
+Run the server:
+
+```bash
+mvn spring-boot:run
 ```
 
-You can configure the server to use your database by changing application.properties variables to your own db set up.
-the file needs to be in "DrawAndGuess/server/src/main/resources" (delete the '.example' extention for it to be used)
+## Database Configuration
 
-by default the app will not use db and will save data in ram.
+By default, the app does not use a database and stores data in memory.
 
-enjoy :)
+To configure a database, update the `application.properties` file with your own database settings. The file should be located at:
+
+```text
+DrawAndGuess/server/src/main/resources/application.properties
+```
+
+If you are using the example config, remove the `.example` extension so Spring can load it.
+
+## Enjoy
+
+Have fun drawing and guessing.
