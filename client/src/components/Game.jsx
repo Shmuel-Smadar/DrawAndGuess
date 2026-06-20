@@ -9,7 +9,7 @@ import WordSelection from "./Prompt/WordSelection";
 import Canvas from "./Drawing/Canvas";
 import ColorPicker from "./DrawingPanel/ColorPicker";
 import WordHint from "./DrawingPanel/WordHint";
-import { CANVAS_HEIGHT_RATIO, GAME_TITLE } from "../utils/constants";
+import { GAME_TITLE } from "../utils/constants";
 import useGameSubscriptions from "../hooks/useGameSubscriptions";
 import AppHeader from "./common/AppHeader";
 
@@ -24,6 +24,10 @@ function Game({ client, connected }) {
     width: window.innerWidth,
     height: window.innerHeight,
   });
+  const isMobileLayout = windowSize.width < 1024;
+  const sidebarHeight = isMobileLayout
+    ? Math.min(Math.max(windowSize.height * 0.62, 430), 620)
+    : Math.max(420, Math.min(windowSize.height * 0.72, windowSize.height - 250));
 
   const { handleDrawerChange, handleWordSelect } = useGameSubscriptions({
     client,
@@ -68,7 +72,7 @@ function Game({ client, connected }) {
             </motion.button>
           </>
         }
-        className="-mt-5 mb-1 lg:mb-2"
+        className="mb-2 lg:mb-3"
       />
 
       <motion.div
@@ -77,7 +81,7 @@ function Game({ client, connected }) {
         transition={{ delay: 0.3 }}
         className="max-w-7xl mx-auto"
       >
-        <div className="game-area flex flex-col lg:flex-row gap-1 lg:gap-6 items-start justify-center min-h-screen">
+        <div className="game-area flex flex-col lg:grid lg:grid-cols-[auto_400px] gap-3 lg:gap-x-6 lg:gap-y-2 items-start justify-center">
           {connected && client && (
             <motion.div
               initial={{ opacity: 0, x: -20 }}
@@ -85,16 +89,18 @@ function Game({ client, connected }) {
               transition={{ delay: 0.4 }}
               className="drawing-area flex flex-col items-center order-1 w-full lg:w-auto lg:order-1"
             >
-              <div className="w-fit max-w-full mx-auto">
+              <div className="w-fit max-w-full mx-auto flex flex-col items-center lg:items-end">
                 <Canvas client={client} />
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.5 }}
-                  className="mt-1 lg:mt-4 w-full"
+                  className={isDrawer ? "mt-2 w-full lg:hidden" : "mt-2 lg:mt-4 w-full"}
                 >
                   {isDrawer ? (
-                    <ColorPicker client={client} />
+                    <div className="lg:hidden">
+                      <ColorPicker client={client} />
+                    </div>
                   ) : (
                     <WordHint client={client} />
                   )}
@@ -110,10 +116,20 @@ function Game({ client, connected }) {
           >
             <RightSidebar
               client={client}
-              height={windowSize.height * CANVAS_HEIGHT_RATIO}
+              height={sidebarHeight}
               onDrawerChange={handleDrawerChange}
             />
           </motion.div>
+          {connected && client && isDrawer && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              className="hidden lg:block lg:col-span-2 lg:row-start-2 w-full"
+            >
+              <ColorPicker client={client} variant="desktop" />
+            </motion.div>
+          )}
         </div>
       </motion.div>
 

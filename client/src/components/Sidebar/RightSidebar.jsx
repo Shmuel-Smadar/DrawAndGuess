@@ -10,8 +10,7 @@ import { CHAT_HEIGHT_RATIO, PARTICIPANTS_HEIGHT_RATIO } from '../../utils/consta
  * - A participants list at the bottom portion
  */
 const RightSidebar = ({client, height, onDrawerChange }) => {
-  // Ensure minimum height for usability
-  const adjustedHeight = height < 600 ? 560 : height;
+  const adjustedHeight = Math.max(height, 300);
   const chatHeight = adjustedHeight * CHAT_HEIGHT_RATIO;
   const participantsHeight = adjustedHeight * PARTICIPANTS_HEIGHT_RATIO;
 
