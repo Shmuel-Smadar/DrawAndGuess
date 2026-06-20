@@ -81,7 +81,7 @@ function Game({ client, connected }) {
         transition={{ delay: 0.3 }}
         className="max-w-7xl mx-auto"
       >
-        <div className="game-area flex flex-col lg:flex-row gap-3 lg:gap-6 items-start justify-center">
+        <div className="game-area flex flex-col lg:grid lg:grid-cols-[auto_400px] gap-3 lg:gap-x-6 lg:gap-y-4 items-start justify-center">
           {connected && client && (
             <motion.div
               initial={{ opacity: 0, x: -20 }}
@@ -98,7 +98,9 @@ function Game({ client, connected }) {
                   className="mt-2 lg:mt-4 w-full"
                 >
                   {isDrawer ? (
-                    <ColorPicker client={client} />
+                    <div className="lg:hidden">
+                      <ColorPicker client={client} />
+                    </div>
                   ) : (
                     <WordHint client={client} />
                   )}
@@ -118,6 +120,16 @@ function Game({ client, connected }) {
               onDrawerChange={handleDrawerChange}
             />
           </motion.div>
+          {connected && client && isDrawer && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              className="hidden lg:block lg:col-span-2 lg:row-start-2 w-full"
+            >
+              <ColorPicker client={client} variant="desktop" />
+            </motion.div>
+          )}
         </div>
       </motion.div>
 
