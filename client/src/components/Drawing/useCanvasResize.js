@@ -42,6 +42,10 @@ export const useCanvasResize = (canvasRef) => {
 
       canvas.style.width = `${width}px`;
       canvas.style.height = `${height}px`;
+      canvas.parentElement?.style.setProperty(
+        "--drawing-surface-width",
+        `${width}px`,
+      );
       canvas.width = width;
       canvas.height = height;
 
