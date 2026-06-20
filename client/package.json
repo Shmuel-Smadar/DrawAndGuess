@@ -2,7 +2,7 @@
   "name": "client",
   "version": "0.1.0",
   "private": true,
-  "homepage": "/drawandguess",
+  "homepage": ".",
   "dependencies": {
     "@reduxjs/toolkit": "^2.5.0",
     "@stomp/stompjs": "^7.0.0",
@@ -27,9 +27,9 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "postbuild": "rm -rf ../server/src/main/resources/static/drawandguess/* && cp -r build/* ../server/src/main/resources/static/drawandguess/",
-    "obfuscate": "javascript-obfuscator build --output build --config obfuscator-config.json",
-    "build:o": "npm run build && npm run obfuscate && npm run postbuild",
+    "postbuild": "node -e \"const fs=require('fs');const dest='../server/src/main/resources/static/drawandguess';fs.rmSync(dest,{recursive:true,force:true});fs.mkdirSync(dest,{recursive:true});fs.cpSync('build',dest,{recursive:true});\"",
+    "obfuscate": "javascript-obfuscator build/static/js --output build/static/js --compact true --simplify true --string-array true --string-array-threshold 0.75 --identifier-names-generator hexadecimal",
+    "build:o": "react-scripts build && npm run obfuscate",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

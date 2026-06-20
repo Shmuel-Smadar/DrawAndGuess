@@ -39,10 +39,10 @@ function ColorPicker({client}) {
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="card p-2 lg:p-3 w-full max-w-full mx-auto"
+      className="card p-1 lg:p-3 w-full max-w-full mx-auto"
     >
       {/* First row: Tools + First 6 colors */}
-      <div className="flex justify-center gap-1 lg:gap-2 mb-1 lg:mb-2 flex-wrap">
+      <div className="flex justify-center gap-0.5 lg:gap-2 mb-1 lg:mb-2 flex-wrap">
         <motion.button
           onClick={handleClearCanvas}
           className="w-8 h-8 lg:w-10 lg:h-10 bg-red-100 hover:bg-red-200 dark:bg-red-900/30 dark:hover:bg-red-900/50 rounded-lg transition-colors duration-200 flex items-center justify-center"
@@ -127,7 +127,7 @@ function ColorPicker({client}) {
       </div>
 
       {/* Second row: Remaining 7 colors */}
-      <div className="flex justify-center gap-1 lg:gap-2">
+      <div className="flex justify-center gap-0.5 lg:gap-2 flex-wrap">
         {COLOR_OPTIONS.slice(6).map(c => (
           <motion.button
             key={c.code}

@@ -29,7 +29,7 @@ function Canvas({ client }) {
         cursor: isFillMode
           ? `url(${BucketIcon}) ${BUCKET_ICON_CURSOR_OFFSET}, auto`
           : DEFAULT_CURSOR,
-        maxHeight: '75vh', // Allow up to 75% of viewport height on mobile
+        maxHeight: '80vh',
         overscrollBehavior: 'none', // Prevent scroll during drawing
         touchAction: 'none' // Prevent default touch behaviors
       }}

@@ -9,7 +9,7 @@ import WordSelection from "./Prompt/WordSelection";
 import Canvas from "./Drawing/Canvas";
 import ColorPicker from "./DrawingPanel/ColorPicker";
 import WordHint from "./DrawingPanel/WordHint";
-import { CANVAS_HEIGHT_RATIO, GAME_TITLE } from "../utils/constants";
+import { GAME_TITLE } from "../utils/constants";
 import useGameSubscriptions from "../hooks/useGameSubscriptions";
 import AppHeader from "./common/AppHeader";
 
@@ -24,6 +24,10 @@ function Game({ client, connected }) {
     width: window.innerWidth,
     height: window.innerHeight,
   });
+  const isMobileLayout = windowSize.width < 1024;
+  const sidebarHeight = isMobileLayout
+    ? Math.min(Math.max(windowSize.height * 0.38, 300), 420)
+    : Math.max(420, Math.min(windowSize.height * 0.72, windowSize.height - 235));
 
   const { handleDrawerChange, handleWordSelect } = useGameSubscriptions({
     client,
@@ -68,7 +72,7 @@ function Game({ client, connected }) {
             </motion.button>
           </>
         }
-        className="-mt-5 mb-1 lg:mb-2"
+        className="mb-2 lg:mb-3"
       />
 
       <motion.div
@@ -77,7 +81,7 @@ function Game({ client, connected }) {
         transition={{ delay: 0.3 }}
         className="max-w-7xl mx-auto"
       >
-        <div className="game-area flex flex-col lg:flex-row gap-1 lg:gap-6 items-start justify-center min-h-screen">
+        <div className="game-area flex flex-col lg:flex-row gap-3 lg:gap-6 items-start justify-center">
           {connected && client && (
             <motion.div
               initial={{ opacity: 0, x: -20 }}
@@ -91,7 +95,7 @@ function Game({ client, connected }) {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.5 }}
-                  className="mt-1 lg:mt-4 w-full"
+                  className="mt-2 lg:mt-4 w-full"
                 >
                   {isDrawer ? (
                     <ColorPicker client={client} />
@@ -110,7 +114,7 @@ function Game({ client, connected }) {
           >
             <RightSidebar
               client={client}
-              height={windowSize.height * CANVAS_HEIGHT_RATIO}
+              height={sidebarHeight}
               onDrawerChange={handleDrawerChange}
             />
           </motion.div>

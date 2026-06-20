@@ -16,6 +16,9 @@
 !*.svg
 !pom.xml
 !package.json
+!Dockerfile
+!*.dockerignore
+!client/.env.production
 !*.example
 !.gitignore
 !manifest.json
