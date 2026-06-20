@@ -48,8 +48,9 @@ function ColorPicker({client, variant = 'mobile'}) {
     aspectRatio: '1 / 1'
   }
   const iconClass = 'w-4 h-4 lg:w-5 lg:h-5'
-  const firstRowColors = COLOR_OPTIONS.slice(0, 6)
-  const secondRowColors = COLOR_OPTIONS.slice(6)
+  const visibleColors = isDesktop ? COLOR_OPTIONS : COLOR_OPTIONS.slice(0, 8)
+  const firstRowColors = isDesktop ? visibleColors.slice(0, 6) : visibleColors.slice(0, 4)
+  const secondRowColors = isDesktop ? visibleColors.slice(6) : visibleColors.slice(4)
 
   return (
     <motion.div
@@ -59,12 +60,12 @@ function ColorPicker({client, variant = 'mobile'}) {
       style={isDesktop
         ? { "--picker-button-size": "40px" }
         : {
-          "--picker-button-size": "clamp(30px, calc((100vw - 3rem) / 9), 40px)",
+          "--picker-button-size": "clamp(34px, calc((100vw - 4.5rem) / 7), 44px)",
           width: "var(--drawing-surface-width, 100%)"
         }}
     >
       {/* First row: Tools + First 6 colors */}
-      <div className="flex justify-center gap-0.5 lg:gap-2 mb-1 lg:mb-2 flex-nowrap">
+      <div className="flex justify-center gap-1.5 lg:gap-3 mb-1.5 lg:mb-3 flex-nowrap">
         <motion.button
           onClick={handleClearCanvas}
           className="bg-red-100 hover:bg-red-200 dark:bg-red-900/30 dark:hover:bg-red-900/50 rounded-lg transition-colors duration-200 flex items-center justify-center"
@@ -151,7 +152,7 @@ function ColorPicker({client, variant = 'mobile'}) {
         ))}
       </div>
 
-      <div className="flex justify-center gap-0.5 lg:gap-2 flex-nowrap">
+      <div className="flex justify-center gap-1.5 lg:gap-3 flex-nowrap">
         {secondRowColors.map(c => (
           <motion.button
             key={c.code}
@@ -189,13 +190,13 @@ function ColorPicker({client, variant = 'mobile'}) {
                 initial={{ opacity: 0, scale: 0.92, y: 8 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.92, y: 8 }}
-                className="absolute bottom-full right-0 mb-2 grid grid-cols-4 gap-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-2 z-20"
+                className="absolute bottom-full right-0 mb-3 w-max grid grid-cols-4 gap-3 rounded-xl border border-gray-200 bg-white p-3 shadow-2xl dark:border-gray-600 dark:bg-gray-800 z-20"
               >
                 {COLOR_OPTIONS.map(c => (
                   <motion.button
                     key={c.code}
                     onClick={() => selectColor(c.code)}
-                    className={`w-8 h-8 rounded-lg border-2 transition-all duration-200 ${
+                    className={`h-10 w-10 rounded-lg border-2 transition-all duration-200 ${
                       color === c.code
                         ? 'border-primary-500 shadow-lg'
                         : 'border-gray-300 dark:border-gray-600'
