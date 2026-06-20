@@ -21,7 +21,7 @@ export const useCanvasResize = (canvasRef) => {
         : Math.min(window.innerWidth * 0.5, window.innerWidth * CANVAS_WIDTH_RATIO);
       const maxHeight = isMobileLayout
         ? window.innerHeight * 0.72
-        : Math.max(420, Math.min(window.innerHeight * 0.72, window.innerHeight - 235));
+        : Math.max(420, Math.min(window.innerHeight * 0.72, window.innerHeight - 250));
 
       let width, height;
       if (maxWidth / maxHeight > ASPECT_RATIO) {

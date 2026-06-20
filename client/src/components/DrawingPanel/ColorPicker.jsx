@@ -42,12 +42,14 @@ function ColorPicker({client, variant = 'mobile'}) {
     setShowColorList(false)
   }
 
-  const buttonClass = isDesktop
-    ? 'h-10 w-[var(--picker-button-size)] min-w-[var(--picker-button-size)]'
-    : 'w-8 h-8 lg:w-10 lg:h-10'
+  const buttonSizeStyle = {
+    width: 'var(--picker-button-size)',
+    minWidth: 'var(--picker-button-size)',
+    aspectRatio: '1 / 1'
+  }
   const iconClass = 'w-4 h-4 lg:w-5 lg:h-5'
-  const visibleColors = isDesktop ? COLOR_OPTIONS.slice(0, 6) : COLOR_OPTIONS.slice(0, 6)
-  const remainingColors = COLOR_OPTIONS.slice(6)
+  const firstRowColors = COLOR_OPTIONS.slice(0, 6)
+  const secondRowColors = COLOR_OPTIONS.slice(6)
 
   return (
     <motion.div
@@ -55,14 +57,18 @@ function ColorPicker({client, variant = 'mobile'}) {
       animate={{ opacity: 1, y: 0 }}
       className={`card p-1 lg:p-3 max-w-full mx-auto ${isDesktop ? 'relative w-full' : ''}`}
       style={isDesktop
-        ? { "--picker-button-size": "clamp(32px, calc((100% - 8.5rem) / 11), 40px)" }
-        : { width: "var(--drawing-surface-width, 100%)" }}
+        ? { "--picker-button-size": "40px" }
+        : {
+          "--picker-button-size": "clamp(30px, calc((100vw - 3rem) / 9), 40px)",
+          width: "var(--drawing-surface-width, 100%)"
+        }}
     >
       {/* First row: Tools + First 6 colors */}
-      <div className={`flex justify-center gap-0.5 lg:gap-2 ${isDesktop ? 'flex-nowrap' : 'mb-1 lg:mb-2 flex-wrap'}`}>
+      <div className="flex justify-center gap-0.5 lg:gap-2 mb-1 lg:mb-2 flex-nowrap">
         <motion.button
           onClick={handleClearCanvas}
-          className={`${buttonClass} bg-red-100 hover:bg-red-200 dark:bg-red-900/30 dark:hover:bg-red-900/50 rounded-lg transition-colors duration-200 flex items-center justify-center`}
+          className="bg-red-100 hover:bg-red-200 dark:bg-red-900/30 dark:hover:bg-red-900/50 rounded-lg transition-colors duration-200 flex items-center justify-center"
+          style={buttonSizeStyle}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           title="Clear Canvas"
@@ -72,11 +78,12 @@ function ColorPicker({client, variant = 'mobile'}) {
 
         <motion.button
           onClick={() => dispatch(setIsFillMode(!isFillMode))}
-          className={`${buttonClass} rounded-lg transition-all duration-200 flex items-center justify-center ${
+          className={`rounded-lg transition-all duration-200 flex items-center justify-center ${
             isFillMode
               ? 'bg-primary-500 text-white shadow-md'
               : 'bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600'
           }`}
+          style={buttonSizeStyle}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           title={isFillMode ? "Fill Mode: ON" : "Fill Mode: OFF"}
@@ -88,7 +95,8 @@ function ColorPicker({client, variant = 'mobile'}) {
         <div className="relative">
           <motion.button
             onClick={() => setShowSizeList(!showSizeList)}
-            className={`${buttonClass} bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-lg transition-colors duration-200 flex items-center justify-center`}
+            className="bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-lg transition-colors duration-200 flex items-center justify-center"
+            style={buttonSizeStyle}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             title="Brush Size"
@@ -126,32 +134,53 @@ function ColorPicker({client, variant = 'mobile'}) {
         </div>
 
         {/* First 6 colors on the same row */}
-        {visibleColors.map(c => (
+        {firstRowColors.map(c => (
           <motion.button
             key={c.code}
             onClick={() => selectColor(c.code)}
-            className={`${buttonClass} rounded-lg border-2 transition-all duration-200 ${
+            className={`rounded-lg border-2 transition-all duration-200 ${
               color === c.code
                 ? 'border-primary-500 shadow-lg'
                 : 'border-gray-300 dark:border-gray-600 hover:scale-105'
             }`}
-            style={{ backgroundColor: c.code }}
+            style={{ ...buttonSizeStyle, backgroundColor: c.code }}
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
             title={`Color: ${c.code}`}
           />
         ))}
+      </div>
 
+      <div className="flex justify-center gap-0.5 lg:gap-2 flex-nowrap">
+        {secondRowColors.map(c => (
+          <motion.button
+            key={c.code}
+            onClick={() => selectColor(c.code)}
+            className={`rounded-lg border-2 transition-all duration-200 ${
+              color === c.code
+                ? 'border-primary-500 shadow-lg'
+                : 'border-gray-300 dark:border-gray-600 hover:scale-105'
+            }`}
+            style={{ ...buttonSizeStyle, backgroundColor: c.code }}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+            title={`Color: ${c.code}`}
+          />
+        ))}
         <div className="relative">
           <motion.button
             onClick={() => setShowColorList(!showColorList)}
-            className={`${buttonClass} rounded-lg border-2 border-gray-300 dark:border-gray-600 flex items-center justify-center transition-all duration-200`}
-            style={{ backgroundColor: color }}
+            className="relative rounded-lg border-2 border-gray-300 dark:border-gray-600 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 flex items-center justify-center transition-all duration-200"
+            style={buttonSizeStyle}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             title="More colors"
           >
-            <Palette className={`${iconClass} text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.8)]`} />
+            <Palette className={`${iconClass} text-gray-700 dark:text-gray-200`} />
+            <span
+              className="absolute bottom-1 right-1 h-2.5 w-2.5 rounded-full border border-white dark:border-gray-900"
+              style={{ backgroundColor: color }}
+            />
           </motion.button>
 
           <AnimatePresence>
@@ -182,26 +211,6 @@ function ColorPicker({client, variant = 'mobile'}) {
           </AnimatePresence>
         </div>
       </div>
-
-      {!isDesktop && (
-        <div className="flex justify-center gap-0.5 lg:gap-2 flex-wrap mt-1">
-          {remainingColors.map(c => (
-            <motion.button
-              key={c.code}
-              onClick={() => selectColor(c.code)}
-              className={`w-8 h-8 lg:w-10 lg:h-10 rounded-lg border-2 transition-all duration-200 ${
-                color === c.code
-                  ? 'border-primary-500 shadow-lg'
-                  : 'border-gray-300 dark:border-gray-600 hover:scale-105'
-              }`}
-              style={{ backgroundColor: c.code }}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-              title={`Color: ${c.code}`}
-            />
-          ))}
-        </div>
-      )}
     </motion.div>
   )
 }

@@ -27,7 +27,7 @@ function Game({ client, connected }) {
   const isMobileLayout = windowSize.width < 1024;
   const sidebarHeight = isMobileLayout
     ? Math.min(Math.max(windowSize.height * 0.38, 300), 420)
-    : Math.max(420, Math.min(windowSize.height * 0.72, windowSize.height - 235));
+    : Math.max(420, Math.min(windowSize.height * 0.72, windowSize.height - 250));
 
   const { handleDrawerChange, handleWordSelect } = useGameSubscriptions({
     client,
