@@ -1,6 +1,6 @@
 # DrawAndGuess
 ## Prerequisites
-You need at least **Java 11** or above to run the code.  
+You need at least **Java 11** or above to run the code.
 You need to use nodejs to compile the code. https://nodejs.org/en
 You need to use maven to compile the code. https://maven.apache.org/ 
 (either add it to the environment variables, or use mvn.cmd to excecute mvn commands on windows)
