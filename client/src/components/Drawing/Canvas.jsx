@@ -24,7 +24,7 @@ function Canvas({ client }) {
   return (
     <canvas
       ref={canvasRef}
-      className="w-full max-w-full h-auto border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm bg-white dark:bg-gray-800 block mx-auto mb-1 lg:mb-0"
+      className="w-full max-w-full h-auto border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm bg-white dark:bg-gray-800 block mx-auto lg:mx-0 mb-1 lg:mb-0"
       style={{
         cursor: isFillMode
           ? `url(${BucketIcon}) ${BUCKET_ICON_CURSOR_OFFSET}, auto`

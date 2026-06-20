@@ -89,7 +89,7 @@ function Game({ client, connected }) {
               transition={{ delay: 0.4 }}
               className="drawing-area flex flex-col items-center order-1 w-full lg:w-auto lg:order-1"
             >
-              <div className="w-fit max-w-full mx-auto">
+              <div className="w-fit max-w-full mx-auto flex flex-col items-center lg:items-end">
                 <Canvas client={client} />
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
