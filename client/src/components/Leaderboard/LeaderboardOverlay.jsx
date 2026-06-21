@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Trophy } from "lucide-react";
 import {
   DEFAULT_LEADERBOARD_URL,
-  LEADERBOARD_REFRESH_INTERVAL,
   FIRST_PLACE_ICON,
   SECOND_PLACE_ICON,
   THIRD_PLACE_ICON,
@@ -67,8 +66,6 @@ function LeaderboardOverlay({ onClose }) {
     };
 
     fetchScores();
-    const interval = setInterval(fetchScores, LEADERBOARD_REFRESH_INTERVAL);
-    return () => clearInterval(interval);
   }, []);
 
   const getRankIcon = (index) => {

@@ -8,7 +8,6 @@ export const VIRTUAL_HEIGHT = 16
 export const ASPECT_RATIO = VIRTUAL_WIDTH / VIRTUAL_HEIGHT
 export const DEFAULT_SOCKET_URL = "http://localhost:8080/draw-and-guess"
 export const DEFAULT_LEADERBOARD_URL = "http://localhost:8080/leaderboard"
-export const LEADERBOARD_REFRESH_INTERVAL = 100
 export const MAX_WINNER_MESSAGE_LENGTH = 50
 export const CANVAS_WIDTH_RATIO = 0.9
 export const CANVAS_HEIGHT_RATIO = 0.8
