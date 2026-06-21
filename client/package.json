@@ -27,9 +27,10 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "postbuild": "node -e \"const fs=require('fs');const dest='../server/src/main/resources/static/drawandguess';fs.rmSync(dest,{recursive:true,force:true});fs.mkdirSync(dest,{recursive:true});fs.cpSync('build',dest,{recursive:true});\"",
+    "postbuild": "npm run copy-to-server",
+    "copy-to-server": "node -e \"const fs=require('fs');const dest='../server/src/main/resources/static/drawandguess';fs.rmSync(dest,{recursive:true,force:true});fs.mkdirSync(dest,{recursive:true});fs.cpSync('build',dest,{recursive:true});\"",
     "obfuscate": "javascript-obfuscator build/static/js --output build/static/js --compact true --simplify true --string-array true --string-array-threshold 0.75 --identifier-names-generator hexadecimal",
-    "build:o": "react-scripts build && npm run obfuscate",
+    "build:o": "react-scripts build && npm run obfuscate && npm run copy-to-server",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
