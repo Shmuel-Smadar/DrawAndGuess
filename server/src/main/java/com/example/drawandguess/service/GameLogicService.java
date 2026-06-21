@@ -8,7 +8,6 @@ import com.example.drawandguess.model.Game;
 import com.example.drawandguess.model.Participant;
 import com.example.drawandguess.model.Room;
 import com.example.drawandguess.model.WordOptions;
-import com.example.drawandguess.model.MessageType;
 import com.example.drawandguess.model.ClearCanvasMessage;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
@@ -73,11 +72,10 @@ public class GameLogicService {
         if (game.isDrawer(sessionId)) {
             game.setChosenWord(chosenWord);
             String drawerUsername = participantService.findParticipantBySessionId(sessionId).getUsername();
-            chatService.sendChatMessage(roomId, messageService.systemMessage(
-                    MessageType.ROUND_STARTED,
+            chatService.sendChatMessage(roomId, messageService.roundStarted(
                     drawerUsername,
-                    String.valueOf(game.getRoundCount() + 1),
-                    String.valueOf(TOTAL_ROUNDS)
+                    game.getRoundCount() + 1,
+                    TOTAL_ROUNDS
             ));
             hintService.startHintProgression(roomId, game, () -> handleNoGuess(roomId, game));
         }
@@ -96,7 +94,7 @@ public class GameLogicService {
             drawingService.clearCanvas(roomId, new ClearCanvasMessage(SERVER_MESSAGE_TYPE));
             game.nextRound();
             String username = participantService.findParticipantBySessionId(sessionId).getUsername();
-            chatService.sendChatMessage(roomId, messageService.systemMessage(MessageType.WORD_GUESSED, username));
+            chatService.sendChatMessage(roomId, messageService.wordGuessed(username));
             if (game.isGameOver()) {
                 endGame(roomId, game);
             } else {
@@ -109,7 +107,7 @@ public class GameLogicService {
     public void handleNoGuess(String roomId, Game game) {
         hintService.stopHintProgression(roomId);
         drawingService.clearCanvas(roomId, new ClearCanvasMessage(SERVER_MESSAGE_TYPE));
-        ChatMessage msg = messageService.systemMessage(MessageType.NO_GUESS);
+        ChatMessage msg = messageService.noGuess();
         chatService.sendChatMessage(roomId, msg);
         game.nextRound();
         if (game.isGameOver()) {
@@ -130,7 +128,7 @@ public class GameLogicService {
         if (p == null) return;
         boolean wasDrawer = game.isDrawer(sessionId);
         game.removeParticipant(sessionId);
-        chatService.sendChatMessage(roomId, messageService.systemMessage(MessageType.PARTICIPANT_LEFT, p.getUsername()));
+        chatService.sendChatMessage(roomId, messageService.participantLeft(p.getUsername()));
         if (game.isGameOver()) {
             roomService.broadcastParticipants(roomId);
             if (game.getParticipantSessionIds().isEmpty()) {
@@ -145,8 +143,7 @@ public class GameLogicService {
             String newDrawerId = game.getCurrentDrawer();
             if (newDrawerId != null) {
                 participantService.setDrawer(newDrawerId, true);
-                chatService.sendChatMessage(roomId, messageService.systemMessage(
-                        MessageType.PREVIOUS_DRAWER_QUIT,
+                chatService.sendChatMessage(roomId, messageService.previousDrawerQuit(
                         participantService.findParticipantBySessionId(newDrawerId).getUsername()
                 ));
             }
@@ -176,18 +173,16 @@ public class GameLogicService {
     private void endGame(String roomId, Game game) {
         drawingService.clearCanvas(roomId, new ClearCanvasMessage(SERVER_MESSAGE_TYPE));
         String finalScoreMessage = scoringService.buildFinalScoreMessage(game);
-        chatService.sendChatMessage(roomId, messageService.systemMessage(
-                MessageType.GAME_ENDED,
-                String.valueOf(TOTAL_ROUNDS),
+        chatService.sendChatMessage(roomId, messageService.gameEnded(
+                TOTAL_ROUNDS,
                 finalScoreMessage,
-                String.valueOf(NEW_GAME_DELAY_SECONDS)
+                NEW_GAME_DELAY_SECONDS
         ));
         String winnerSessionId = scoringService.getWinnerSessionId(game);
         if (winnerSessionId != null) {
             String winnerName = participantService.findParticipantBySessionId(winnerSessionId).getUsername();
             leaderboardService.saveScores(winnerName, game.getScore(winnerName));
-            chatService.sendChatMessage(roomId, messageService.systemMessage(
-                    MessageType.WINNER_ANNOUNCED,
+            chatService.sendChatMessage(roomId, messageService.winnerAnnounced(
                     winnerSessionId,
                     winnerName + " is the winner!"
             ));
@@ -213,10 +208,9 @@ public class GameLogicService {
                 participantService.getAllParticipants().values().forEach(
                         p -> participantService.setDrawer(p.getSessionId(), p.getSessionId().equals(firstDrawerId))
                 );
-                ChatMessage newGameMsg = messageService.systemMessage(
-                        MessageType.NEW_GAME_STARTED,
-                        String.valueOf(game.getRoundCount() + 1),
-                        String.valueOf(TOTAL_ROUNDS),
+                ChatMessage newGameMsg = messageService.newGameStarted(
+                        game.getRoundCount() + 1,
+                        TOTAL_ROUNDS,
                         participantService.findParticipantBySessionId(firstDrawerId).getUsername()
                 );
                 chatService.sendChatMessage(roomId, newGameMsg);

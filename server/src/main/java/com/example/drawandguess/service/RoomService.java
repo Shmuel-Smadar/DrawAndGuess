@@ -8,7 +8,6 @@ import com.example.drawandguess.model.Game;
 import com.example.drawandguess.model.Room;
 import com.example.drawandguess.model.Participant;
 import com.example.drawandguess.model.ChatMessage;
-import com.example.drawandguess.model.MessageType;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
@@ -96,7 +95,7 @@ public class RoomService {
     */
     private void scheduleParticipantJoinedMessage(String roomId, String nickname) {
         taskScheduler.schedule(() -> {
-            ChatMessage msg = messageService.systemMessage(MessageType.PARTICIPANT_JOINED, nickname);
+            ChatMessage msg = messageService.participantJoined(nickname);
             chatService.sendChatMessage(roomId, msg);
         }, Instant.now().plusMillis(TIMER_DELAY_MS));
     }

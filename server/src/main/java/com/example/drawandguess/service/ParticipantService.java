@@ -1,9 +1,9 @@
 package com.example.drawandguess.service;
 
-import static com.example.drawandguess.config.GameConstants.buildSystemMessage;
+import static com.example.drawandguess.config.GameConstants.NICKNAME_REGISTERED_MESSAGE;
+import static com.example.drawandguess.config.GameConstants.NICKNAME_TAKEN_MESSAGE;
 import com.example.drawandguess.model.NicknameResgistrationResponse;
 import com.example.drawandguess.model.Participant;
-import com.example.drawandguess.model.MessageType;
 import org.springframework.stereotype.Service;
 import java.util.Map;
 import java.util.Optional;
@@ -25,11 +25,11 @@ public class ParticipantService {
      */
     public NicknameResgistrationResponse registerParticipant(String sessionId, String nickname) {
         if (isNicknameTaken(nickname)) {
-            return new NicknameResgistrationResponse(false, buildSystemMessage(MessageType.NICKNAME_TAKEN));
+            return new NicknameResgistrationResponse(false, NICKNAME_TAKEN_MESSAGE);
         }
         Participant participant = new Participant(sessionId, nickname, false);
         sessionIdToParticipant.put(sessionId, participant);
-        return new NicknameResgistrationResponse(true, buildSystemMessage(MessageType.NICKNAME_REGISTERED));
+        return new NicknameResgistrationResponse(true, NICKNAME_REGISTERED_MESSAGE);
     }
 
     public void removeParticipant(String sessionId) {

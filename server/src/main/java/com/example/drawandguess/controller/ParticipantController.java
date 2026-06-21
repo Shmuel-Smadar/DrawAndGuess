@@ -13,9 +13,8 @@ import org.springframework.messaging.handler.annotation.Payload;
 
 import static com.example.drawandguess.config.APIConstants.REGISTER_NICKNAME;
 import static com.example.drawandguess.config.APIConstants.NICKNAME_TOPIC;
+import static com.example.drawandguess.config.GameConstants.INVALID_NICKNAME_MESSAGE;
 import static com.example.drawandguess.config.GameConstants.NICKNAME_REGEX;
-import static com.example.drawandguess.config.GameConstants.buildSystemMessage;
-import static com.example.drawandguess.model.MessageType.INVALID_NICKNAME;
 
 /*
  * A controller that handles user registration requests.
@@ -41,7 +40,7 @@ public class ParticipantController {
             String sessionId = headerAccessor.getSessionId();
             String nickname = request.getNickname().trim();
             if (!nickname.matches(NICKNAME_REGEX)) {
-                return new NicknameResgistrationResponse(false, buildSystemMessage(INVALID_NICKNAME));
+                return new NicknameResgistrationResponse(false, INVALID_NICKNAME_MESSAGE);
             }
             NicknameResgistrationResponse res = participantService.registerParticipant(sessionId, nickname);
             res.setSessionId(sessionId);
