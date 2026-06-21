@@ -1,11 +1,8 @@
 package com.example.drawandguess.service;
 
 import com.example.drawandguess.model.LeaderboardEntry;
-import com.example.drawandguess.model.ScoreUpdate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jms.annotation.JmsListener;
-import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
@@ -17,23 +14,17 @@ import java.util.ArrayList;
 
 @Service
 public class LeaderboardService {
-    private final JmsTemplate jmsTemplate;
     private final JdbcTemplate jdbcTemplate;
     private final boolean useDatabase;
     private final Map<String, LeaderboardEntry> inMemoryLeaderboard = new ConcurrentHashMap<>();
 
-    public LeaderboardService(JmsTemplate jmsTemplate, JdbcTemplate jdbcTemplate, @Value("${USE_DB:false}") boolean useDatabase) {
-        this.jmsTemplate = jmsTemplate;
+    public LeaderboardService(JdbcTemplate jdbcTemplate, @Value("${USE_DB:false}") boolean useDatabase) {
         this.jdbcTemplate = jdbcTemplate;
         this.useDatabase = useDatabase;
     }
 
-    // A method that updates the score (wither in memory or in db, according to the configuration
-    @JmsListener(destination = "leaderboardQueue")
-    public void receiveScoreUpdate(ScoreUpdate update) {
-        String username = update.getUsername();
-        int newScore = update.getNewScore();
-
+    // Updates the score either in memory or in the database, according to the configuration.
+    public void saveScores(String username, int newScore) {
         if (useDatabase) {
             Integer currentScore = getExistingScore(username);
             if (currentScore == null) {
@@ -44,10 +35,6 @@ public class LeaderboardService {
         } else {
             updateScoreInMemory(username, newScore);
         }
-    }
-
-    public void saveScores(String username, int score) {
-        jmsTemplate.convertAndSend("leaderboardQueue", new ScoreUpdate(username, score));
     }
 
     // A method that updates the score in memory

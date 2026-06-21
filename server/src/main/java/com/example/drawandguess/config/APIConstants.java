@@ -55,9 +55,6 @@ public final class APIConstants {
     public static final String HOME_PATH = "/home";
     public static final String MAIN_INDEX_FILE = "forward:/drawandguess/index.html";
 
-    // VM connector for EmbeddedActiveMQ
-    public static final String VM_CONNECTOR = "vm://localhost";
-
     // static helper methods for path construction
     public static String topicRoomChat(String roomId) {
         return TOPIC_ROOM_PREFIX + roomId + "/chat";
