@@ -91,7 +91,6 @@ export const useDrawingHandlers = ({
       roomId,
       userID,
       canvasRef,
-      dispatch,
       setIsDrawing,
       lastPositions,
       computeCoords,
@@ -142,6 +141,15 @@ export const useDrawingHandlers = ({
       destination: APP_ROOM_DRAW(roomId),
       body: JSON.stringify(msg),
     });
-  }, [isDrawer, client, roomId, userID, setIsDrawing, lastPositions]);
+  }, [
+    isDrawer,
+    client,
+    isFillMode,
+    dispatch,
+    roomId,
+    userID,
+    setIsDrawing,
+    lastPositions,
+  ]);
   return { startDrawing, draw, stopDrawing };
 };
